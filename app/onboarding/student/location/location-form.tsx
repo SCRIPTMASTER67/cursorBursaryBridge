@@ -15,7 +15,7 @@ import { useFormSubmit } from '@/hooks/use-form-submit';
 import { careerInterestLabels, provinceLabels, studyLocationLabels, toOptions } from '@/lib/labels';
 import { studentSteps } from '@/lib/onboarding-steps';
 import { MAX_CAREER_INTERESTS } from '@/lib/validation/student';
-import { southAfricanCities } from '@/services/catalog';
+import { southAfricanCities } from '@/lib/sa-locations';
 
 const stepLabels = studentSteps.map((s) => s.label);
 const careerOptions = (Object.keys(careerInterestLabels) as CareerInterest[]).map((value) => ({
@@ -46,7 +46,9 @@ export function LocationForm({
 
   // The city list narrows to the selected province, so the search stays short.
   const cityItems = useMemo(() => {
-    const cities = province ? (southAfricanCities[province] ?? []) : Object.values(southAfricanCities).flat();
+    const cities = province
+      ? (southAfricanCities[province as Province] ?? [])
+      : Object.values(southAfricanCities).flat();
     return cities.map((name) => ({ value: name, label: name }));
   }, [province]);
 
