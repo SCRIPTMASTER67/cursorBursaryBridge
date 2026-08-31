@@ -316,6 +316,9 @@ npm run dev            # terminal 1
 npm run test:e2e       # terminal 2
 ```
 
+The suite creates real records and deletes them again when it finishes, so a
+test run leaves the demo data untouched.
+
 ### Visual QA
 
 `npm run screenshots` captures every major screen at 1440px, 834px and 390px into

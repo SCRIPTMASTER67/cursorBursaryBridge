@@ -189,9 +189,18 @@ async function main() {
   }>('/api/catalog');
   check(
     '2. standardised catalogue loads',
-    catalogue.status === 200 && catalogue.body.institutions.length > 0,
+    catalogue.status === 200 && (catalogue.body.institutions?.length ?? 0) > 0,
     `status ${catalogue.status}`,
   );
+
+  // Everything downstream depends on the catalogue, so stop with a readable
+  // message rather than a TypeError if the server is not serving it.
+  if (!catalogue.body.institutions?.length || !catalogue.body.programmes?.length) {
+    throw new Error(
+      `The catalogue came back empty (status ${catalogue.status}). ` +
+        'Is the dev server running and the database seeded? Run `npm run dev` and `npm run db:seed`.',
+    );
+  }
 
   const up = catalogue.body.institutions.find((i) => i.name === 'University of Pretoria')!;
   const uj = catalogue.body.institutions.find((i) => i.name === 'University of Johannesburg')!;
