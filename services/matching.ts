@@ -2,6 +2,7 @@ import 'server-only';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { MatchingService } from '@/lib/matching';
+import { toMatchableProgramme, toMatchableStudent } from '@/lib/matching/adapters';
 import type { MatchResult, MatchableProgramme, MatchableStudent } from '@/lib/matching';
 
 /**
@@ -51,36 +52,7 @@ export async function loadMatchableStudent(
   });
   if (!profile) return null;
 
-  return {
-    studyPreferences: profile.studyPreferences,
-    currentProgrammeId: profile.currentProgrammeId,
-    currentInstitutionId: profile.currentInstitutionId,
-    qualificationLevel: profile.qualificationLevel,
-    academicAverage: profile.academicAverage,
-    province: profile.province,
-    householdIncome: profile.householdIncome,
-    citizenship: profile.citizenship,
-    yearOfStudy: profile.yearOfStudy,
-  };
-}
-
-export function toMatchableProgramme(programme: ProgrammeWithRelations): MatchableProgramme {
-  return {
-    id: programme.id,
-    supportedProgrammeIds: programme.supportedProgrammes.map((p) => p.programmeId),
-    supportedInstitutionIds: programme.supportedInstitutions.map((i) => i.institutionId),
-    eligibility: programme.eligibility
-      ? {
-          minAcademicAverage: programme.eligibility.minAcademicAverage,
-          qualificationLevels: programme.eligibility.qualificationLevels,
-          yearsOfStudy: programme.eligibility.yearsOfStudy,
-          citizenship: programme.eligibility.citizenship,
-          maxHouseholdIncome: programme.eligibility.maxHouseholdIncome,
-          requiresFinancialNeed: programme.eligibility.requiresFinancialNeed,
-          provinces: programme.eligibility.provinces,
-        }
-      : null,
-  };
+  return toMatchableStudent(profile);
 }
 
 export type OpportunityFilters = {
@@ -184,7 +156,7 @@ export async function getMatchForProgramme(
   return { programme, match: MatchingService.score(student, toMatchableProgramme(programme)) };
 }
 
-export { programmeInclude };
+export { programmeInclude, toMatchableProgramme };
 
 export function startOfToday(): Date {
   const d = new Date();
