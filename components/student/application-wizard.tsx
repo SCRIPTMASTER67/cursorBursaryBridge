@@ -402,6 +402,8 @@ function QuestionField({
 }) {
   const stringValue = typeof value === 'string' ? value : '';
 
+  const name = `answers.${question.id}`;
+
   return (
     <Field
       label={question.label}
@@ -411,6 +413,7 @@ function QuestionField({
     >
       {question.type === 'LONG_TEXT' && (
         <Textarea
+          name={name}
           rows={5}
           value={stringValue}
           onChange={(event) => onChange(event.target.value)}
@@ -418,10 +421,11 @@ function QuestionField({
         />
       )}
       {question.type === 'SHORT_TEXT' && (
-        <Input value={stringValue} onChange={(event) => onChange(event.target.value)} />
+        <Input name={name} value={stringValue} onChange={(event) => onChange(event.target.value)} />
       )}
       {question.type === 'NUMBER' && (
         <Input
+          name={name}
           type="number"
           inputMode="numeric"
           value={stringValue}
@@ -429,10 +433,11 @@ function QuestionField({
         />
       )}
       {question.type === 'DATE' && (
-        <Input type="date" value={stringValue} onChange={(event) => onChange(event.target.value)} />
+        <Input name={name} type="date" value={stringValue} onChange={(event) => onChange(event.target.value)} />
       )}
       {question.type === 'YES_NO' && (
         <Select
+          name={name}
           options={[
             { value: 'Yes', label: 'Yes' },
             { value: 'No', label: 'No' },
@@ -444,6 +449,7 @@ function QuestionField({
       )}
       {question.type === 'SINGLE_SELECT' && (
         <Select
+          name={name}
           options={question.options.map((option) => ({ value: option, label: option }))}
           placeholder="Select an option"
           value={stringValue}
@@ -457,6 +463,7 @@ function QuestionField({
             return (
               <Checkbox
                 key={option}
+                name={name}
                 checked={selected.includes(option)}
                 onChange={(event) =>
                   onChange(
