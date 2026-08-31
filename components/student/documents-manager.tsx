@@ -97,7 +97,7 @@ export function DocumentsManager({ documents }: { documents: DocumentRow[] }) {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start">
+    <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start [&>*]:min-w-0">
       <Card>
         <CardHeader title="Your documents" description={`${documents.length} uploaded`} />
         {documents.length === 0 ? (

@@ -51,7 +51,7 @@ export default async function OrganisationPage() {
         <StatCard value={formatNumber(stats.selected)} label="Beneficiaries" accent="success" />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
         <SummarySections sections={sections} />
 
         <Card className="p-5">

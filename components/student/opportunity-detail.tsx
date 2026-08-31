@@ -42,7 +42,7 @@ export function OpportunityDetail({
   const institutions = programme.supportedInstitutions.map((i) => i.institution.name);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+    <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
       <div className="space-y-5">
         <Card className="p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">

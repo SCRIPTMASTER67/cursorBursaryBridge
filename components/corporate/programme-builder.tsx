@@ -190,7 +190,7 @@ export function ProgrammeBuilder({
   const programmeItems = catalog.programmes.map((p) => ({ value: p.id, label: p.name }));
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:items-start">
+    <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:items-start [&>*]:min-w-0">
       <Card className="p-3 lg:sticky lg:top-6">
         <VerticalSteps steps={builderSteps} current={step} />
       </Card>

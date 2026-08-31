@@ -38,7 +38,8 @@ export default async function CorporateDashboardPage() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
-            {greeting()}, {user.firstName}!
+            {greeting()}, {user.firstName}!{' '}
+            <span aria-hidden="true">👋</span>
           </h1>
           <p className="mt-1.5 text-[13px] text-ink-400">
             Here’s what’s happening with your programmes at {organisation.name}.
@@ -57,7 +58,7 @@ export default async function CorporateDashboardPage() {
         <StatCard value={formatNumber(stats.selected)} label="Selected" accent="success" />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
         {/* ------------------------------------------------ Active programmes */}
         <Card>
           <CardHeader

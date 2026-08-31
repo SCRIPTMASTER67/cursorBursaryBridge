@@ -188,7 +188,7 @@ export function ApplicantProfile({
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
         <div className="space-y-5">
           {/* ------------------------------------------------- Identity card */}
           <Card className="p-6">
@@ -200,10 +200,13 @@ export function ApplicantProfile({
                     {student.firstName} {student.lastName}
                   </h1>
                   <p className="mt-1 text-[13px] text-ink-500">
-                    {student.qualificationLevel
-                      ? `${qualificationLabels[student.qualificationLevel]} `
-                      : ''}
                     {student.programme ?? 'Programme not set'}
+                    {student.qualificationLevel && (
+                      <>
+                        <span className="mx-1.5 text-ink-300">·</span>
+                        {qualificationLabels[student.qualificationLevel]}
+                      </>
+                    )}
                   </p>
                   <p className="text-[13px] text-ink-400">{student.institution ?? 'Institution not set'}</p>
                 </div>

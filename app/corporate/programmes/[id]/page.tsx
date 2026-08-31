@@ -86,7 +86,7 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
         <StatCard value={formatNumber(counts.selected)} label="Selected" accent="success" />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
         <div className="space-y-5">
           <Card>
             <CardHeader title="Description" />

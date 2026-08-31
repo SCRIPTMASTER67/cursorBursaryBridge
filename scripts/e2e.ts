@@ -27,6 +27,24 @@ async function questionIdsFor(fundingProgrammeId: string): Promise<string[]> {
   return questions.map((question) => question.id);
 }
 
+/**
+ * Remove everything this run created.
+ *
+ * The checks write real rows to the same database the demo accounts use, so
+ * without this a test run would leave "E2E Demo Funder" programmes sitting in
+ * the seeded student's matches. Cascades handle the dependent rows.
+ */
+async function cleanUp(runId: string) {
+  const { count: users } = await db.user.deleteMany({
+    where: { email: { startsWith: 'e2e.', contains: runId } },
+  });
+  // Organisations are not cascaded from the user, so they go separately.
+  const { count: organisations } = await db.organisation.deleteMany({
+    where: { name: { contains: runId } },
+  });
+  console.log(`\nCleaned up ${users} test user(s) and ${organisations} test organisation(s).`);
+}
+
 let passed = 0;
 let failed = 0;
 const failures: string[] = [];
@@ -506,7 +524,7 @@ async function main() {
   });
   check('4. funding profile saves', fundingProfile.status === 200, `status ${fundingProfile.status}`);
 
-  const process = await corporate.json('/api/corporate/onboarding', {
+  const currentProcess = await corporate.json('/api/corporate/onboarding', {
     method: 'POST',
     body: JSON.stringify({
       step: 'process',
@@ -516,7 +534,7 @@ async function main() {
       },
     }),
   });
-  check('5. current process saves', process.status === 200, `status ${process.status}`);
+  check('5. current process saves', currentProcess.status === 200, `status ${currentProcess.status}`);
 
   const tooManyChallenges = await corporate.json('/api/corporate/onboarding', {
     method: 'POST',
@@ -866,6 +884,8 @@ async function main() {
   );
 
   // =========================================================================
+  await cleanUp(unique);
+
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failures.length > 0) {
     console.log('\nFailures:');

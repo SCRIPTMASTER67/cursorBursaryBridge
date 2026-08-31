@@ -80,7 +80,8 @@ export default async function StudentDashboardPage() {
     <PageBody>
       <div className="mb-6">
         <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
-          {greeting()}, {user.firstName}!
+          {greeting()}, {user.firstName}!{' '}
+          <span aria-hidden="true">👋</span>
         </h1>
         <p className="mt-1.5 text-[13px] text-ink-400">Here are your funding matches today.</p>
       </div>
@@ -101,7 +102,7 @@ export default async function StudentDashboardPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start [&>*]:min-w-0">
         <div className="space-y-6">
           {/* --------------------------------------------------- Top matches */}
           <section>

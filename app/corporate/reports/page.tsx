@@ -103,7 +103,7 @@ export default async function ReportsPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid gap-6 lg:grid-cols-2 [&>*]:min-w-0">
         <Card>
           <CardHeader title="Applications by status" />
           <div className="space-y-3.5 px-6 pb-6">

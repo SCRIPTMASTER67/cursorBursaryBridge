@@ -16,7 +16,8 @@
     "db:studio": "prisma studio",
     "test:matching": "tsx scripts/test-matching.ts",
     "test:e2e": "tsx scripts/e2e.ts",
-    "test": "npm run test:matching && npm run test:e2e"
+    "test": "npm run test:matching && npm run test:e2e",
+    "screenshots": "tsx scripts/screenshots.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -38,6 +39,7 @@
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
+    "playwright": "^1.62.1",
     "postcss": "^8.4.49",
     "prisma": "^6.19.3",
     "tailwindcss": "^3.4.17",

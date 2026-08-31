@@ -68,7 +68,7 @@ export default async function StudentProfilePage() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start">
+      <div className="grid gap-6 lg:grid-cols-[1.7fr_1fr] lg:items-start [&>*]:min-w-0">
         <SummarySections sections={sections} />
 
         <div className="space-y-5 lg:sticky lg:top-6">
