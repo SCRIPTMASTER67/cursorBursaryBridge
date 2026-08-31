@@ -47,7 +47,7 @@ export function AccountSettings({
 
   async function saveDetails(event: React.FormEvent) {
     event.preventDefault();
-    const result = await details.submit('/api/student/settings', values, { method: 'PUT' });
+    const result = await details.submit('/api/account/settings', values, { method: 'PUT' });
     if (result) {
       toast.push('success', result.message ?? 'Your details have been updated.');
       router.refresh();
@@ -57,7 +57,7 @@ export function AccountSettings({
   async function changePassword(event: React.FormEvent) {
     event.preventDefault();
     await password.submit(
-      '/api/student/settings',
+      '/api/account/settings',
       { intent: 'password', ...passwords },
       {
         method: 'PUT',

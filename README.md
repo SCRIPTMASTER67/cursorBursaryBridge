@@ -333,7 +333,11 @@ app/
     organisation/      5 steps: details -> role -> funding -> process -> review
   student/             dashboard, opportunities, applications, profile, documents
   corporate/           dashboard, programmes, applications, shortlists, reports
-  api/                 every mutation — authenticated, validated, audited
+  api/
+    auth/              register, login, logout, verify
+    student/  corporate/   role-scoped mutations
+    account/           settings and notifications, shared by both roles
+    documents/         upload, delete, authorised download
 components/
   ui/                  design system: button, field, combobox, table, modal…
   student/  corporate/  onboarding/  layout/  landing/

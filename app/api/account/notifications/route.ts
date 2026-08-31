@@ -2,7 +2,12 @@ import type { NextRequest } from 'next/server';
 import { apiError, apiOk, apiUser } from '@/lib/auth/api';
 import { markAllNotificationsRead, markNotificationRead } from '@/services/notifications';
 
-/** Mark one notification, or all of them, as read. */
+/**
+ * Mark one notification, or all of them, as read.
+ *
+ * Shared by both roles — notifications belong to a user, not to a role — and
+ * scoped to the caller, so nobody can mark someone else's as read.
+ */
 export async function POST(request: NextRequest) {
   const auth = await apiUser();
   if (!auth.ok) return auth.response;

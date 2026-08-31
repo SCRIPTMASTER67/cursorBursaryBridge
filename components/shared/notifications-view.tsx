@@ -40,7 +40,7 @@ export function NotificationsView({ notifications }: { notifications: Notificati
   async function markAll() {
     setBusy(true);
     try {
-      await fetch('/api/student/notifications', {
+      await fetch('/api/account/notifications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ all: true }),
@@ -52,7 +52,7 @@ export function NotificationsView({ notifications }: { notifications: Notificati
   }
 
   async function markOne(id: string) {
-    await fetch('/api/student/notifications', {
+    await fetch('/api/account/notifications', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),

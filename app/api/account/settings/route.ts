@@ -26,7 +26,12 @@ const passwordChangeSchema = z
     path: ['confirmPassword'],
   });
 
-/** Update account details, or change the password. */
+/**
+ * Update account details, or change the password.
+ *
+ * Shared by both roles: account details belong to the User, and every write is
+ * scoped to the authenticated caller.
+ */
 export async function PUT(request: NextRequest) {
   const auth = await apiUser();
   if (!auth.ok) return auth.response;
