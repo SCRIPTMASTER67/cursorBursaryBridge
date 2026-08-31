@@ -1,0 +1,804 @@
+// ---------------------------------------------------------------------------
+// Bursary-Bridge — PostgreSQL schema
+//
+// Two visible roles: STUDENT and CORPORATE.
+// Service boundaries are kept clean so that verification, messaging and
+// reporting subsystems can be layered on later without a rewrite.
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================================================
+// Enums
+// ===========================================================================
+
+enum UserRole {
+  STUDENT
+  CORPORATE
+}
+
+enum EducationStage {
+  GRADE_10
+  GRADE_11
+  MATRIC
+  UNIVERSITY_FIRST_YEAR
+  UNIVERSITY_CURRENT
+  TVET_COLLEGE
+  POSTGRADUATE
+  PLANNING_TO_STUDY
+  OTHER
+}
+
+enum QualificationLevel {
+  CERTIFICATE
+  DIPLOMA
+  ADVANCED_DIPLOMA
+  BACHELORS
+  HONOURS
+  MASTERS
+  DOCTORAL
+  OTHER
+}
+
+enum StudyStatus {
+  CURRENTLY_ENROLLED
+  ACCEPTED_NOT_REGISTERED
+  APPLIED_AWAITING
+  PLANNING_TO_APPLY
+  RETURNING_STUDENT
+  OTHER
+}
+
+enum ResultType {
+  SCHOOL_REPORT
+  MATRIC_RESULTS
+  UNIVERSITY_TRANSCRIPT
+  ACADEMIC_RECORD
+  OTHER
+  NONE_YET
+}
+
+enum Achievement {
+  SUBJECT_DISTINCTIONS
+  ACADEMIC_AWARDS
+  DEANS_LIST
+  COMPETITIONS
+  OLYMPIADS
+  RESEARCH
+  OTHER
+  NONE
+}
+
+enum FundingNeed {
+  TUITION_FEES
+  REGISTRATION_FEES
+  ACCOMMODATION
+  BOOKS_MATERIALS
+  MEALS_LIVING
+  TRANSPORT
+  LAPTOP_DEVICE
+  OTHER_EXPENSES
+  FULL_FUNDING
+  PARTIAL_FUNDING
+  NOT_SURE
+}
+
+enum FundingSituation {
+  NO_FUNDING
+  PARTIALLY_FUNDED
+  FULLY_FUNDED
+  AWAITING_DECISION
+  DONT_KNOW
+}
+
+enum BursaryStatus {
+  YES
+  NO
+  APPLICATION_PENDING
+  PREFER_NOT_TO_SAY
+}
+
+enum IncomeBand {
+  BELOW_50K
+  R50K_100K
+  R100K_200K
+  R200K_350K
+  R350K_500K
+  ABOVE_500K
+  DONT_KNOW
+  PREFER_NOT_TO_SAY
+}
+
+enum Citizenship {
+  SA_CITIZEN
+  PERMANENT_RESIDENT
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum TriState {
+  YES
+  NO
+  PREFER_NOT_TO_SAY
+}
+
+enum StudyLocationPreference {
+  SAME_LOCATION
+  DIFFERENT_LOCATION
+  NOT_SURE
+}
+
+enum CareerInterest {
+  TECHNOLOGY
+  ENGINEERING
+  HEALTHCARE
+  FINANCE_ACCOUNTING
+  LAW
+  EDUCATION
+  AGRICULTURE
+  SCIENCE_RESEARCH
+  BUSINESS
+  GOVERNMENT
+  MINING
+  ENERGY
+  MANUFACTURING
+  CONSTRUCTION
+  MEDIA_COMMUNICATIONS
+  OTHER
+}
+
+enum Province {
+  EASTERN_CAPE
+  FREE_STATE
+  GAUTENG
+  KWAZULU_NATAL
+  LIMPOPO
+  MPUMALANGA
+  NORTHERN_CAPE
+  NORTH_WEST
+  WESTERN_CAPE
+}
+
+enum InstitutionType {
+  UNIVERSITY
+  UNIVERSITY_OF_TECHNOLOGY
+  TVET_COLLEGE
+  PRIVATE_INSTITUTION
+  OTHER
+}
+
+enum OrganisationType {
+  CORPORATION
+  FOUNDATION
+  NGO
+  NON_PROFIT
+  PROFESSIONAL_ORGANISATION
+  GOVERNMENT_ORGANISATION
+  EDUCATIONAL_ORGANISATION
+  OTHER
+}
+
+enum Industry {
+  FINANCIAL_SERVICES
+  MINING
+  TECHNOLOGY
+  TELECOMMUNICATIONS
+  ENGINEERING
+  HEALTHCARE
+  ENERGY
+  MANUFACTURING
+  RETAIL
+  CONSTRUCTION
+  PROFESSIONAL_SERVICES
+  OTHER
+}
+
+enum CorporateRole {
+  BURSARY_FUNDING_MANAGER
+  HR_MANAGER
+  TALENT_MANAGER
+  CSI_MANAGER
+  FOUNDATION_MANAGER
+  PROGRAMME_MANAGER
+  ADMINISTRATOR
+  EXECUTIVE
+  OTHER
+}
+
+enum OrganisationSize {
+  UNDER_50
+  SIZE_50_250
+  SIZE_251_1000
+  SIZE_1001_5000
+  ABOVE_5000
+}
+
+enum ProgrammeTypeOffered {
+  BURSARIES
+  SCHOLARSHIPS
+  GRANTS
+  INTERNSHIPS
+  LEARNERSHIPS
+  GRADUATE_PROGRAMMES
+  OTHER
+}
+
+enum OffersFunding {
+  YES
+  NO
+  PLANNING_TO
+  NOT_SURE
+}
+
+enum ApplicationVolume {
+  UNDER_100
+  V100_500
+  V501_1000
+  V1001_5000
+  V5001_10000
+  ABOVE_10000
+}
+
+enum ProcessMethod {
+  EMAIL
+  SPREADSHEETS
+  GOOGLE_FORMS
+  WEBSITE_FORMS
+  DEDICATED_SOFTWARE
+  MANUAL_PROCESS
+  OTHER
+}
+
+enum ProcessChallenge {
+  TOO_MANY_APPLICATIONS
+  MANUAL_SCREENING
+  DOCUMENT_VERIFICATION
+  FINDING_ELIGIBLE_APPLICANTS
+  COMMUNICATION
+  SHORTLISTING
+  REPORTING
+  FRAUD_DUPLICATES
+  TRACKING_BENEFICIARIES
+  OTHER
+}
+
+enum FundingType {
+  BURSARY
+  SCHOLARSHIP
+  GRANT
+  OTHER
+}
+
+enum FundingCoverage {
+  TUITION_FEES
+  REGISTRATION_FEES
+  ACCOMMODATION
+  MEALS_LIVING
+  BOOKS_MATERIALS
+  LAPTOP_DEVICE
+  TRANSPORT
+  OTHER
+}
+
+enum ProgrammeStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  DOCUMENTS_REQUIRED
+  SHORTLISTED
+  APPROVED
+  UNSUCCESSFUL
+}
+
+enum MatchClassification {
+  STRONG_MATCH
+  POTENTIAL_MATCH
+  MORE_INFO_NEEDED
+}
+
+enum DocumentType {
+  ID_DOCUMENT
+  ACADEMIC_RECORD
+  TRANSCRIPT
+  MATRIC_CERTIFICATE
+  PROOF_OF_RESIDENCE
+  PROOF_OF_INCOME
+  PROOF_OF_REGISTRATION
+  CV
+  MOTIVATION_LETTER
+  OTHER
+}
+
+enum ShortlistStatus {
+  SHORTLISTED
+  SELECTED
+  WITHDRAWN
+}
+
+enum NotificationType {
+  NEW_MATCH
+  APPLICATION_SUBMITTED
+  APPLICATION_STATUS_CHANGED
+  DEADLINE_APPROACHING
+  INFORMATION_REQUESTED
+  PROGRAMME_PUBLISHED
+  WELCOME
+}
+
+enum QuestionType {
+  SHORT_TEXT
+  LONG_TEXT
+  SINGLE_SELECT
+  MULTI_SELECT
+  NUMBER
+  DATE
+  YES_NO
+}
+
+// ===========================================================================
+// Identity & access
+// ===========================================================================
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  passwordHash       String
+  role               UserRole
+  firstName          String
+  lastName           String
+  mobile             String?
+  emailVerifiedAt    DateTime?
+  emailNotifications Boolean   @default(true)
+  acceptedTermsAt    DateTime?
+  lastLoginAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  sessions          Session[]
+  verificationToken VerificationToken?
+  studentProfile    StudentProfile?
+  corporateProfile  CorporateProfile?
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+  createdProgrammes FundingProgramme[] @relation("ProgrammeCreator")
+  shortlistEntries  Shortlist[]        @relation("ShortlistAddedBy")
+
+  @@index([role])
+}
+
+/// Opaque, revocable server-side sessions. Only the SHA-256 hash of the
+/// session token is stored, so a database leak cannot be replayed as a login.
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ===========================================================================
+// Reference catalogue (standardised institutions & programmes)
+// ===========================================================================
+
+model Institution {
+  id        String          @id @default(cuid())
+  name      String          @unique
+  shortName String?
+  type      InstitutionType
+  province  Province
+  city      String
+  createdAt DateTime        @default(now())
+
+  studyPreferences   StudyPreference[]
+  currentStudents    StudentProfile[]              @relation("CurrentInstitution")
+  supportedInProgram FundingProgrammeInstitution[]
+
+  @@index([province])
+  @@index([type])
+}
+
+/// A standardised course / programme of study (e.g. "Computer Science").
+model Programme {
+  id                  String               @id @default(cuid())
+  name                String               @unique
+  field               CareerInterest
+  qualificationLevels QualificationLevel[]
+  createdAt           DateTime             @default(now())
+
+  studyPreferences   StudyPreference[]
+  currentStudents    StudentProfile[]            @relation("CurrentProgramme")
+  supportedInProgram FundingProgrammeProgramme[]
+
+  @@index([field])
+}
+
+// ===========================================================================
+// Student
+// ===========================================================================
+
+model StudentProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Education journey
+  educationStage       EducationStage?
+  qualificationLevel   QualificationLevel?
+  studyStatus          StudyStatus?
+  currentInstitutionId String?
+  currentProgrammeId   String?
+  yearOfStudy          Int?
+
+  // Academic profile
+  academicAverage        Int?
+  academicAverageUnknown Boolean       @default(false)
+  resultTypes            ResultType[]
+  achievements           Achievement[]
+
+  // Funding needs
+  fundingNeeds     FundingNeed[]
+  fundingSituation FundingSituation?
+  bursaryStatus    BursaryStatus?
+
+  // Financial profile
+  householdIncome IncomeBand?
+
+  // Personal eligibility
+  dateOfBirth      DateTime?
+  citizenship      Citizenship?
+  firstGeneration  TriState?
+  disability       TriState?
+  orphanVulnerable TriState?
+
+  // Location
+  province                Province?
+  city                    String?
+  studyLocationPreference StudyLocationPreference?
+
+  // Interests
+  careerInterests CareerInterest[]
+
+  // Onboarding / progressive completion
+  onboardingStep        String    @default("education")
+  onboardingCompletedAt DateTime?
+  profileStrength       Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentInstitution Institution?      @relation("CurrentInstitution", fields: [currentInstitutionId], references: [id], onDelete: SetNull)
+  currentProgramme   Programme?        @relation("CurrentProgramme", fields: [currentProgrammeId], references: [id], onDelete: SetNull)
+  studyPreferences   StudyPreference[]
+  applications       Application[]
+  documents          Document[]
+
+  @@index([province])
+  @@index([educationStage])
+}
+
+/// A course paired with the institution the student wants to study it at.
+/// A student may hold a maximum of six (enforced in the service layer and by
+/// the unique constraint on preferenceNumber).
+model StudyPreference {
+  id               String @id @default(cuid())
+  studentProfileId String
+  preferenceNumber Int
+  programmeId      String
+  institutionId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  programme      Programme      @relation(fields: [programmeId], references: [id], onDelete: Restrict)
+  institution    Institution    @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  @@unique([studentProfileId, preferenceNumber])
+  @@unique([studentProfileId, programmeId, institutionId])
+  @@index([programmeId])
+  @@index([institutionId])
+}
+
+// ===========================================================================
+// Corporate / funder
+// ===========================================================================
+
+model Organisation {
+  id          String           @id @default(cuid())
+  name        String           @unique
+  type        OrganisationType
+  industry    Industry
+  website     String?
+  country     String           @default("South Africa")
+  description String?
+  logoUrl     String?
+
+  // Funding profile
+  offersFunding     OffersFunding?
+  programmeTypes    ProgrammeTypeOffered[]
+  applicationVolume ApplicationVolume?
+
+  // Current process
+  processMethods ProcessMethod[]
+  challenges     ProcessChallenge[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members      CorporateProfile[]
+  programmes   FundingProgramme[]
+  applications Application[]
+  shortlists   Shortlist[]
+}
+
+model CorporateProfile {
+  id               String            @id @default(cuid())
+  userId           String            @unique
+  organisationId   String
+  role             CorporateRole?
+  department       String?
+  organisationSize OrganisationSize?
+
+  onboardingStep        String    @default("organisation")
+  onboardingCompletedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@index([organisationId])
+}
+
+// ===========================================================================
+// Funding programmes & eligibility
+// ===========================================================================
+
+model FundingProgramme {
+  id               String            @id @default(cuid())
+  organisationId   String
+  createdById      String?
+  name             String
+  slug             String            @unique
+  shortDescription String
+  fullDescription  String
+  fundingType      FundingType
+  coverage         FundingCoverage[]
+  openDate         DateTime
+  closingDate      DateTime
+  status           ProgrammeStatus   @default(DRAFT)
+  intakeTarget     Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  createdBy    User?        @relation("ProgrammeCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  eligibility           EligibilityRule?
+  supportedInstitutions FundingProgrammeInstitution[]
+  supportedProgrammes   FundingProgrammeProgramme[]
+  questions             ApplicationQuestion[]
+  applications          Application[]
+  shortlists            Shortlist[]
+
+  @@index([organisationId])
+  @@index([status])
+  @@index([closingDate])
+}
+
+/// The machine-readable rule set the eligibility & matching services evaluate.
+model EligibilityRule {
+  id                 String @id @default(cuid())
+  fundingProgrammeId String @unique
+
+  minAcademicAverage    Int?
+  qualificationLevels   QualificationLevel[]
+  yearsOfStudy          Int[]
+  citizenship           Citizenship[]
+  maxHouseholdIncome    IncomeBand?
+  requiresFinancialNeed Boolean              @default(false)
+  provinces             Province[]
+  otherRequirements     String?
+  requiredDocuments     DocumentType[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+}
+
+model FundingProgrammeInstitution {
+  fundingProgrammeId String
+  institutionId      String
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  institution      Institution      @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@id([fundingProgrammeId, institutionId])
+  @@index([institutionId])
+}
+
+model FundingProgrammeProgramme {
+  fundingProgrammeId String
+  programmeId        String
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  programme        Programme        @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+
+  @@id([fundingProgrammeId, programmeId])
+  @@index([programmeId])
+}
+
+/// Programme-specific questions asked at application time only — never during
+/// student registration.
+model ApplicationQuestion {
+  id                 String       @id @default(cuid())
+  fundingProgrammeId String
+  label              String
+  helpText           String?
+  type               QuestionType
+  required           Boolean      @default(false)
+  options            String[]
+  order              Int
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+
+  @@index([fundingProgrammeId])
+}
+
+// ===========================================================================
+// Applications
+// ===========================================================================
+
+model Application {
+  id                 String            @id @default(cuid())
+  studentProfileId   String
+  fundingProgrammeId String
+  organisationId     String
+  status             ApplicationStatus @default(DRAFT)
+
+  // Snapshot of the match at submission time, so the score shown to the funder
+  // is stable even if the student later edits their profile.
+  matchScore          Int?
+  matchClassification MatchClassification?
+  matchReasons        Json?
+
+  answers            Json?
+  reviewNotes        String?
+  submittedAt        DateTime?
+  lastStatusChangeAt DateTime?
+  decisionAt         DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile   StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  fundingProgramme FundingProgramme      @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  organisation     Organisation          @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  documents        ApplicationDocument[]
+  shortlist        Shortlist?
+
+  @@unique([studentProfileId, fundingProgrammeId])
+  @@index([fundingProgrammeId, status])
+  @@index([organisationId, status])
+  @@index([studentProfileId])
+  @@index([matchScore])
+}
+
+model Document {
+  id               String       @id @default(cuid())
+  studentProfileId String
+  type             DocumentType
+  fileName         String
+  mimeType         String
+  sizeBytes        Int
+  storageKey       String       @unique
+  uploadedAt       DateTime     @default(now())
+
+  studentProfile StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  applications   ApplicationDocument[]
+
+  @@index([studentProfileId])
+}
+
+model ApplicationDocument {
+  applicationId String
+  documentId    String
+  requirement   DocumentType
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  document    Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, documentId])
+  @@index([documentId])
+}
+
+model Shortlist {
+  id                 String          @id @default(cuid())
+  organisationId     String
+  fundingProgrammeId String
+  applicationId      String          @unique
+  addedById          String?
+  status             ShortlistStatus @default(SHORTLISTED)
+  note               String?
+  addedAt            DateTime        @default(now())
+  selectedAt         DateTime?
+
+  organisation     Organisation     @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  application      Application      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  addedBy          User?            @relation("ShortlistAddedBy", fields: [addedById], references: [id], onDelete: SetNull)
+
+  @@index([organisationId, status])
+  @@index([fundingProgrammeId])
+}
+
+// ===========================================================================
+// Notifications & audit
+// ===========================================================================
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  body        String
+  link        String?
+  readAt      DateTime?
+  emailSentAt DateTime?
+  createdAt   DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
