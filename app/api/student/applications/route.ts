@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db';
 import { apiError, apiOk, apiStudent, zodFields } from '@/lib/auth/api';
 import { applicationDraftSchema, submitApplicationSchema } from '@/lib/validation/application';
-import { getMatchForProgramme } from '@/services/matching';
+import { getMatchAndEligibility } from '@/services/matching';
 import { notify } from '@/services/notifications';
 import { audit } from '@/services/audit';
 import { clientIp, rateLimit } from '@/lib/auth/rate-limit';
@@ -105,7 +105,8 @@ export async function POST(request: NextRequest) {
     return apiError('You have already submitted an application to this opportunity.', 409);
   }
 
-  const match = intent === 'submit' ? await getMatchForProgramme(auth.studentProfileId, fundingProgrammeId) : null;
+  const match =
+    intent === 'submit' ? await getMatchAndEligibility(auth.studentProfileId, fundingProgrammeId) : null;
   const now = new Date();
 
   const application = await prisma.application.upsert({
@@ -126,6 +127,7 @@ export async function POST(request: NextRequest) {
       matchScore: match?.match.matchScore ?? null,
       matchClassification: match?.match.classification ?? null,
       matchReasons: match ? (match.match.criteria as object) : undefined,
+      eligibilityOutcome: match?.eligibility.outcome ?? null,
     },
     update: {
       status: intent === 'submit' ? 'SUBMITTED' : 'DRAFT',
@@ -135,6 +137,7 @@ export async function POST(request: NextRequest) {
       matchScore: match?.match.matchScore ?? undefined,
       matchClassification: match?.match.classification ?? undefined,
       matchReasons: match ? (match.match.criteria as object) : undefined,
+      eligibilityOutcome: match?.eligibility.outcome ?? undefined,
     },
     select: { id: true },
   });

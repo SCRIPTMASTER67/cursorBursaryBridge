@@ -309,6 +309,14 @@ enum MatchClassification {
   MORE_INFO_NEEDED
 }
 
+/// The funder-facing verdict, recorded when an application is submitted.
+/// Missing information is PENDING_VERIFICATION, never an automatic rejection.
+enum EligibilityOutcome {
+  ELIGIBLE
+  NOT_ELIGIBLE
+  PENDING_VERIFICATION
+}
+
 enum DocumentType {
   ID_DOCUMENT
   ACADEMIC_RECORD
@@ -694,6 +702,7 @@ model Application {
   matchScore          Int?
   matchClassification MatchClassification?
   matchReasons        Json?
+  eligibilityOutcome  EligibilityOutcome?
 
   answers            Json?
   reviewNotes        String?
@@ -715,6 +724,7 @@ model Application {
   @@index([organisationId, status])
   @@index([studentProfileId])
   @@index([matchScore])
+  @@index([organisationId, eligibilityOutcome])
 }
 
 model Document {

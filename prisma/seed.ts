@@ -637,6 +637,7 @@ async function seedStudents({
       yearOfStudy: 1 + Math.floor(random() * 4),
       currentInstitution: preferenceSet.institutions[0],
       currentProgramme: preferenceSet.courses[0],
+      incompleteProfile: random() < 0.18,
     });
     students.push(student);
   }
@@ -656,6 +657,12 @@ async function seedStudents({
     yearOfStudy: number;
     currentInstitution: string;
     currentProgramme: string;
+    /**
+     * Leaves the financial and academic fields blank, so the eligibility
+     * service reports PENDING_VERIFICATION rather than a pass or a fail —
+     * the behaviour that stops an incomplete profile being auto-rejected.
+     */
+    incompleteProfile?: boolean;
   }) {
     const preferenceCount = Math.min(input.preferenceSet.courses.length, input.preferenceSet.institutions.length);
     const interests = [...new Set(input.preferenceSet.courses.map((name) => prog(name).field))].slice(0, 5);
@@ -678,15 +685,19 @@ async function seedStudents({
             currentInstitutionId: inst(input.currentInstitution).id,
             currentProgrammeId: prog(input.currentProgramme).id,
             yearOfStudy: input.yearOfStudy,
-            academicAverage: input.average,
-            resultTypes: ['MATRIC_RESULTS', 'UNIVERSITY_TRANSCRIPT'],
-            achievements: input.average >= 75 ? ['SUBJECT_DISTINCTIONS', 'ACADEMIC_AWARDS'] : [],
+            academicAverage: input.incompleteProfile ? null : input.average,
+            academicAverageUnknown: input.incompleteProfile ?? false,
+            resultTypes: input.incompleteProfile ? [] : ['MATRIC_RESULTS', 'UNIVERSITY_TRANSCRIPT'],
+            achievements:
+              !input.incompleteProfile && input.average >= 75
+                ? ['SUBJECT_DISTINCTIONS', 'ACADEMIC_AWARDS']
+                : [],
             fundingNeeds: ['TUITION_FEES', 'ACCOMMODATION', 'BOOKS_MATERIALS', 'MEALS_LIVING', 'FULL_FUNDING'],
             fundingSituation: 'NO_FUNDING',
             bursaryStatus: 'NO',
-            householdIncome: input.income,
+            householdIncome: input.incompleteProfile ? null : input.income,
             dateOfBirth: new Date(2004, Math.floor(random() * 12), 1 + Math.floor(random() * 27)),
-            citizenship: 'SA_CITIZEN',
+            citizenship: input.incompleteProfile ? null : 'SA_CITIZEN',
             firstGeneration: random() > 0.5 ? 'YES' : 'NO',
             disability: 'NO',
             orphanVulnerable: 'NO',
@@ -696,7 +707,7 @@ async function seedStudents({
             careerInterests: interests,
             onboardingStep: 'review',
             onboardingCompletedAt: new Date(),
-            profileStrength: 85,
+            profileStrength: input.incompleteProfile ? 55 : 85,
             studyPreferences: {
               create: Array.from({ length: preferenceCount }, (_, i) => ({
                 preferenceNumber: i + 1,
@@ -730,6 +741,7 @@ async function seedStudents({
   // Score each application with the real engine so the funder dashboards show
   // meaningful match percentages rather than invented numbers.
   const { MatchingService } = await import('../lib/matching/engine');
+  const { EligibilityService } = await import('../lib/matching/eligibility');
   const { toMatchableProgramme } = await import('../lib/matching/adapters');
 
   const programmeRecords = await prisma.fundingProgramme.findMany({
@@ -776,10 +788,16 @@ async function seedStudents({
       yearOfStudy: profile.yearOfStudy,
     };
 
-    // Apply to the programmes this student actually matches well.
+    // Students apply to their better matches, but not only to perfect ones —
+    // real funders receive plenty of applications that fail their criteria, and
+    // the dashboards should reflect that.
     const ranked = programmeRecords
-      .map((programme) => ({ programme, match: MatchingService.score(matchable, toMatchableProgramme(programme)) }))
-      .filter((entry) => entry.match.matchScore >= 55)
+      .map((programme) => ({
+        programme,
+        match: MatchingService.score(matchable, toMatchableProgramme(programme)),
+        eligibility: EligibilityService.evaluate(matchable, toMatchableProgramme(programme)),
+      }))
+      .filter((entry) => entry.match.matchScore >= 40)
       .sort((a, b) => b.match.matchScore - a.match.matchScore)
       .slice(0, 1 + Math.floor(random() * 3));
 
@@ -796,6 +814,7 @@ async function seedStudents({
           matchScore: entry.match.matchScore,
           matchClassification: entry.match.classification,
           matchReasons: entry.match.criteria as unknown as Prisma.InputJsonValue,
+          eligibilityOutcome: entry.eligibility.outcome,
           answers: {},
           submittedAt,
           lastStatusChangeAt: submittedAt,
@@ -820,7 +839,16 @@ async function seedStudents({
     }
   }
 
+  const outcomeSpread = await prisma.application.groupBy({
+    by: ['eligibilityOutcome'],
+    where: { status: { not: 'DRAFT' } },
+    _count: { _all: true },
+  });
+  const spread = outcomeSpread
+    .map((row) => `${row.eligibilityOutcome ?? 'UNSCORED'}=${row._count._all}`)
+    .join(', ');
   console.log(`  applications: ${applicationCount} (${shortlistCount} shortlisted or selected)`);
+  console.log(`  eligibility spread: ${spread}`);
 
   // A draft application for the demo student, so "My Applications" shows one.
   const demoDraftProgramme = createdProgrammes.find((p) => p.slug === 'amandla-mining-bursary-2026');

@@ -1,7 +1,8 @@
 import 'server-only';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db';
-import { MatchingService } from '@/lib/matching';
+import { EligibilityService, MatchingService } from '@/lib/matching';
+import type { EligibilityResult } from '@/lib/matching';
 import { toMatchableProgramme, toMatchableStudent } from '@/lib/matching/adapters';
 import type { MatchResult, MatchableProgramme, MatchableStudent } from '@/lib/matching';
 
@@ -138,6 +139,28 @@ export async function getRankedOpportunities(
     return scored.filter((item) => item.match.matchScore >= filters.minMatchScore!);
   }
   return scored;
+}
+
+/**
+ * Score a single programme AND evaluate hard eligibility.
+ *
+ * Used at submission time so the funder-facing verdict is recorded alongside
+ * the match snapshot, rather than inferred from the score afterwards.
+ */
+export async function getMatchAndEligibility(
+  studentProfileId: string,
+  fundingProgrammeId: string,
+): Promise<(OpportunityMatch & { eligibility: EligibilityResult }) | null> {
+  const result = await getMatchForProgramme(studentProfileId, fundingProgrammeId);
+  if (!result) return null;
+
+  const student = await loadMatchableStudent(studentProfileId);
+  if (!student) return null;
+
+  return {
+    ...result,
+    eligibility: EligibilityService.evaluate(student, toMatchableProgramme(result.programme)),
+  };
 }
 
 /** Score a single programme for a student — used by the detail and apply pages. */
