@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import subprocess
+import zipfile
 from xml.sax.saxutils import escape
 
 from PIL import Image
@@ -803,7 +804,19 @@ def package(document, out):
 
     if os.path.exists(out):
         os.remove(out)
-    subprocess.run(["zip", "-Xrq", f"../{out}", "."], cwd=BUILD, check=True)
+    # Word writes [Content_Types].xml as the first entry and stores no
+    # directory entries. Some readers rely on both, so write the archive the
+    # same way rather than letting a recursive zip decide the order.
+    names = []
+    for root, _, files in os.walk(BUILD):
+        for f in files:
+            rel = os.path.relpath(os.path.join(root, f), BUILD)
+            names.append(rel.replace(os.sep, "/"))
+    names.sort(key=lambda n: (n != "[Content_Types].xml", n))
+
+    with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
+        for name in names:
+            z.write(os.path.join(BUILD, name), name)
 
 
 def render(docx, pdf):
