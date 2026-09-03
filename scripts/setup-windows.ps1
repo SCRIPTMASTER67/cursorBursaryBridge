@@ -49,7 +49,16 @@ foreach ($i in 1..15) {
     Start-Sleep -Seconds 3
 }
 if (-not $connected) {
-    throw 'Could not connect as "postgres" - wrong password, or the service has not started.'
+    Write-Host ''
+    Write-Host 'Password authentication failed for user "postgres".' -ForegroundColor Red
+    Write-Host ''
+    Write-Host 'PostgreSQL has no password recovery, but the password can be reset.'
+    Write-Host 'Open PowerShell AS ADMINISTRATOR, run this, then start over:'
+    Write-Host ''
+    Write-Host '  irm https://raw.githubusercontent.com/SCRIPTMASTER67/cursorBursaryBridge/claude/bursary-bridge-prototype-vhhs5t/scripts/fix-postgres-password.ps1 | iex' -ForegroundColor Yellow
+    Write-Host ''
+    Write-Host 'That sets the postgres password to: postgres'
+    throw 'Cannot continue without the postgres password.'
 }
 
 Step 'Creating the role and database'
