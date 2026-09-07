@@ -1,0 +1,66 @@
+[
+  [
+    "ui_landing.png",
+    "Landing page"
+  ],
+  [
+    "ui_login.png",
+    "Log in page"
+  ],
+  [
+    "ui_register-chooser.png",
+    "Registration, choice of account type"
+  ],
+  [
+    "ui_student-dashboard.png",
+    "Student dashboard"
+  ],
+  [
+    "ui_student-opportunities.png",
+    "Opportunities, ranked by match"
+  ],
+  [
+    "ui_student-opportunity-detail.png",
+    "Opportunity detail, with the match explained"
+  ],
+  [
+    "ui_student-apply.png",
+    "Application form"
+  ],
+  [
+    "ui_student-applications.png",
+    "Student application tracker"
+  ],
+  [
+    "ui_student-documents.png",
+    "Student document library"
+  ],
+  [
+    "ui_corporate-dashboard.png",
+    "Corporate dashboard"
+  ],
+  [
+    "ui_corporate-programme-new.png",
+    "Funding programme editor"
+  ],
+  [
+    "ui_corporate-applications.png",
+    "Applications received"
+  ],
+  [
+    "ui_corporate-applicant-profile.png",
+    "Applicant review, with the eligibility verdict"
+  ],
+  [
+    "ui_corporate-shortlists.png",
+    "Shortlists"
+  ],
+  [
+    "ui_corporate-reports.png",
+    "Corporate reports"
+  ],
+  [
+    "ui_mobile_dashboard.png",
+    "Student dashboard at a mobile width of 390 pixels"
+  ]
+]
