@@ -7,6 +7,7 @@
  *
  * Usage: npm run dev, then `npm run test:e2e`.
  */
+import '../lib/load-env';
 import { PrismaClient } from '@prisma/client';
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';

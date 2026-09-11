@@ -9,6 +9,7 @@
  * Every funder and funding programme here is FICTIONAL. Real organisations are
  * never represented as offering funding on this platform.
  */
+import '../lib/load-env';
 import {
   PrismaClient,
   type ApplicationStatus,

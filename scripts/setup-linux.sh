@@ -49,18 +49,19 @@ else
     die 'No supported package manager found (apt-get, dnf or pacman).'
 fi
 
-# Next.js 15 needs Node 18.18+; several distributions still ship something
-# older, so install Node 20 from NodeSource when the system node is too old.
+# Next.js 15 needs Node 18.18+, but Playwright requires Node 20 or newer, so 20
+# is the real floor for this project. Ubuntu 24.04 ships 18, which clears the
+# Next.js bar and then warns on every install, so check for 20.
 step 'Checking Node.js'
 need_node=1
 if command -v node >/dev/null; then
     major=$(node -v | sed 's/^v\([0-9]*\).*/\1/')
-    [ "$major" -ge 18 ] && need_node=0
+    [ "$major" -ge 20 ] && need_node=0
 fi
 if [ "$need_node" -eq 1 ]; then
-    echo 'Installing Node.js 20 from NodeSource'
+    echo "Installing Node.js 20 from NodeSource (found ${major:-none}, need 20+)"
     curl -fsSL https://deb.nodesource.com/setup_20.x | $SUDO -E bash - >/dev/null 2>&1 || \
-        die 'NodeSource setup failed. Install Node 18+ manually and re-run.'
+        die 'NodeSource setup failed. Install Node 20+ manually and re-run.'
     $SUDO apt-get install -y -qq nodejs
 else
     echo "Using $(node -v)"
