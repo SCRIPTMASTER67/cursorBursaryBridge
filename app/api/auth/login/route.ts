@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db';
 import { apiError, apiOk, zodFields } from '@/lib/auth/api';
 import { verifyPassword } from '@/lib/auth/password';
+import type { UserRole } from '@prisma/client';
 import { createSession, homePathForRole } from '@/lib/auth/session';
 import { clientIp, rateLimit } from '@/lib/auth/rate-limit';
 import { loginSchema } from '@/lib/validation/auth';
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { email: parsed.data.email },
-    select: { id: true, passwordHash: true, role: true },
+    select: { id: true, passwordHash: true, role: true, status: true },
   });
 
   // Identical response for an unknown email and a wrong password, so the
@@ -47,6 +48,24 @@ export async function POST(request: NextRequest) {
     return invalid();
   }
 
+  // Checked after the password, not before: a suspended account must not be
+  // distinguishable from any other until the caller has proved they own it,
+  // or this endpoint would tell an attacker which addresses are registered.
+  // No session is created, so a suspended account cannot hold one at all.
+  if (user.status === 'SUSPENDED') {
+    await audit({
+      userId: user.id,
+      action: 'auth.login_suspended',
+      entityType: 'User',
+      entityId: user.id,
+      ipAddress: ip,
+    });
+    return apiError(
+      'This account has been suspended. Contact support if you believe this is a mistake.',
+      403,
+    );
+  }
+
   await createSession(user.id, { userAgent: request.headers.get('user-agent'), ipAddress: ip });
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
   await audit({ userId: user.id, action: 'auth.login', entityType: 'User', entityId: user.id, ipAddress: ip });
@@ -58,7 +77,8 @@ export async function POST(request: NextRequest) {
  * Send the user where they can actually act: mid-onboarding users resume where
  * they stopped, everyone else lands on their dashboard.
  */
-async function landingPath(userId: string, role: 'STUDENT' | 'CORPORATE'): Promise<string> {
+async function landingPath(userId: string, role: UserRole): Promise<string> {
+  if (role === 'ADMIN') return homePathForRole(role);
   if (role === 'STUDENT') {
     const profile = await prisma.studentProfile.findUnique({
       where: { userId },

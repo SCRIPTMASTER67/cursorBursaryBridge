@@ -73,7 +73,16 @@ export async function destroyAllSessions(userId: string): Promise<void> {
 
 export type SessionUser = Pick<
   User,
-  'id' | 'email' | 'role' | 'firstName' | 'lastName' | 'mobile' | 'emailVerifiedAt' | 'emailNotifications'
+  | 'id'
+  | 'email'
+  | 'role'
+  | 'status'
+  | 'mustResetPassword'
+  | 'firstName'
+  | 'lastName'
+  | 'mobile'
+  | 'emailVerifiedAt'
+  | 'emailNotifications'
 >;
 
 /**
@@ -94,6 +103,8 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
           id: true,
           email: true,
           role: true,
+          status: true,
+          mustResetPassword: true,
           firstName: true,
           lastName: true,
           mobile: true,
@@ -110,6 +121,15 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
     return null;
   }
 
+  // A suspended account is treated exactly like a signed-out one, and every
+  // session it holds is destroyed rather than only the one presented. Doing it
+  // here means suspension takes effect across every page, route handler and
+  // role at once, instead of relying on each caller to remember to check.
+  if (session.user.status === 'SUSPENDED') {
+    await prisma.session.deleteMany({ where: { userId: session.user.id } });
+    return null;
+  }
+
   return session.user;
 });
 
@@ -123,13 +143,27 @@ export async function requireUser(): Promise<SessionUser> {
 export async function requireRole(role: UserRole): Promise<SessionUser> {
   const user = await requireUser();
   if (user.role !== role) {
-    redirect(user.role === 'STUDENT' ? '/student/dashboard' : '/corporate/dashboard');
+    redirect(homePathForRole(user.role));
   }
   return user;
 }
 
+/**
+ * Where a role belongs when it has no more specific destination.
+ *
+ * Written as an exhaustive switch rather than a ternary so that adding a
+ * fourth role is a compile error here instead of a silent redirect to the
+ * wrong portal.
+ */
 export function homePathForRole(role: UserRole): string {
-  return role === 'STUDENT' ? '/student/dashboard' : '/corporate/dashboard';
+  switch (role) {
+    case 'STUDENT':
+      return '/student/dashboard';
+    case 'CORPORATE':
+      return '/corporate/dashboard';
+    case 'ADMIN':
+      return '/admin/dashboard';
+  }
 }
 
 export { hashToken };

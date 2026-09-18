@@ -47,3 +47,16 @@ export async function requireCorporate(): Promise<{
   if (!profile.onboardingCompletedAt) redirect(`/onboarding/organisation/${profile.onboardingStep}`);
   return { user, corporateProfileId: profile.id, organisationId: profile.organisationId };
 }
+
+/**
+ * Administrator scope.
+ *
+ * Administrators have no profile table and no onboarding, so unlike the other
+ * two guards there is no second lookup and nothing to redirect to mid-flow.
+ * The returned id is the actor recorded against every admin action in the
+ * audit log.
+ */
+export async function requireAdmin(): Promise<{ user: SessionUser; adminUserId: string }> {
+  const user = await requireRole('ADMIN');
+  return { user, adminUserId: user.id };
+}

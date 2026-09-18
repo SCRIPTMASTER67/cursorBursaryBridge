@@ -1,4 +1,5 @@
 import 'server-only';
+import type { ProgrammeStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
 
 export type CorporateStats = {
@@ -35,7 +36,7 @@ export async function getCorporateStats(organisationId: string): Promise<Corpora
 export type ProgrammeSummaryRow = {
   id: string;
   name: string;
-  status: 'DRAFT' | 'PUBLISHED' | 'CLOSED';
+  status: ProgrammeStatus;
   closingDate: Date;
   applicationCount: number;
   eligibleCount: number;

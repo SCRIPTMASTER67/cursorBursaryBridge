@@ -22,6 +22,14 @@ datasource db {
 enum UserRole {
   STUDENT
   CORPORATE
+  ADMIN
+}
+
+/// Account state. Suspension is reversible and is the only account-level
+/// control an administrator has; accounts are never deleted from the portal.
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
 }
 
 enum EducationStage {
@@ -291,6 +299,9 @@ enum ProgrammeStatus {
   DRAFT
   PUBLISHED
   CLOSED
+  /// Withdrawn by an administrator for a policy breach. Only an administrator
+  /// can clear it, so the owning organisation cannot simply publish again.
+  SUSPENDED
 }
 
 enum ApplicationStatus {
@@ -361,19 +372,21 @@ enum QuestionType {
 // ===========================================================================
 
 model User {
-  id                 String    @id @default(cuid())
-  email              String    @unique
+  id                 String        @id @default(cuid())
+  email              String        @unique
   passwordHash       String
   role               UserRole
+  status             AccountStatus @default(ACTIVE)
+  mustResetPassword  Boolean       @default(false)
   firstName          String
   lastName           String
   mobile             String?
   emailVerifiedAt    DateTime?
-  emailNotifications Boolean   @default(true)
+  emailNotifications Boolean       @default(true)
   acceptedTermsAt    DateTime?
   lastLoginAt        DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   sessions          Session[]
   verificationToken VerificationToken?
@@ -385,6 +398,7 @@ model User {
   shortlistEntries  Shortlist[]        @relation("ShortlistAddedBy")
 
   @@index([role])
+  @@index([status])
 }
 
 /// Opaque, revocable server-side sessions. Only the SHA-256 hash of the
@@ -544,6 +558,7 @@ model StudyPreference {
 model Organisation {
   id          String           @id @default(cuid())
   name        String           @unique
+  status      AccountStatus    @default(ACTIVE)
   type        OrganisationType
   industry    Industry
   website     String?
@@ -811,4 +826,5 @@ model AuditLog {
   @@index([userId])
   @@index([entityType, entityId])
   @@index([createdAt])
+  @@index([action, createdAt])
 }

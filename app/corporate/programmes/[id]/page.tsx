@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PageBody, PageHeader } from '@/components/layout/app-shell';
 import { ProgrammeActions } from '@/components/corporate/programme-actions';
+import { Alert } from '@/components/ui/alert';
 import { Badge, ProgrammeStatusBadge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
 import { Card, CardHeader, StatCard } from '@/components/ui/card';
@@ -59,17 +60,28 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
         }
         actions={
           <>
-            <ButtonLink
-              href={`/corporate/programmes/${programme.id}/edit`}
-              variant="outline"
-              leadingIcon={<Edit className="h-4 w-4" />}
-            >
-              Edit
-            </ButtonLink>
+            {/* A suspended programme cannot be edited; the route refuses it, so
+                the control is hidden rather than left to fail. */}
+            {programme.status === 'SUSPENDED' ? null : (
+              <ButtonLink
+                href={`/corporate/programmes/${programme.id}/edit`}
+                variant="outline"
+                leadingIcon={<Edit className="h-4 w-4" />}
+              >
+                Edit
+              </ButtonLink>
+            )}
             <ProgrammeActions programmeId={programme.id} status={programme.status} />
           </>
         }
       />
+
+      {programme.status === 'SUSPENDED' ? (
+        <Alert tone="danger" title="This programme has been suspended by Bursary-Bridge" className="mb-6">
+          It is not visible to students and cannot be edited or published while it is suspended.
+          Contact support if you believe this is a mistake.
+        </Alert>
+      ) : null}
 
       <div className="mb-6 flex flex-wrap items-center gap-2">
         <ProgrammeStatusBadge status={programme.status} />

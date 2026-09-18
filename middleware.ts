@@ -11,7 +11,7 @@ const SESSION_COOKIE = 'bb_session';
  * database round trip while still bouncing anonymous traffic away from the
  * application shell.
  */
-const PROTECTED_PREFIXES = ['/student', '/corporate', '/onboarding'];
+const PROTECTED_PREFIXES = ['/student', '/corporate', '/onboarding', '/admin'];
 const AUTH_ONLY_PATHS = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {

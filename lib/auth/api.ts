@@ -59,6 +59,15 @@ export async function apiCorporate(): Promise<
   };
 }
 
+/** Route-handler equivalent of requireAdmin. */
+export async function apiAdmin(): Promise<
+  { ok: true; user: SessionUser; adminUserId: string } | { ok: false; response: NextResponse }
+> {
+  const auth = await apiUser('ADMIN');
+  if (!auth.ok) return auth;
+  return { ok: true, user: auth.user, adminUserId: auth.user.id };
+}
+
 /** Turn a ZodError into the `fields` map our forms render inline. */
 export function zodFields(error: { issues: { path: (string | number)[]; message: string }[] }) {
   const fields: Record<string, string> = {};

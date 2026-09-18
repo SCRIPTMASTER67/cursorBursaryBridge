@@ -39,6 +39,9 @@ export function ProgrammeActions({
         PUBLISHED: 'Programme published. Matching students can see it now.',
         DRAFT: 'Programme unpublished. It is no longer visible to students.',
         CLOSED: 'Programme closed. It no longer accepts applications.',
+        // Only an administrator can set or clear this, so the corporate portal
+        // never sends it; the entry exists to keep the map exhaustive.
+        SUSPENDED: 'Programme suspended.',
       };
       toast.push('success', messages[next]);
       setConfirming(null);

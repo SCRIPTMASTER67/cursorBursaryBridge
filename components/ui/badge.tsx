@@ -69,6 +69,7 @@ const programmeTones: Record<ProgrammeStatus, BadgeTone> = {
   DRAFT: 'neutral',
   PUBLISHED: 'success',
   CLOSED: 'danger',
+  SUSPENDED: 'danger',
 };
 
 export function ProgrammeStatusBadge({ status, className }: { status: ProgrammeStatus; className?: string }) {

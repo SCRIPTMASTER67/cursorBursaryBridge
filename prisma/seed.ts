@@ -520,9 +520,25 @@ async function main() {
 
   await seedStudents({ inst, prog, passwordHash, createdProgrammes, organisations });
 
+  // Administrators are seeded rather than registered: there is deliberately no
+  // public sign-up route for the ADMIN role, so platform staff are created by
+  // whoever provisions the deployment.
+  await prisma.user.create({
+    data: {
+      email: 'admin@demo.bursarybridge.local',
+      passwordHash,
+      role: 'ADMIN',
+      firstName: 'Platform',
+      lastName: 'Administrator',
+      emailVerifiedAt: new Date(),
+      acceptedTermsAt: new Date(),
+    },
+  });
+
   console.log('\nDemo accounts (password: %s)', DEMO_PASSWORD);
   console.log('  Student   student@demo.bursarybridge.local');
   console.log('  Corporate corporate@demo.bursarybridge.local');
+  console.log('  Admin     admin@demo.bursarybridge.local');
   console.log('\nSeeding complete.');
 }
 

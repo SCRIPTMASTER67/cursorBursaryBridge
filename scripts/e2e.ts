@@ -8,6 +8,7 @@
  * Usage: npm run dev, then `npm run test:e2e`.
  */
 import '../lib/load-env';
+import { hash } from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
@@ -892,6 +893,197 @@ async function main() {
     unknownEmail.status === 401 && unknownEmail.body.error === wrongPassword.body.error,
     'responses differ, which would allow account enumeration',
   );
+
+  // =========================================================================
+  section('Admin portal');
+  // =========================================================================
+
+  // Administrators are seeded, not registered: there is no public sign-up for
+  // the role, so the test creates one directly and then signs in through the
+  // real login route like any other actor.
+  const adminEmail = `e2e.admin.${unique}@demo.bursarybridge.local`;
+  await db.user.create({
+    data: {
+      email: adminEmail,
+      passwordHash: await hash(PASSWORD, 10),
+      role: 'ADMIN',
+      firstName: 'E2E',
+      lastName: 'Admin',
+      emailVerifiedAt: new Date(),
+      acceptedTermsAt: new Date(),
+    },
+  });
+
+  const admin = new Session();
+  const adminLogin = await admin.json<{ redirectTo?: string }>('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: adminEmail, password: PASSWORD }),
+  });
+  check('an admin can sign in', adminLogin.status === 200, `status ${adminLogin.status}`);
+  check(
+    'and lands on the admin dashboard',
+    adminLogin.body.redirectTo === '/admin/dashboard',
+    `redirectTo ${adminLogin.body.redirectTo}`,
+  );
+
+  const adminDashboard = await admin.page('/admin/dashboard');
+  check('the admin dashboard renders', adminDashboard.status === 200, `status ${adminDashboard.status}`);
+
+  // --- the guard rejects everyone else -------------------------------------
+  const anonAdminApi = await new Session().json('/api/admin/users/whatever', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'attempting without a session' }),
+  });
+  check('an anonymous request to an admin route is 401', anonAdminApi.status === 401, `status ${anonAdminApi.status}`);
+
+  const studentAdminApi = await student.json('/api/admin/users/whatever', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'a student attempting an admin action' }),
+  });
+  check('a student calling an admin route is 403', studentAdminApi.status === 403, `status ${studentAdminApi.status}`);
+
+  const corporateAdminApi = await corporate.json('/api/admin/programmes/whatever', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'a funder attempting an admin action' }),
+  });
+  check('a funder calling an admin route is 403', corporateAdminApi.status === 403, `status ${corporateAdminApi.status}`);
+
+  const studentAdminPage = await student.page('/admin/dashboard');
+  check(
+    'a student is redirected away from an admin page',
+    studentAdminPage.status === 307 || studentAdminPage.status === 302,
+    `status ${studentAdminPage.status}`,
+  );
+
+  // --- a reason is required ------------------------------------------------
+  const noReason = await admin.json('/api/admin/programmes/whatever', {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'short' }),
+  });
+  check('an action without a proper reason is rejected', noReason.status === 422, `status ${noReason.status}`);
+
+  // --- suspend a programme -------------------------------------------------
+  const targetProgramme = await db.fundingProgramme.findFirstOrThrow({
+    where: { organisation: { name: { contains: unique } } },
+    select: { id: true, name: true, status: true },
+  });
+
+  const suspendProgramme = await admin.json(`/api/admin/programmes/${targetProgramme.id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'Breaches the platform content policy.' }),
+  });
+  check('an admin can suspend a programme', suspendProgramme.status === 200, `status ${suspendProgramme.status}`);
+
+  const afterSuspend = await db.fundingProgramme.findUniqueOrThrow({
+    where: { id: targetProgramme.id },
+    select: { status: true },
+  });
+  check('the programme is SUSPENDED in the database', afterSuspend.status === 'SUSPENDED', afterSuspend.status);
+
+  // The point of the new status: the owner cannot undo it.
+  const funderRepublish = await corporate.json(`/api/corporate/programmes/${targetProgramme.id}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'PUBLISHED' }),
+  });
+  check(
+    'the owning funder cannot publish a suspended programme',
+    funderRepublish.status === 403,
+    `status ${funderRepublish.status}`,
+  );
+
+  const stillSuspended = await db.fundingProgramme.findUniqueOrThrow({
+    where: { id: targetProgramme.id },
+    select: { status: true },
+  });
+  check('and it is still SUSPENDED afterwards', stillSuspended.status === 'SUSPENDED', stillSuspended.status);
+
+  const suspendAudit = await db.auditLog.findFirst({
+    where: { action: 'admin.programme_suspended', entityId: targetProgramme.id },
+    select: { metadata: true, userId: true },
+  });
+  check('the suspension is in the audit log with its reason', Boolean(suspendAudit), 'no audit entry');
+  check(
+    'the audit entry records the reason',
+    typeof (suspendAudit?.metadata as { reason?: string } | null)?.reason === 'string',
+    'no reason recorded',
+  );
+
+  const restoreProgramme = await admin.json(`/api/admin/programmes/${targetProgramme.id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'RESTORE', reason: 'Policy breach resolved by the funder.' }),
+  });
+  check('an admin can restore it', restoreProgramme.status === 200, `status ${restoreProgramme.status}`);
+  const afterRestore = await db.fundingProgramme.findUniqueOrThrow({
+    where: { id: targetProgramme.id },
+    select: { status: true },
+  });
+  check('it returns to DRAFT rather than PUBLISHED', afterRestore.status === 'DRAFT', afterRestore.status);
+
+  // --- suspend an account --------------------------------------------------
+  const studentRecord = await db.user.findUniqueOrThrow({
+    where: { email: studentEmail },
+    select: { id: true },
+  });
+
+  const selfSuspend = await admin.json(`/api/admin/users/${(await db.user.findUniqueOrThrow({ where: { email: adminEmail }, select: { id: true } })).id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'attempting to suspend my own account' }),
+  });
+  check('an admin cannot suspend their own account', selfSuspend.status === 422, `status ${selfSuspend.status}`);
+
+  const suspendStudent = await admin.json(`/api/admin/users/${studentRecord.id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'SUSPEND', reason: 'Suspected fraudulent application activity.' }),
+  });
+  check('an admin can suspend a student account', suspendStudent.status === 200, `status ${suspendStudent.status}`);
+
+  // Suspension is enforced by getCurrentUser, so the student's existing cookie
+  // must stop working on the very next request.
+  const suspendedStudentPage = await student.page('/student/dashboard');
+  check(
+    'the suspended student is no longer signed in',
+    suspendedStudentPage.status === 307 || suspendedStudentPage.status === 302,
+    `status ${suspendedStudentPage.status}`,
+  );
+
+  const suspendedLogin = await new Session().json('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail, password: PASSWORD }),
+  });
+  check(
+    'and cannot sign in again while suspended',
+    suspendedLogin.status !== 200,
+    `status ${suspendedLogin.status}`,
+  );
+
+  const reactivate = await admin.json(`/api/admin/users/${studentRecord.id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'REACTIVATE', reason: 'Investigation closed with no finding.' }),
+  });
+  check('an admin can reactivate the account', reactivate.status === 200, `status ${reactivate.status}`);
+
+  const reactivatedLogin = await new Session().json('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail, password: PASSWORD }),
+  });
+  check('and the student can sign in again', reactivatedLogin.status === 200, `status ${reactivatedLogin.status}`);
+
+  // --- force a password reset ----------------------------------------------
+  const forceReset = await admin.json(`/api/admin/users/${studentRecord.id}`, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'FORCE_PASSWORD_RESET', reason: 'Credentials shared in a public forum.' }),
+  });
+  check('an admin can force a password reset', forceReset.status === 200, `status ${forceReset.status}`);
+  const flagged = await db.user.findUniqueOrThrow({
+    where: { id: studentRecord.id },
+    select: { mustResetPassword: true, sessions: { select: { id: true } } },
+  });
+  check('the account is flagged for reset', flagged.mustResetPassword === true, 'flag not set');
+  check('and its sessions were ended', flagged.sessions.length === 0, `${flagged.sessions.length} session(s) left`);
+
+  // --- the audit log is read-only ------------------------------------------
+  const auditPage = await admin.page('/admin/audit');
+  check('the audit log page renders', auditPage.status === 200, `status ${auditPage.status}`);
 
   // =========================================================================
   await cleanUp(unique);

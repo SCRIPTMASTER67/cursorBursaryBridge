@@ -21,6 +21,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   });
   if (!programme) return apiError('Programme not found.', 404);
 
+  // A suspended programme was withdrawn by an administrator. The funder must
+  // not be able to publish out of that state, or the suspension would be
+  // undone by whoever owns the programme.
+  if (programme.status === 'SUSPENDED') {
+    return apiError(
+      'This programme has been suspended by Bursary-Bridge and cannot be changed. Contact support if you believe this is a mistake.',
+      403,
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = statusSchema.safeParse(body);
   if (!parsed.success) return apiError('Invalid status.', 422, zodFields(parsed.error));
@@ -52,7 +62,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   const { id } = await params;
   const programme = await prisma.fundingProgramme.findFirst({
     where: { id, organisationId: auth.organisationId },
-    select: { id: true },
+    select: { id: true, status: true },
   });
   if (!programme) return apiError('Programme not found.', 404);
 
@@ -63,6 +73,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   }
 
   const { details, eligibility, questions, publish } = parsed.data;
+
+  // Same rule as the status endpoint: editing must not be a way around a
+  // suspension, and `publish` on this payload would otherwise be exactly that.
+  if (programme.status === 'SUSPENDED') {
+    return apiError(
+      'This programme has been suspended by Bursary-Bridge and cannot be edited. Contact support if you believe this is a mistake.',
+      403,
+    );
+  }
 
   await prisma.$transaction([
     prisma.fundingProgramme.update({

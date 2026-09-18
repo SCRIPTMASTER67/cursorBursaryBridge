@@ -331,6 +331,7 @@ export const programmeStatusLabels: Record<ProgrammeStatus, string> = {
   DRAFT: 'Draft',
   PUBLISHED: 'Active',
   CLOSED: 'Closed',
+  SUSPENDED: 'Suspended',
 };
 
 export const applicationStatusLabels: Record<ApplicationStatus, string> = {
