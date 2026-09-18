@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db';
 import { apiAdmin, apiError, apiOk, zodFields } from '@/lib/auth/api';
 import { clientIp, rateLimit } from '@/lib/auth/rate-limit';
 import { destroyAllSessions } from '@/lib/auth/session';
+import { issuePasswordReset } from '@/lib/auth/password-reset';
 import { audit } from '@/services/audit';
 import {
   forcePasswordResetSchema,
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
   const user = await prisma.user.findUnique({
     where: { id },
-    select: { id: true, email: true, role: true, status: true },
+    select: { id: true, email: true, firstName: true, role: true, status: true },
   });
   if (!user) return apiError('Account not found.', 404);
 
@@ -98,6 +99,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   // sessions is what makes it take effect now rather than in fourteen days.
   await prisma.user.update({ where: { id }, data: { mustResetPassword: true } });
   await destroyAllSessions(id);
+  // Issue the link here rather than only raising the flag: without it the
+  // account is locked out with no way back in.
+  await issuePasswordReset({ id: user.id, email: user.email, firstName: user.firstName });
   await audit({
     userId: auth.adminUserId,
     action: 'admin.user_password_reset_forced',

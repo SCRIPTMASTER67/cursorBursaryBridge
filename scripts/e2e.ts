@@ -8,6 +8,7 @@
  * Usage: npm run dev, then `npm run test:e2e`.
  */
 import '../lib/load-env';
+import { createHash, randomBytes } from 'node:crypto';
 import { hash } from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 
@@ -1218,6 +1219,194 @@ async function main() {
   // --- the audit log is read-only ------------------------------------------
   const auditPage = await admin.page('/admin/audit');
   check('the audit log page renders', auditPage.status === 200, `status ${auditPage.status}`);
+
+  // =========================================================================
+  section('Password reset');
+  // =========================================================================
+
+  // The student was flagged for reset just above, so this picks up exactly
+  // where a forced reset leaves someone: locked out, needing a way back in.
+  const flaggedLogin = await new Session().json<{ fields?: Record<string, string> }>(
+    '/api/auth/login',
+    { method: 'POST', body: JSON.stringify({ email: studentEmail, password: PASSWORD }) },
+  );
+  check(
+    'a flagged account cannot sign in with the old password',
+    flaggedLogin.status === 403,
+    `status ${flaggedLogin.status}`,
+  );
+  check(
+    'and the response says a reset is required',
+    flaggedLogin.body.fields?.form === 'PASSWORD_RESET_REQUIRED',
+    JSON.stringify(flaggedLogin.body.fields),
+  );
+
+  // Forcing the reset should have issued a link, or the account has no way back.
+  const issuedByAdmin = await db.passwordResetToken.findFirst({
+    where: { user: { email: studentEmail } },
+    select: { id: true },
+  });
+  check('forcing a reset issues a reset token', Boolean(issuedByAdmin), 'no token issued');
+
+  // --- anti-enumeration ----------------------------------------------------
+  const forgotKnown = await new Session().json<{ message?: string }>('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail }),
+  });
+  const forgotUnknown = await new Session().json<{ message?: string }>(
+    '/api/auth/forgot-password',
+    { method: 'POST', body: JSON.stringify({ email: `nobody.${unique}@example.com` }) },
+  );
+  check(
+    'a reset request for an unknown address looks identical to a known one',
+    forgotKnown.status === forgotUnknown.status &&
+      forgotKnown.body.message === forgotUnknown.body.message,
+    'responses differ, which would allow account enumeration',
+  );
+
+  // The token itself is only ever emailed, so the test reads the hash side of
+  // it the same way the server does.
+  const resetToken = randomBytes(32).toString('base64url');
+  const studentForReset = await db.user.findUniqueOrThrow({
+    where: { email: studentEmail },
+    select: { id: true },
+  });
+  await db.passwordResetToken.upsert({
+    where: { userId: studentForReset.id },
+    create: {
+      userId: studentForReset.id,
+      tokenHash: createHash('sha256').update(resetToken).digest('hex'),
+      expiresAt: new Date(Date.now() + 3_600_000),
+    },
+    update: {
+      tokenHash: createHash('sha256').update(resetToken).digest('hex'),
+      expiresAt: new Date(Date.now() + 3_600_000),
+    },
+  });
+
+  // --- invalid and mismatched input ----------------------------------------
+  const badToken = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      token: 'not-a-real-token',
+      newPassword: 'NewJourney1234!',
+      confirmPassword: 'NewJourney1234!',
+    }),
+  });
+  check('an unknown reset token is rejected', badToken.status === 400, `status ${badToken.status}`);
+
+  const mismatch = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      token: resetToken,
+      newPassword: 'NewJourney1234!',
+      confirmPassword: 'DifferentPassword1',
+    }),
+  });
+  check('mismatched passwords are rejected', mismatch.status === 422, `status ${mismatch.status}`);
+
+  const weakPassword = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token: resetToken, newPassword: 'short', confirmPassword: 'short' }),
+  });
+  check(
+    'a password below the policy is rejected',
+    weakPassword.status === 422,
+    `status ${weakPassword.status}`,
+  );
+
+  // --- the happy path ------------------------------------------------------
+  const NEW_PASSWORD = 'NewJourney1234!';
+  const reset = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      token: resetToken,
+      newPassword: NEW_PASSWORD,
+      confirmPassword: NEW_PASSWORD,
+    }),
+  });
+  check(
+    'a valid reset token sets the new password',
+    reset.status === 200,
+    `status ${reset.status}`,
+  );
+
+  const afterReset = await db.user.findUniqueOrThrow({
+    where: { id: studentForReset.id },
+    select: { mustResetPassword: true },
+  });
+  check('the reset flag is cleared', afterReset.mustResetPassword === false, 'flag still set');
+
+  const tokenGone = await db.passwordResetToken.findFirst({
+    where: { userId: studentForReset.id },
+  });
+  check('the token is consumed', tokenGone === null, 'token still present');
+
+  const replay = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      token: resetToken,
+      newPassword: NEW_PASSWORD,
+      confirmPassword: NEW_PASSWORD,
+    }),
+  });
+  check('the same link cannot be used twice', replay.status === 400, `status ${replay.status}`);
+
+  const oldPasswordLogin = await new Session().json('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail, password: PASSWORD }),
+  });
+  check(
+    'the old password no longer works',
+    oldPasswordLogin.status === 401,
+    `status ${oldPasswordLogin.status}`,
+  );
+
+  const newPasswordLogin = await new Session().json('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail, password: NEW_PASSWORD }),
+  });
+  check(
+    'the new password signs the student back in',
+    newPasswordLogin.status === 200,
+    `status ${newPasswordLogin.status}`,
+  );
+
+  // --- an expired link -----------------------------------------------------
+  const expiredToken = randomBytes(32).toString('base64url');
+  await db.passwordResetToken.create({
+    data: {
+      userId: studentForReset.id,
+      tokenHash: createHash('sha256').update(expiredToken).digest('hex'),
+      expiresAt: new Date(Date.now() - 60_000),
+    },
+  });
+  const expired = await new Session().json('/api/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({
+      token: expiredToken,
+      newPassword: NEW_PASSWORD,
+      confirmPassword: NEW_PASSWORD,
+    }),
+  });
+  check('an expired reset link is rejected', expired.status === 410, `status ${expired.status}`);
+
+  // --- a suspended account cannot reset its way back in --------------------
+  await db.user.update({ where: { id: studentForReset.id }, data: { status: 'SUSPENDED' } });
+  const suspendedForgot = await new Session().json('/api/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify({ email: studentEmail }),
+  });
+  check(
+    'a suspended account still gets the neutral response',
+    suspendedForgot.status === 200,
+    `status ${suspendedForgot.status}`,
+  );
+  const suspendedToken = await db.passwordResetToken.findFirst({
+    where: { userId: studentForReset.id },
+  });
+  check('but no reset link is issued for it', suspendedToken === null, 'a token was issued');
+  await db.user.update({ where: { id: studentForReset.id }, data: { status: 'ACTIVE' } });
 
   // =========================================================================
   await cleanUp(unique);

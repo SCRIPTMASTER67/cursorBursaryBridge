@@ -30,7 +30,13 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { email: parsed.data.email },
-    select: { id: true, passwordHash: true, role: true, status: true },
+    select: {
+      id: true,
+      passwordHash: true,
+      role: true,
+      status: true,
+      mustResetPassword: true,
+    },
   });
 
   // Identical response for an unknown email and a wrong password, so the
@@ -72,6 +78,23 @@ export async function POST(request: NextRequest) {
     return apiError(
       'This account has been suspended. Contact support if you believe this is a mistake.',
       403,
+    );
+  }
+
+  // An administrator forced a reset, so the old password must not get them in
+  // even though it verified. They are sent to the reset flow instead.
+  if (user.mustResetPassword) {
+    await audit({
+      userId: user.id,
+      action: 'auth.login_reset_required',
+      entityType: 'User',
+      entityId: user.id,
+      ipAddress: ip,
+    });
+    return apiError(
+      'Your password must be reset before you can sign in. Request a reset link to continue.',
+      403,
+      { form: 'PASSWORD_RESET_REQUIRED' },
     );
   }
 

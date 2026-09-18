@@ -25,7 +25,13 @@ export default async function LoginPage() {
 
       <LoginForm />
 
-      <p className="mt-6 text-center text-[13px] text-ink-400">
+      <p className="mt-4 text-center text-[13px]">
+        <Link href="/forgot-password" className="font-semibold text-brand-600 hover:text-brand-700">
+          Forgot your password?
+        </Link>
+      </p>
+
+      <p className="mt-3 text-center text-[13px] text-ink-400">
         Don’t have an account?{' '}
         <Link href="/register" className="font-semibold text-brand-600 hover:text-brand-700">
           Sign up

@@ -388,14 +388,15 @@ model User {
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  sessions          Session[]
-  verificationToken VerificationToken?
-  studentProfile    StudentProfile?
-  corporateProfile  CorporateProfile?
-  notifications     Notification[]
-  auditLogs         AuditLog[]
-  createdProgrammes FundingProgramme[] @relation("ProgrammeCreator")
-  shortlistEntries  Shortlist[]        @relation("ShortlistAddedBy")
+  sessions           Session[]
+  verificationToken  VerificationToken?
+  passwordResetToken PasswordResetToken?
+  studentProfile     StudentProfile?
+  corporateProfile   CorporateProfile?
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  createdProgrammes  FundingProgramme[]  @relation("ProgrammeCreator")
+  shortlistEntries   Shortlist[]         @relation("ShortlistAddedBy")
 
   @@index([role])
   @@index([status])
@@ -416,6 +417,23 @@ model Session {
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+/// Single-use password reset tokens.
+///
+/// Separate from VerificationToken because that model is unique on userId and
+/// already carries email verification; one table could not hold both for the
+/// same account. Only the hash is stored, so the database cannot be read to
+/// forge a reset link. Unique on userId, so issuing a new link invalidates any
+/// previous one.
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model VerificationToken {
