@@ -32,7 +32,7 @@ export default async function AdminProgrammesPage({
     <PageBody>
       <div className="space-y-6">
         <header>
-          <h1 className="text-[26px] font-semibold text-ink-900">Funding programmes</h1>
+          <h1 className="text-ink-900 text-[26px] font-semibold">Funding programmes</h1>
           <p className="mt-1 text-[14px] text-ink-500">
             {total} programme{total === 1 ? '' : 's'} across every organisation. Suspending a
             programme withdraws it from students, and only an administrator can restore it.
@@ -73,7 +73,7 @@ export default async function AdminProgrammesPage({
             </div>
             <button
               type="submit"
-              className="rounded-field bg-primary-600 px-4 py-2 text-[14px] font-medium text-white"
+              className="bg-primary-600 rounded-field px-4 py-2 text-[14px] font-medium text-white"
             >
               Apply
             </button>
@@ -99,7 +99,7 @@ export default async function AdminProgrammesPage({
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.id} className="border-b border-line/60 last:border-0">
-                      <td className="px-4 py-3 text-ink-800">{row.name}</td>
+                      <td className="text-ink-800 px-4 py-3">{row.name}</td>
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/organisations/${row.organisation.id}`}

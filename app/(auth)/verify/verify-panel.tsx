@@ -49,7 +49,9 @@ export function VerifyPanel({
         <Icon tone="brand">
           <Mail className="h-8 w-8" />
         </Icon>
-        <h1 className="mt-6 text-[22px] font-bold tracking-[-0.02em] text-ink">Verifying your email…</h1>
+        <h1 className="mt-6 text-[22px] font-bold tracking-[-0.02em] text-ink">
+          Verifying your email…
+        </h1>
         <p className="mt-2 text-[13px] leading-6 text-ink-400">This will only take a moment.</p>
       </>
     );
@@ -61,7 +63,9 @@ export function VerifyPanel({
         <Icon tone="success">
           <CheckCircle className="h-8 w-8" />
         </Icon>
-        <h1 className="mt-6 text-[22px] font-bold tracking-[-0.02em] text-ink">Your email is verified</h1>
+        <h1 className="mt-6 text-[22px] font-bold tracking-[-0.02em] text-ink">
+          Your email is verified
+        </h1>
         <p className="mt-2 text-[13px] leading-6 text-ink-400">
           You’re all set. Let’s finish building your profile.
         </p>
@@ -81,7 +85,11 @@ export function VerifyPanel({
       <h1 className="mt-6 text-[22px] font-bold tracking-[-0.02em] text-ink">Check your email</h1>
       <p className="mt-2 text-[13px] leading-6 text-ink-400">
         We’ve sent a verification link to
-        {email ? <span className="block font-semibold text-ink-700">{email}</span> : ' your email address.'}
+        {email ? (
+          <span className="block font-semibold text-ink-700">{email}</span>
+        ) : (
+          ' your email address.'
+        )}
       </p>
 
       {error && (
@@ -127,7 +135,9 @@ function Icon({ children, tone }: { children: React.ReactNode; tone: 'brand' | '
     success: 'bg-success-50 text-success-600',
   } as const;
   return (
-    <span className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${tones[tone]}`}>
+    <span
+      className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full ${tones[tone]}`}
+    >
       {children}
     </span>
   );

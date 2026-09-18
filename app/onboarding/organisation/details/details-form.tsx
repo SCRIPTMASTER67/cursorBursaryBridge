@@ -19,10 +19,18 @@ const stepLabels = corporateSteps.map((s) => s.label);
 export function OrganisationDetailsForm({
   initial,
 }: {
-  initial: { name: string; type: OrganisationType; industry: Industry; website: string; country: string };
+  initial: {
+    name: string;
+    type: OrganisationType;
+    industry: Industry;
+    website: string;
+    country: string;
+  };
 }) {
   const router = useRouter();
-  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{ redirectTo: string }>();
+  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{
+    redirectTo: string;
+  }>();
   const [values, setValues] = useState(initial);
 
   function update<K extends keyof typeof values>(field: K, value: (typeof values)[K]) {
@@ -59,7 +67,11 @@ export function OrganisationDetailsForm({
           </Button>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-5">
           <Field label="Organisation name" error={fieldErrors.name} required>

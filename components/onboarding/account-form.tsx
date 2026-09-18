@@ -13,10 +13,14 @@ import { useFormSubmit } from '@/hooks/use-form-submit';
 
 type Audience = 'student' | 'organisation';
 
-const copy: Record<Audience, { endpoint: string; notificationLabel: string; emailLabel: string; emailPlaceholder: string }> = {
+const copy: Record<
+  Audience,
+  { endpoint: string; notificationLabel: string; emailLabel: string; emailPlaceholder: string }
+> = {
   student: {
     endpoint: '/api/auth/register/student',
-    notificationLabel: 'Receive bursary, scholarship and funding opportunity notifications via email',
+    notificationLabel:
+      'Receive bursary, scholarship and funding opportunity notifications via email',
     emailLabel: 'Email Address',
     emailPlaceholder: 'you@example.com',
   },
@@ -49,7 +53,9 @@ const emptyValues = {
 export function AccountForm({ audience }: { audience: Audience }) {
   const router = useRouter();
   const config = copy[audience];
-  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{ redirectTo: string }>();
+  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{
+    redirectTo: string;
+  }>();
   const [values, setValues] = useState(emptyValues);
 
   function update<K extends keyof typeof emptyValues>(field: K, value: (typeof emptyValues)[K]) {
@@ -81,7 +87,11 @@ export function AccountForm({ audience }: { audience: Audience }) {
             required
           />
         </Field>
-        <Field label={audience === 'student' ? 'Last Name' : 'Last name'} error={fieldErrors.lastName} required>
+        <Field
+          label={audience === 'student' ? 'Last Name' : 'Last name'}
+          error={fieldErrors.lastName}
+          required
+        >
           <Input
             name="lastName"
             autoComplete="family-name"
@@ -104,7 +114,11 @@ export function AccountForm({ audience }: { audience: Audience }) {
         />
       </Field>
 
-      <Field label={audience === 'student' ? 'Mobile Number' : 'Mobile number'} error={fieldErrors.mobile} required>
+      <Field
+        label={audience === 'student' ? 'Mobile Number' : 'Mobile number'}
+        error={fieldErrors.mobile}
+        required
+      >
         <Input
           type="tel"
           name="mobile"
@@ -125,7 +139,11 @@ export function AccountForm({ audience }: { audience: Audience }) {
             required
           />
         </Field>
-        <Field label={audience === 'student' ? 'Confirm Password' : 'Confirm password'} error={fieldErrors.confirmPassword} required>
+        <Field
+          label={audience === 'student' ? 'Confirm Password' : 'Confirm password'}
+          error={fieldErrors.confirmPassword}
+          required
+        >
           <PasswordInput
             name="confirmPassword"
             value={values.confirmPassword}
@@ -155,7 +173,10 @@ export function AccountForm({ audience }: { audience: Audience }) {
                 Terms of Service
               </Link>{' '}
               and{' '}
-              <Link href="/legal/privacy" className="font-medium text-brand-600 hover:text-brand-700">
+              <Link
+                href="/legal/privacy"
+                className="font-medium text-brand-600 hover:text-brand-700"
+              >
                 Privacy Notice
               </Link>
               .

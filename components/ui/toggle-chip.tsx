@@ -75,14 +75,30 @@ export function SelectTile({
       {selected && (
         <span className="absolute right-2.5 top-2.5 flex h-4 w-4 items-center justify-center rounded-full bg-brand-600">
           <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none" aria-hidden="true">
-            <path d="m2.5 6 2.5 2.5 4.5-5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="m2.5 6 2.5 2.5 4.5-5"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </span>
       )}
-      <span className={cn('flex h-9 w-9 items-center justify-center', selected ? 'text-brand-600' : 'text-ink-400')}>
+      <span
+        className={cn(
+          'flex h-9 w-9 items-center justify-center',
+          selected ? 'text-brand-600' : 'text-ink-400',
+        )}
+      >
         {icon}
       </span>
-      <span className={cn('text-[13px] font-medium leading-tight', selected ? 'text-brand-700' : 'text-ink-700')}>
+      <span
+        className={cn(
+          'text-[13px] font-medium leading-tight',
+          selected ? 'text-brand-700' : 'text-ink-700',
+        )}
+      >
         {label}
       </span>
     </button>

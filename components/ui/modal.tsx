@@ -76,7 +76,9 @@ export function Modal({
             <h2 id="modal-title" className="text-base font-semibold text-ink">
               {title}
             </h2>
-            {description && <p className="mt-1 text-[13px] leading-5 text-ink-400">{description}</p>}
+            {description && (
+              <p className="mt-1 text-[13px] leading-5 text-ink-400">{description}</p>
+            )}
           </div>
           <button
             type="button"
@@ -131,7 +133,11 @@ export function ConfirmDialog({
           <Button variant="outline" onClick={onClose} disabled={loading}>
             {cancelLabel}
           </Button>
-          <Button variant={tone === 'danger' ? 'danger' : 'primary'} onClick={onConfirm} loading={loading}>
+          <Button
+            variant={tone === 'danger' ? 'danger' : 'primary'}
+            onClick={onConfirm}
+            loading={loading}
+          >
             {confirmLabel}
           </Button>
         </>

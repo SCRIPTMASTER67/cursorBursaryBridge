@@ -35,11 +35,17 @@ export function StepDots({
             <span
               className={cn(
                 'block rounded-full transition-colors',
-                active ? 'h-2.5 w-2.5 bg-brand-600' : done ? 'h-2 w-2 bg-brand-600' : 'h-2 w-2 bg-line-strong',
+                active
+                  ? 'h-2.5 w-2.5 bg-brand-600'
+                  : done
+                    ? 'h-2 w-2 bg-brand-600'
+                    : 'h-2 w-2 bg-line-strong',
               )}
             />
             {step < total && (
-              <span className={cn('block h-[2px] w-5 rounded-full', done ? 'bg-brand-600' : 'bg-line')} />
+              <span
+                className={cn('block h-[2px] w-5 rounded-full', done ? 'bg-brand-600' : 'bg-line')}
+              />
             )}
           </span>
         );
@@ -129,7 +135,11 @@ export function VerticalSteps({
             <span
               className={cn(
                 'text-[13px]',
-                active ? 'font-semibold text-ink' : done ? 'font-medium text-ink-600' : 'text-ink-400',
+                active
+                  ? 'font-semibold text-ink'
+                  : done
+                    ? 'font-medium text-ink-600'
+                    : 'text-ink-400',
               )}
             >
               {step.label}

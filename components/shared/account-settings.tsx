@@ -140,7 +140,9 @@ export function AccountSettings({
             <PasswordInput
               autoComplete="current-password"
               value={passwords.currentPassword}
-              onChange={(event) => setPasswords({ ...passwords, currentPassword: event.target.value })}
+              onChange={(event) =>
+                setPasswords({ ...passwords, currentPassword: event.target.value })
+              }
             />
           </Field>
 
@@ -156,7 +158,9 @@ export function AccountSettings({
           <Field label="Confirm new password" error={password.fieldErrors.confirmPassword} required>
             <PasswordInput
               value={passwords.confirmPassword}
-              onChange={(event) => setPasswords({ ...passwords, confirmPassword: event.target.value })}
+              onChange={(event) =>
+                setPasswords({ ...passwords, confirmPassword: event.target.value })
+              }
             />
           </Field>
 

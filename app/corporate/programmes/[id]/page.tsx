@@ -50,7 +50,10 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
         title={programme.name}
         description={programme.shortDescription}
         breadcrumb={
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-ink-400">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-[13px] text-ink-400"
+          >
             <Link href="/corporate/programmes" className="hover:text-ink-600">
               Programmes
             </Link>
@@ -77,7 +80,11 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
       />
 
       {programme.status === 'SUSPENDED' ? (
-        <Alert tone="danger" title="This programme has been suspended by Bursary-Bridge" className="mb-6">
+        <Alert
+          tone="danger"
+          title="This programme has been suspended by Bursary-Bridge"
+          className="mb-6"
+        >
           It is not visible to students and cannot be edited or published while it is suspended.
           Contact support if you believe this is a mistake.
         </Alert>
@@ -139,7 +146,11 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
               />
               <Requirement
                 label="Minimum academic average"
-                value={eligibility?.minAcademicAverage ? `${eligibility.minAcademicAverage}%` : 'No minimum'}
+                value={
+                  eligibility?.minAcademicAverage
+                    ? `${eligibility.minAcademicAverage}%`
+                    : 'No minimum'
+                }
               />
               <Requirement
                 label="Year of study"
@@ -196,7 +207,9 @@ export default async function ProgrammeDetailPage({ params }: { params: Promise<
                         {question.required && <span className="ml-1.5 text-danger-600">*</span>}
                       </span>
                       {question.helpText && (
-                        <span className="mt-0.5 block text-xs text-ink-400">{question.helpText}</span>
+                        <span className="mt-0.5 block text-xs text-ink-400">
+                          {question.helpText}
+                        </span>
                       )}
                     </span>
                   </li>

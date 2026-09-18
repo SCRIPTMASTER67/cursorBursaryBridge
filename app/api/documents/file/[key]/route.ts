@@ -41,7 +41,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     });
     allowed = Boolean(
       profile &&
-        document.applications.some((link) => link.application.organisationId === profile.organisationId),
+        document.applications.some(
+          (link) => link.application.organisationId === profile.organisationId,
+        ),
     );
   }
 

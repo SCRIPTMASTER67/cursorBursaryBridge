@@ -46,7 +46,8 @@ export const educationSchema = z
   })
   .superRefine((data, ctx) => {
     // Grade 10/11 learners are never asked for a tertiary qualification.
-    const isSchoolLearner = data.educationStage === 'GRADE_10' || data.educationStage === 'GRADE_11';
+    const isSchoolLearner =
+      data.educationStage === 'GRADE_10' || data.educationStage === 'GRADE_11';
     if (!isSchoolLearner && !data.qualificationLevel) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -136,7 +137,10 @@ export const academicSchema = z
       .default([]),
   })
   .superRefine((data, ctx) => {
-    if (!data.academicAverageUnknown && (data.academicAverage === null || data.academicAverage === undefined)) {
+    if (
+      !data.academicAverageUnknown &&
+      (data.academicAverage === null || data.academicAverage === undefined)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['academicAverage'],
@@ -197,9 +201,7 @@ export const financialSchema = z.object({
       },
       { message: 'Enter a valid date of birth' },
     ),
-  citizenship: z
-    .enum(['SA_CITIZEN', 'PERMANENT_RESIDENT', 'OTHER', 'PREFER_NOT_TO_SAY'])
-    .nullish(),
+  citizenship: z.enum(['SA_CITIZEN', 'PERMANENT_RESIDENT', 'OTHER', 'PREFER_NOT_TO_SAY']).nullish(),
   firstGeneration: z.enum(['YES', 'NO', 'PREFER_NOT_TO_SAY']).nullish(),
   disability: z.enum(['YES', 'NO', 'PREFER_NOT_TO_SAY']).nullish(),
   orphanVulnerable: z.enum(['YES', 'NO', 'PREFER_NOT_TO_SAY']).nullish(),

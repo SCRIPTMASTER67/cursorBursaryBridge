@@ -48,7 +48,10 @@ export async function POST(request: NextRequest) {
   if (action === 'REMOVE') {
     await prisma.$transaction([
       prisma.shortlist.deleteMany({
-        where: { applicationId: { in: applications.map((a) => a.id) }, organisationId: auth.organisationId },
+        where: {
+          applicationId: { in: applications.map((a) => a.id) },
+          organisationId: auth.organisationId,
+        },
       }),
       prisma.application.updateMany({
         where: { id: { in: applications.map((a) => a.id) }, organisationId: auth.organisationId },

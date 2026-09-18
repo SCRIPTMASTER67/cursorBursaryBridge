@@ -26,7 +26,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         ref={ref}
         id={props.id ?? field?.id}
         aria-invalid={isInvalid || undefined}
-        aria-describedby={[field?.descriptionId, field?.errorId].filter(Boolean).join(' ') || undefined}
+        aria-describedby={
+          [field?.descriptionId, field?.errorId].filter(Boolean).join(' ') || undefined
+        }
         className={cn(
           controlClasses,
           'h-11 cursor-pointer appearance-none pr-10',

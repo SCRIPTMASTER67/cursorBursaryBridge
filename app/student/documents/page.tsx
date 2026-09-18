@@ -11,7 +11,14 @@ export default async function DocumentsPage() {
 
   const documents = await prisma.document.findMany({
     where: { studentProfileId },
-    select: { id: true, type: true, fileName: true, sizeBytes: true, uploadedAt: true, storageKey: true },
+    select: {
+      id: true,
+      type: true,
+      fileName: true,
+      sizeBytes: true,
+      uploadedAt: true,
+      storageKey: true,
+    },
     orderBy: { uploadedAt: 'desc' },
   });
 

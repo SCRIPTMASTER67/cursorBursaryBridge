@@ -44,7 +44,11 @@ export function OrganisationReviewPanel({ sections }: { sections: SummarySection
         </Button>
       }
     >
-      {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+      {error && (
+        <Alert tone="danger" className="mb-5">
+          {error}
+        </Alert>
+      )}
       <SummarySections sections={sections} />
     </StepShell>
   );

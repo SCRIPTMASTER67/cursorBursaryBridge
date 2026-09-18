@@ -43,7 +43,11 @@ export function Alert({
   return (
     <div
       role={tone === 'danger' ? 'alert' : 'status'}
-      className={cn('flex items-start gap-3 rounded-field border px-4 py-3', config[tone].wrap, className)}
+      className={cn(
+        'flex items-start gap-3 rounded-field border px-4 py-3',
+        config[tone].wrap,
+        className,
+      )}
     >
       {config[tone].icon}
       <div className="min-w-0 flex-1 text-[13px] leading-5">

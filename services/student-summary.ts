@@ -75,7 +75,9 @@ export async function buildStudentSummary(studentProfileId: string): Promise<Sum
         },
         {
           label: 'Qualification level',
-          value: profile.qualificationLevel ? qualificationLabels[profile.qualificationLevel] : dash,
+          value: profile.qualificationLevel
+            ? qualificationLabels[profile.qualificationLevel]
+            : dash,
         },
         {
           label: 'Study status',
@@ -87,7 +89,9 @@ export async function buildStudentSummary(studentProfileId: string): Promise<Sum
         ...(profile.currentProgramme
           ? [{ label: 'Current programme', value: profile.currentProgramme.name }]
           : []),
-        ...(profile.yearOfStudy ? [{ label: 'Year of study', value: `Year ${profile.yearOfStudy}` }] : []),
+        ...(profile.yearOfStudy
+          ? [{ label: 'Year of study', value: `Year ${profile.yearOfStudy}` }]
+          : []),
       ],
     },
     {
@@ -111,8 +115,14 @@ export async function buildStudentSummary(studentProfileId: string): Promise<Sum
           label: 'Latest average',
           value: profile.academicAverage !== null ? `${profile.academicAverage}%` : 'Not provided',
         },
-        { label: 'Results available', value: list(profile.resultTypes.map((r) => resultTypeLabels[r])) },
-        { label: 'Achievements', value: list(profile.achievements.map((a) => achievementLabels[a])) },
+        {
+          label: 'Results available',
+          value: list(profile.resultTypes.map((r) => resultTypeLabels[r])),
+        },
+        {
+          label: 'Achievements',
+          value: list(profile.achievements.map((a) => achievementLabels[a])),
+        },
       ],
     },
     {
@@ -120,7 +130,10 @@ export async function buildStudentSummary(studentProfileId: string): Promise<Sum
       title: 'Funding Needs',
       editHref: '/onboarding/student/funding',
       rows: [
-        { label: 'Needs funding for', value: list(profile.fundingNeeds.map((n) => fundingNeedLabels[n])) },
+        {
+          label: 'Needs funding for',
+          value: list(profile.fundingNeeds.map((n) => fundingNeedLabels[n])),
+        },
         {
           label: 'Current situation',
           value: profile.fundingSituation ? fundingSituationLabels[profile.fundingSituation] : dash,
@@ -147,13 +160,22 @@ export async function buildStudentSummary(studentProfileId: string): Promise<Sum
       title: 'Eligibility',
       editHref: '/onboarding/student/financial',
       rows: [
-        { label: 'Date of birth', value: profile.dateOfBirth ? formatDate(profile.dateOfBirth) : dash },
-        { label: 'Citizenship', value: profile.citizenship ? citizenshipLabels[profile.citizenship] : dash },
+        {
+          label: 'Date of birth',
+          value: profile.dateOfBirth ? formatDate(profile.dateOfBirth) : dash,
+        },
+        {
+          label: 'Citizenship',
+          value: profile.citizenship ? citizenshipLabels[profile.citizenship] : dash,
+        },
         {
           label: 'First-generation student',
           value: profile.firstGeneration ? triStateLabels[profile.firstGeneration] : dash,
         },
-        { label: 'Disability', value: profile.disability ? triStateLabels[profile.disability] : dash },
+        {
+          label: 'Disability',
+          value: profile.disability ? triStateLabels[profile.disability] : dash,
+        },
       ],
     },
     {

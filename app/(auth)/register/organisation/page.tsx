@@ -18,7 +18,9 @@ export default async function OrganisationRegisterPage() {
         <Logo />
       </div>
 
-      <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">Create your corporate account</h1>
+      <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
+        Create your corporate account
+      </h1>
       <p className="mt-1.5 text-[13px] leading-6 text-ink-400">
         Join Bursary-Bridge to manage funding programmes and connect with students.
       </p>

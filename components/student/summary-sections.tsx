@@ -16,7 +16,12 @@ export function SummarySections({
   editLabel?: string;
 }) {
   return (
-    <div className={cn('divide-y divide-line overflow-hidden rounded-card border border-line bg-white', className)}>
+    <div
+      className={cn(
+        'divide-y divide-line overflow-hidden rounded-card border border-line bg-white',
+        className,
+      )}
+    >
       {sections.map((section) => (
         <section key={section.key} id={section.key} className="px-5 py-4">
           <div className="flex items-center justify-between gap-4">

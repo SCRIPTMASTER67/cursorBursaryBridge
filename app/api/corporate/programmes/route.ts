@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
 
   // Every referenced institution and course must exist in the catalogue.
   if (eligibility.institutionIds.length > 0) {
-    const count = await prisma.institution.count({ where: { id: { in: eligibility.institutionIds } } });
+    const count = await prisma.institution.count({
+      where: { id: { in: eligibility.institutionIds } },
+    });
     if (count !== eligibility.institutionIds.length) {
       return apiError('One of the selected institutions is no longer available.', 422);
     }

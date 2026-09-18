@@ -36,7 +36,10 @@ export async function POST(request: NextRequest) {
 
   const data = parsed.data;
 
-  const existing = await prisma.user.findUnique({ where: { email: data.email }, select: { id: true } });
+  const existing = await prisma.user.findUnique({
+    where: { email: data.email },
+    select: { id: true },
+  });
   if (existing) {
     return apiError('That email address is already registered.', 409, {
       email: 'An account with this email already exists. Try logging in instead.',
@@ -86,7 +89,13 @@ export async function POST(request: NextRequest) {
     link: '/onboarding/student/education',
   });
 
-  await audit({ userId: user.id, action: 'student.registered', entityType: 'User', entityId: user.id, ipAddress: ip });
+  await audit({
+    userId: user.id,
+    action: 'student.registered',
+    entityType: 'User',
+    entityId: user.id,
+    ipAddress: ip,
+  });
 
   return apiOk({ ok: true, redirectTo: '/verify' }, 201);
 }

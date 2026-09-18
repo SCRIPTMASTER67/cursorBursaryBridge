@@ -72,6 +72,8 @@ export function Tr({
   interactive?: boolean;
 }) {
   return (
-    <tr className={cn(interactive && 'transition-colors hover:bg-surface-subtle', className)}>{children}</tr>
+    <tr className={cn(interactive && 'transition-colors hover:bg-surface-subtle', className)}>
+      {children}
+    </tr>
   );
 }

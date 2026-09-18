@@ -9,7 +9,15 @@ export default async function OrganisationDetailsPage() {
   const { organisationId } = await requireCorporateOnboarding();
   const organisation = await prisma.organisation.findUniqueOrThrow({
     where: { id: organisationId },
-    select: { name: true, type: true, industry: true, website: true, country: true, createdAt: true, updatedAt: true },
+    select: {
+      name: true,
+      type: true,
+      industry: true,
+      website: true,
+      country: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   });
 
   // The account step seeds a placeholder name from the email domain; blank it

@@ -27,19 +27,21 @@ export default function PrivacyPage() {
             </p>
           </section>
           <section>
-            <h2 className="text-[15px] font-semibold text-ink">What we deliberately do not collect</h2>
+            <h2 className="text-[15px] font-semibold text-ink">
+              What we deliberately do not collect
+            </h2>
             <p className="mt-2">
-              Registration never asks for your street address, ID number, bank details, a parent’s ID
-              or detailed financial records. Sensitive information is requested only when a specific
-              application actually requires it.
+              Registration never asks for your street address, ID number, bank details, a parent’s
+              ID or detailed financial records. Sensitive information is requested only when a
+              specific application actually requires it.
             </p>
           </section>
           <section>
             <h2 className="text-[15px] font-semibold text-ink">Who sees your information</h2>
             <p className="mt-2">
-              Your profile is private until you apply. Submitting an application shares that profile,
-              and any documents you attached, with that funder alone. Other organisations cannot see
-              it, and we never sell your information.
+              Your profile is private until you apply. Submitting an application shares that
+              profile, and any documents you attached, with that funder alone. Other organisations
+              cannot see it, and we never sell your information.
             </p>
           </section>
           <section>

@@ -69,7 +69,10 @@ export function useFormSubmit<TResponse = unknown>() {
     [],
   );
 
-  const reset = useCallback(() => setState({ submitting: false, error: null, fieldErrors: {} }), []);
+  const reset = useCallback(
+    () => setState({ submitting: false, error: null, fieldErrors: {} }),
+    [],
+  );
 
   const clearFieldError = useCallback((field: string) => {
     setState((current) => {

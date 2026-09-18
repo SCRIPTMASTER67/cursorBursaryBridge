@@ -208,7 +208,9 @@ export function ApplicantProfile({
                       </>
                     )}
                   </p>
-                  <p className="text-[13px] text-ink-400">{student.institution ?? 'Institution not set'}</p>
+                  <p className="text-[13px] text-ink-400">
+                    {student.institution ?? 'Institution not set'}
+                  </p>
                 </div>
               </div>
 
@@ -244,9 +246,15 @@ export function ApplicantProfile({
                   <section>
                     <h2 className="text-[13px] font-semibold text-ink">Application details</h2>
                     <dl className="mt-3 space-y-2.5">
-                      <Row label="Date applied" value={application.submittedAt ? formatDate(application.submittedAt) : '—'} />
+                      <Row
+                        label="Date applied"
+                        value={application.submittedAt ? formatDate(application.submittedAt) : '—'}
+                      />
                       <Row label="Programme applied for" value={application.programmeName} />
-                      <Row label="Status" value={<ApplicationStatusBadge status={application.status} />} />
+                      <Row
+                        label="Status"
+                        value={<ApplicationStatusBadge status={application.status} />}
+                      />
                     </dl>
                   </section>
 
@@ -285,17 +293,23 @@ export function ApplicantProfile({
                     </dl>
                   </section>
 
-                  <section className="sm:col-span-2 border-t border-line pt-5">
+                  <section className="border-t border-line pt-5 sm:col-span-2">
                     <h2 className="text-[13px] font-semibold text-ink">Academic summary</h2>
                     <dl className="mt-3 grid gap-2.5 sm:grid-cols-3">
                       <Row
                         label="Latest average"
-                        value={student.academicAverage !== null ? `${student.academicAverage}%` : 'Not provided'}
+                        value={
+                          student.academicAverage !== null
+                            ? `${student.academicAverage}%`
+                            : 'Not provided'
+                        }
                       />
                       <Row
                         label="Qualification"
                         value={
-                          student.qualificationLevel ? qualificationLabels[student.qualificationLevel] : '—'
+                          student.qualificationLevel
+                            ? qualificationLabels[student.qualificationLevel]
+                            : '—'
                         }
                       />
                       <Row
@@ -311,10 +325,12 @@ export function ApplicantProfile({
                     )}
                   </section>
 
-                  <section className="sm:col-span-2 border-t border-line pt-5">
+                  <section className="border-t border-line pt-5 sm:col-span-2">
                     <h2 className="text-[13px] font-semibold text-ink">Study preferences</h2>
                     {student.studyPreferences.length === 0 ? (
-                      <p className="mt-2 text-[13px] text-ink-400">No study preferences recorded.</p>
+                      <p className="mt-2 text-[13px] text-ink-400">
+                        No study preferences recorded.
+                      </p>
                     ) : (
                       <ol className="mt-3 space-y-2">
                         {student.studyPreferences.map((preference) => (
@@ -336,17 +352,21 @@ export function ApplicantProfile({
                     )}
                   </section>
 
-                  <section className="sm:col-span-2 border-t border-line pt-5">
+                  <section className="border-t border-line pt-5 sm:col-span-2">
                     <h2 className="text-[13px] font-semibold text-ink">Funding profile</h2>
                     <dl className="mt-3 space-y-2.5">
                       <Row
                         label="Household income"
-                        value={student.householdIncome ? incomeBandLabels[student.householdIncome] : '—'}
+                        value={
+                          student.householdIncome ? incomeBandLabels[student.householdIncome] : '—'
+                        }
                       />
                       <Row
                         label="Current funding"
                         value={
-                          student.fundingSituation ? fundingSituationLabels[student.fundingSituation] : '—'
+                          student.fundingSituation
+                            ? fundingSituationLabels[student.fundingSituation]
+                            : '—'
                         }
                       />
                       <Row
@@ -363,7 +383,9 @@ export function ApplicantProfile({
                       />
                       <Row
                         label="First-generation student"
-                        value={student.firstGeneration ? triStateLabels[student.firstGeneration] : '—'}
+                        value={
+                          student.firstGeneration ? triStateLabels[student.firstGeneration] : '—'
+                        }
                       />
                     </dl>
                   </section>
@@ -377,8 +399,8 @@ export function ApplicantProfile({
                     <EligibilityBadge outcome={eligibility.outcome} />
                   </div>
                   <p className="mt-1.5 text-[13px] leading-6 text-ink-400">
-                    Assessed against this programme’s current criteria. Missing information is flagged
-                    for verification rather than counted as a failure.
+                    Assessed against this programme’s current criteria. Missing information is
+                    flagged for verification rather than counted as a failure.
                   </p>
                   <ul className="mt-4 space-y-2.5">
                     {eligibility.criteria.map((criterion, index) => (
@@ -400,7 +422,9 @@ export function ApplicantProfile({
                           <li key={type} className="flex items-center gap-2.5 text-[13px]">
                             <span
                               className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                                provided ? 'bg-success-50 text-success-600' : 'bg-warning-50 text-warning-600'
+                                provided
+                                  ? 'bg-success-50 text-success-600'
+                                  : 'bg-warning-50 text-warning-600'
                               }`}
                             >
                               {provided ? (
@@ -411,7 +435,9 @@ export function ApplicantProfile({
                             </span>
                             <span className={provided ? 'text-ink-700' : 'text-ink-600'}>
                               {documentTypeLabels[type]}
-                              {!provided && <span className="ml-1.5 text-warning-600">outstanding</span>}
+                              {!provided && (
+                                <span className="ml-1.5 text-warning-600">outstanding</span>
+                              )}
                             </span>
                           </li>
                         );
@@ -432,7 +458,9 @@ export function ApplicantProfile({
                             <span className="block text-[13px] font-medium text-ink">
                               {documentTypeLabels[document.type]}
                             </span>
-                            <span className="block truncate text-xs text-ink-400">{document.fileName}</span>
+                            <span className="block truncate text-xs text-ink-400">
+                              {document.fileName}
+                            </span>
                           </span>
                           <a
                             href={document.url}
@@ -463,7 +491,9 @@ export function ApplicantProfile({
                         const value = application.answers[question.id];
                         return (
                           <div key={question.id}>
-                            <dt className="text-[13px] font-medium text-ink-700">{question.label}</dt>
+                            <dt className="text-[13px] font-medium text-ink-700">
+                              {question.label}
+                            </dt>
                             <dd className="mt-1 whitespace-pre-line text-[13px] leading-6 text-ink-500">
                               {value === undefined || value === ''
                                 ? 'Not answered'
@@ -508,14 +538,29 @@ export function ApplicantProfile({
               >
                 Move to Selected
               </Button>
-              <Button fullWidth variant="outline" onClick={() => setDialog('REQUEST_INFO')} disabled={busy}>
+              <Button
+                fullWidth
+                variant="outline"
+                onClick={() => setDialog('REQUEST_INFO')}
+                disabled={busy}
+              >
                 Request Information
               </Button>
-              <Button fullWidth variant="danger" onClick={() => setDialog('REJECT')} disabled={busy}>
+              <Button
+                fullWidth
+                variant="danger"
+                onClick={() => setDialog('REJECT')}
+                disabled={busy}
+              >
                 Reject
               </Button>
               {application.status !== 'UNDER_REVIEW' && (
-                <Button fullWidth variant="ghost" onClick={() => decide('UNDER_REVIEW')} loading={busy}>
+                <Button
+                  fullWidth
+                  variant="ghost"
+                  onClick={() => decide('UNDER_REVIEW')}
+                  loading={busy}
+                >
                   Move back to review
                 </Button>
               )}
@@ -581,7 +626,11 @@ export function ApplicantProfile({
             <Button variant="outline" onClick={() => setDialog(null)} disabled={busy}>
               Cancel
             </Button>
-            <Button onClick={() => decide('DOCUMENTS_REQUIRED', note)} loading={busy} disabled={!note.trim()}>
+            <Button
+              onClick={() => decide('DOCUMENTS_REQUIRED', note)}
+              loading={busy}
+              disabled={!note.trim()}
+            >
               Send request
             </Button>
           </>
@@ -603,7 +652,9 @@ export function ApplicantProfile({
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-ink-400">{label}</dt>
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-ink-400">
+        {label}
+      </dt>
       <dd className="text-[13px] text-ink-700">{value}</dd>
     </div>
   );

@@ -77,7 +77,9 @@ export async function buildOrganisationSummary(
       rows: [
         {
           label: 'Currently offers funding',
-          value: organisation.offersFunding ? offersFundingLabels[organisation.offersFunding] : dash,
+          value: organisation.offersFunding
+            ? offersFundingLabels[organisation.offersFunding]
+            : dash,
         },
         {
           label: 'Programme types',

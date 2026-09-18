@@ -66,7 +66,9 @@ export function Sidebar({
           <Link href="/" className="flex items-center gap-2" aria-label="Bursary-Bridge home">
             <LogoMark tone="light" className="h-6 w-9" />
             {showWordmark && (
-              <span className="text-[15px] font-bold tracking-[-0.02em] text-white">Bursary-Bridge</span>
+              <span className="text-[15px] font-bold tracking-[-0.02em] text-white">
+                Bursary-Bridge
+              </span>
             )}
           </Link>
           <button
@@ -109,8 +111,9 @@ export function Sidebar({
 function NavLink({ item, onNavigate }: { item: NavItem; onNavigate: () => void }) {
   const pathname = usePathname();
   // Dashboard must match exactly; every other section matches its subtree.
-  const active =
-    item.href.endsWith('/dashboard') ? pathname === item.href : pathname.startsWith(item.href);
+  const active = item.href.endsWith('/dashboard')
+    ? pathname === item.href
+    : pathname.startsWith(item.href);
 
   return (
     <Link
@@ -124,7 +127,9 @@ function NavLink({ item, onNavigate }: { item: NavItem; onNavigate: () => void }
           : 'text-sidebar-text hover:bg-sidebar-hover hover:text-white',
       )}
     >
-      <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center">{item.icon}</span>
+      <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center">
+        {item.icon}
+      </span>
       <span className="flex-1 truncate">{item.label}</span>
       {typeof item.badge === 'number' && item.badge > 0 && (
         <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white/15 px-1.5 text-[10px] font-bold text-white">
@@ -155,8 +160,7 @@ function LogoutButton() {
       type="button"
       onClick={logout}
       disabled={busy}
-      className="flex h-10 w-full items-center gap-3 rounded-btn px-3 text-[13px] font-medium
-                 text-sidebar-text transition-colors hover:bg-sidebar-hover hover:text-white disabled:opacity-60"
+      className="flex h-10 w-full items-center gap-3 rounded-btn px-3 text-[13px] font-medium text-sidebar-text transition-colors hover:bg-sidebar-hover hover:text-white disabled:opacity-60"
     >
       <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center">
         <LogOut className="h-[18px] w-[18px]" />

@@ -66,7 +66,11 @@ export function CurrentProcessForm({
           </Button>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-6">
           <fieldset>
@@ -83,7 +87,9 @@ export function CurrentProcessForm({
           </fieldset>
 
           <div className="border-t border-line pt-5">
-            <p className="text-[13px] font-medium text-ink-700">What are your biggest challenges?</p>
+            <p className="text-[13px] font-medium text-ink-700">
+              What are your biggest challenges?
+            </p>
             <p className="mb-3 mt-1 text-[13px] text-ink-400">
               Select up to {MAX_CHALLENGES}. {challenges.length} selected.
             </p>

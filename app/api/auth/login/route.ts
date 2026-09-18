@@ -38,13 +38,22 @@ export async function POST(request: NextRequest) {
   const invalid = () => apiError('Email address or password is incorrect.', 401);
 
   if (!user) {
-    await verifyPassword(parsed.data.password, '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi');
+    await verifyPassword(
+      parsed.data.password,
+      '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidi',
+    );
     return invalid();
   }
 
   const valid = await verifyPassword(parsed.data.password, user.passwordHash);
   if (!valid) {
-    await audit({ userId: user.id, action: 'auth.login_failed', entityType: 'User', entityId: user.id, ipAddress: ip });
+    await audit({
+      userId: user.id,
+      action: 'auth.login_failed',
+      entityType: 'User',
+      entityId: user.id,
+      ipAddress: ip,
+    });
     return invalid();
   }
 
@@ -68,7 +77,13 @@ export async function POST(request: NextRequest) {
 
   await createSession(user.id, { userAgent: request.headers.get('user-agent'), ipAddress: ip });
   await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
-  await audit({ userId: user.id, action: 'auth.login', entityType: 'User', entityId: user.id, ipAddress: ip });
+  await audit({
+    userId: user.id,
+    action: 'auth.login',
+    entityType: 'User',
+    entityId: user.id,
+    ipAddress: ip,
+  });
 
   return apiOk({ ok: true, redirectTo: await landingPath(user.id, user.role) });
 }
@@ -84,13 +99,15 @@ async function landingPath(userId: string, role: UserRole): Promise<string> {
       where: { userId },
       select: { onboardingCompletedAt: true, onboardingStep: true },
     });
-    if (profile && !profile.onboardingCompletedAt) return `/onboarding/student/${profile.onboardingStep}`;
+    if (profile && !profile.onboardingCompletedAt)
+      return `/onboarding/student/${profile.onboardingStep}`;
   } else {
     const profile = await prisma.corporateProfile.findUnique({
       where: { userId },
       select: { onboardingCompletedAt: true, onboardingStep: true },
     });
-    if (profile && !profile.onboardingCompletedAt) return `/onboarding/organisation/${profile.onboardingStep}`;
+    if (profile && !profile.onboardingCompletedAt)
+      return `/onboarding/organisation/${profile.onboardingStep}`;
   }
   return homePathForRole(role);
 }

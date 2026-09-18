@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
 
   const limit = rateLimit(`resend:${auth.user.id}`, 3, 300);
   if (!limit.allowed) {
-    return apiError(`Please wait ${limit.retryAfterSeconds} seconds before requesting another email.`, 429);
+    return apiError(
+      `Please wait ${limit.retryAfterSeconds} seconds before requesting another email.`,
+      429,
+    );
   }
 
   if (auth.user.emailVerifiedAt) {

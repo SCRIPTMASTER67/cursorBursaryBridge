@@ -1,5 +1,10 @@
 import type { ReactNode } from 'react';
-import type { ApplicationStatus, MatchClassification, ProgrammeStatus, ShortlistStatus } from '@prisma/client';
+import type {
+  ApplicationStatus,
+  MatchClassification,
+  ProgrammeStatus,
+  ShortlistStatus,
+} from '@prisma/client';
 import {
   applicationStatusLabels,
   matchClassificationLabels,
@@ -57,7 +62,13 @@ const applicationTones: Record<ApplicationStatus, BadgeTone> = {
   UNSUCCESSFUL: 'danger',
 };
 
-export function ApplicationStatusBadge({ status, className }: { status: ApplicationStatus; className?: string }) {
+export function ApplicationStatusBadge({
+  status,
+  className,
+}: {
+  status: ApplicationStatus;
+  className?: string;
+}) {
   return (
     <Badge tone={applicationTones[status]} className={className}>
       {applicationStatusLabels[status]}
@@ -72,7 +83,13 @@ const programmeTones: Record<ProgrammeStatus, BadgeTone> = {
   SUSPENDED: 'danger',
 };
 
-export function ProgrammeStatusBadge({ status, className }: { status: ProgrammeStatus; className?: string }) {
+export function ProgrammeStatusBadge({
+  status,
+  className,
+}: {
+  status: ProgrammeStatus;
+  className?: string;
+}) {
   return (
     <Badge tone={programmeTones[status]} className={className}>
       {programmeStatusLabels[status]}
@@ -86,7 +103,13 @@ const eligibilityTones: Record<EligibilityOutcome, BadgeTone> = {
   PENDING_VERIFICATION: 'warning',
 };
 
-export function EligibilityBadge({ outcome, className }: { outcome: EligibilityOutcome; className?: string }) {
+export function EligibilityBadge({
+  outcome,
+  className,
+}: {
+  outcome: EligibilityOutcome;
+  className?: string;
+}) {
   return (
     <Badge tone={eligibilityTones[outcome]} className={className}>
       {eligibilityOutcomeLabels[outcome]}
@@ -100,7 +123,13 @@ const shortlistTones: Record<ShortlistStatus, BadgeTone> = {
   WITHDRAWN: 'neutral',
 };
 
-export function ShortlistStatusBadge({ status, className }: { status: ShortlistStatus; className?: string }) {
+export function ShortlistStatusBadge({
+  status,
+  className,
+}: {
+  status: ShortlistStatus;
+  className?: string;
+}) {
   return (
     <Badge tone={shortlistTones[status]} className={className}>
       {shortlistStatusLabels[status]}
@@ -148,7 +177,11 @@ export function MatchClassificationBadge({
   className?: string;
 }) {
   const tone: BadgeTone =
-    classification === 'STRONG_MATCH' ? 'success' : classification === 'POTENTIAL_MATCH' ? 'brand' : 'warning';
+    classification === 'STRONG_MATCH'
+      ? 'success'
+      : classification === 'POTENTIAL_MATCH'
+        ? 'brand'
+        : 'warning';
   return (
     <Badge tone={tone} className={className}>
       {matchClassificationLabels[classification]}

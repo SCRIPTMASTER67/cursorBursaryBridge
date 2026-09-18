@@ -35,7 +35,10 @@ export function HeroIllustration() {
         <path d="M236 214h48v30a24 24 0 0 1-48 0Z" fill="#9C6540" />
 
         {/* Torso */}
-        <path d="M260 248c58 0 97 34 109 85l13 76c5 26-14 47-40 47H178c-26 0-45-21-40-47l13-76c12-51 51-85 109-85Z" fill="#F5B841" />
+        <path
+          d="M260 248c58 0 97 34 109 85l13 76c5 26-14 47-40 47H178c-26 0-45-21-40-47l13-76c12-51 51-85 109-85Z"
+          fill="#F5B841"
+        />
         <g clipPath="url(#bb-body)">
           {/* Soft shading down the left of the top */}
           <path d="M132 248h74l-18 210h-74Z" fill="#E2A52E" opacity="0.45" />
@@ -77,7 +80,16 @@ export function HeroIllustration() {
         <g transform="rotate(-4 260 386)">
           <rect x="168" y="352" width="184" height="26" rx="6" fill="#5B2EDB" />
           <rect x="176" y="358" width="8" height="14" rx="2" fill="#BCA9F7" opacity="0.7" />
-          <rect x="168" y="380" width="184" height="26" rx="6" fill="#FFFFFF" stroke="#D9CFFB" strokeWidth="2" />
+          <rect
+            x="168"
+            y="380"
+            width="184"
+            height="26"
+            rx="6"
+            fill="#FFFFFF"
+            stroke="#D9CFFB"
+            strokeWidth="2"
+          />
           <rect x="176" y="386" width="8" height="14" rx="2" fill="#D9CFFB" />
           <rect x="168" y="408" width="184" height="26" rx="6" fill="#8055EA" />
           <rect x="176" y="414" width="8" height="14" rx="2" fill="#EBE6FD" opacity="0.7" />
@@ -108,7 +120,12 @@ export function HeroIllustration() {
         <p className="text-[11px] font-medium text-ink-400">Matched for you</p>
         <div className="mt-1 flex items-end justify-between">
           <span className="text-2xl font-bold leading-none text-ink">24</span>
-          <svg viewBox="0 0 48 22" className="h-5 w-12 text-success-600" fill="none" aria-hidden="true">
+          <svg
+            viewBox="0 0 48 22"
+            className="h-5 w-12 text-success-600"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="M2 18 12 10l8 5 10-11 16 4"
               stroke="currentColor"

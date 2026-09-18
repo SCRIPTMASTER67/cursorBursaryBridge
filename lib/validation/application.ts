@@ -6,7 +6,9 @@ import { z } from 'zod';
  */
 export const applicationDraftSchema = z.object({
   fundingProgrammeId: z.string().cuid(),
-  answers: z.record(z.string(), z.union([z.string(), z.array(z.string()), z.number(), z.boolean()])).default({}),
+  answers: z
+    .record(z.string(), z.union([z.string(), z.array(z.string()), z.number(), z.boolean()]))
+    .default({}),
   documentIds: z.array(z.string().cuid()).default([]),
 });
 

@@ -17,7 +17,10 @@ export default async function CorporateNotificationsPage() {
 
   return (
     <PageBody>
-      <PageHeader title="Notifications" description="Updates about your programmes and applicants." />
+      <PageHeader
+        title="Notifications"
+        description="Updates about your programmes and applicants."
+      />
       <NotificationsView
         notifications={notifications.map((notification) => ({
           id: notification.id,

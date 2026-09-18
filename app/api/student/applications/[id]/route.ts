@@ -4,7 +4,10 @@ import { apiError, apiOk, apiStudent } from '@/lib/auth/api';
 import { audit } from '@/services/audit';
 
 /** Withdraw a draft. Submitted applications cannot be deleted by the student. */
-export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await apiStudent();
   if (!auth.ok) return auth.response;
 
@@ -18,7 +21,10 @@ export async function DELETE(_request: NextRequest, { params }: { params: Promis
 
   if (!application) return apiError('Application not found.', 404);
   if (application.status !== 'DRAFT') {
-    return apiError('A submitted application cannot be deleted. Contact the funder to withdraw it.', 409);
+    return apiError(
+      'A submitted application cannot be deleted. Contact the funder to withdraw it.',
+      409,
+    );
   }
 
   await prisma.application.delete({ where: { id: application.id } });

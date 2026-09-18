@@ -19,7 +19,11 @@ const stepLabels = corporateSteps.map((s) => s.label);
 export function CorporateRoleForm({
   initial,
 }: {
-  initial: { role: CorporateRole | null; organisationSize: OrganisationSize | null; department: string };
+  initial: {
+    role: CorporateRole | null;
+    organisationSize: OrganisationSize | null;
+    department: string;
+  };
 }) {
   const router = useRouter();
   const { submitting, error, fieldErrors, submit } = useFormSubmit<{ redirectTo: string }>();
@@ -65,7 +69,11 @@ export function CorporateRoleForm({
           </Button>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-5">
           <Field label="Role" error={fieldErrors.role} required>
@@ -73,12 +81,18 @@ export function CorporateRoleForm({
               options={toOptions(corporateRoleLabels)}
               placeholder="Select your role"
               value={values.role}
-              onChange={(event) => setValues({ ...values, role: event.target.value as CorporateRole })}
+              onChange={(event) =>
+                setValues({ ...values, role: event.target.value as CorporateRole })
+              }
               required
             />
           </Field>
 
-          <Field label="How large is your organisation?" error={fieldErrors.organisationSize} required>
+          <Field
+            label="How large is your organisation?"
+            error={fieldErrors.organisationSize}
+            required
+          >
             <Select
               options={toOptions(organisationSizeLabels)}
               placeholder="Select organisation size"
@@ -90,7 +104,11 @@ export function CorporateRoleForm({
             />
           </Field>
 
-          <Field label="Which best describes your department?" error={fieldErrors.department} optional>
+          <Field
+            label="Which best describes your department?"
+            error={fieldErrors.department}
+            optional
+          >
             <Input
               value={values.department}
               onChange={(event) => setValues({ ...values, department: event.target.value })}

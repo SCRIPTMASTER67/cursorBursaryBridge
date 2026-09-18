@@ -47,7 +47,12 @@ export default async function StudentDashboardPage() {
       where: { studentProfileId },
       include: {
         fundingProgramme: {
-          select: { id: true, name: true, closingDate: true, organisation: { select: { name: true } } },
+          select: {
+            id: true,
+            name: true,
+            closingDate: true,
+            organisation: { select: { name: true } },
+          },
         },
       },
       orderBy: { updatedAt: 'desc' },
@@ -74,14 +79,15 @@ export default async function StudentDashboardPage() {
     documentCount: profile._count.documents,
   });
 
-  const topMatches = opportunities.filter((o) => !appliedProgrammeIds.has(o.programme.id)).slice(0, 3);
+  const topMatches = opportunities
+    .filter((o) => !appliedProgrammeIds.has(o.programme.id))
+    .slice(0, 3);
 
   return (
     <PageBody>
       <div className="mb-6">
         <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
-          {greeting()}, {user.firstName}!{' '}
-          <span aria-hidden="true">👋</span>
+          {greeting()}, {user.firstName}! <span aria-hidden="true">👋</span>
         </h1>
         <p className="mt-1.5 text-[13px] text-ink-400">Here are your funding matches today.</p>
       </div>
@@ -219,7 +225,9 @@ export default async function StudentDashboardPage() {
                         className="flex items-center justify-between gap-3 rounded-btn px-2.5 py-2 text-[13px] text-ink-600 transition-colors hover:bg-surface-subtle"
                       >
                         <span className="truncate">{prompt.label}</span>
-                        <span className="shrink-0 font-semibold text-success-600">+{prompt.weight}%</span>
+                        <span className="shrink-0 font-semibold text-success-600">
+                          +{prompt.weight}%
+                        </span>
                       </Link>
                     </li>
                   ))}
@@ -252,8 +260,12 @@ export default async function StudentDashboardPage() {
                       className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-surface-subtle"
                     >
                       <div className="min-w-0">
-                        <p className="truncate text-[13px] font-medium text-ink">{entry.programme.name}</p>
-                        <p className="mt-0.5 text-xs text-ink-400">{formatDate(entry.programme.closingDate)}</p>
+                        <p className="truncate text-[13px] font-medium text-ink">
+                          {entry.programme.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-ink-400">
+                          {formatDate(entry.programme.closingDate)}
+                        </p>
                       </div>
                       <Badge tone="warning" icon={<Clock className="h-3 w-3" />}>
                         {deadlineLabel(entry.programme.closingDate)}

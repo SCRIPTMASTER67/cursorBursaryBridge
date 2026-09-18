@@ -2,7 +2,13 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import type { FundingCoverage, FundingType, MatchClassification, Province, QualificationLevel } from '@prisma/client';
+import type {
+  FundingCoverage,
+  FundingType,
+  MatchClassification,
+  Province,
+  QualificationLevel,
+} from '@prisma/client';
 import { Calendar, Check, Filter, Search, X } from '@/components/icons';
 import { Badge, MatchBadge } from '@/components/ui/badge';
 import { Button, ButtonLink } from '@/components/ui/button';
@@ -102,13 +108,22 @@ export function OpportunitiesBrowser({
         return false;
       }
       if (filters.courseId && !item.courses.some((c) => c.id === filters.courseId)) return false;
-      if (filters.institutionId && !item.institutions.some((i) => i.id === filters.institutionId)) return false;
-      if (filters.qualification && !item.qualificationLevels.includes(filters.qualification as QualificationLevel)) {
+      if (filters.institutionId && !item.institutions.some((i) => i.id === filters.institutionId))
+        return false;
+      if (
+        filters.qualification &&
+        !item.qualificationLevels.includes(filters.qualification as QualificationLevel)
+      ) {
         return false;
       }
       if (filters.fundingType && item.fundingType !== filters.fundingType) return false;
-      if (filters.coverage && !item.coverage.includes(filters.coverage as FundingCoverage)) return false;
-      if (filters.province && item.provinces.length > 0 && !item.provinces.includes(filters.province as Province)) {
+      if (filters.coverage && !item.coverage.includes(filters.coverage as FundingCoverage))
+        return false;
+      if (
+        filters.province &&
+        item.provinces.length > 0 &&
+        !item.provinces.includes(filters.province as Province)
+      ) {
         return false;
       }
       if (filters.minMatch && item.matchScore < Number(filters.minMatch)) return false;
@@ -121,7 +136,8 @@ export function OpportunitiesBrowser({
     });
 
     return result.sort((a, b) => {
-      if (sort === 'closing') return new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime();
+      if (sort === 'closing')
+        return new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime();
       if (sort === 'name') return a.name.localeCompare(b.name);
       return b.matchScore - a.matchScore;
     });
@@ -185,7 +201,10 @@ export function OpportunitiesBrowser({
                 label="Institution"
                 value={filters.institutionId}
                 onChange={(v) => update('institutionId', v)}
-                options={catalog.institutions.map((i) => ({ value: i.id, label: i.shortName ?? i.name }))}
+                options={catalog.institutions.map((i) => ({
+                  value: i.id,
+                  label: i.shortName ?? i.name,
+                }))}
               />
               <FilterSelect
                 label="Qualification"
@@ -362,7 +381,10 @@ function OpportunityRow({ item }: { item: OpportunityItem }) {
           <dd className="mt-1 text-[13px] text-ink-600">
             {item.courses.length === 0
               ? 'All courses'
-              : item.courses.slice(0, 3).map((c) => c.name).join(', ') +
+              : item.courses
+                  .slice(0, 3)
+                  .map((c) => c.name)
+                  .join(', ') +
                 (item.courses.length > 3 ? ` +${item.courses.length - 3} more` : '')}
           </dd>
         </div>
@@ -373,7 +395,10 @@ function OpportunityRow({ item }: { item: OpportunityItem }) {
           <dd className="mt-1 text-[13px] text-ink-600">
             {item.institutions.length === 0
               ? 'All institutions'
-              : item.institutions.slice(0, 3).map((i) => i.name).join(', ') +
+              : item.institutions
+                  .slice(0, 3)
+                  .map((i) => i.name)
+                  .join(', ') +
                 (item.institutions.length > 3 ? ` +${item.institutions.length - 3} more` : '')}
           </dd>
         </div>
@@ -398,7 +423,9 @@ function OpportunityRow({ item }: { item: OpportunityItem }) {
         >
           <Calendar className="h-4 w-4" />
           Closes {formatDate(item.closingDate)}
-          {closingSoon && <span className="font-semibold">· {days === 0 ? 'today' : `${days} days left`}</span>}
+          {closingSoon && (
+            <span className="font-semibold">· {days === 0 ? 'today' : `${days} days left`}</span>
+          )}
         </p>
         <ButtonLink href={`/student/opportunities/${item.id}`} size="sm">
           View Opportunity

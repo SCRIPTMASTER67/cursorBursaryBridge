@@ -97,7 +97,9 @@ async function main() {
     return row;
   };
 
-  console.log(`  catalogue: ${institutionRows.length} institutions, ${programmeRows.length} courses`);
+  console.log(
+    `  catalogue: ${institutionRows.length} institutions, ${programmeRows.length} courses`,
+  );
 
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
 
@@ -108,7 +110,14 @@ async function main() {
     industry: Prisma.OrganisationCreateInput['industry'];
     website: string;
     description: string;
-    manager: { firstName: string; lastName: string; email: string; mobile: string; role: Prisma.CorporateProfileCreateInput['role']; department: string };
+    manager: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      mobile: string;
+      role: Prisma.CorporateProfileCreateInput['role'];
+      department: string;
+    };
     size: Prisma.CorporateProfileCreateInput['organisationSize'];
     volume: Prisma.OrganisationCreateInput['applicationVolume'];
   }[] = [
@@ -249,7 +258,13 @@ async function main() {
     institutions: string[];
     courses: string[];
     eligibility: Omit<Prisma.EligibilityRuleCreateInput, 'fundingProgramme'>;
-    questions: { label: string; helpText?: string; type: Prisma.ApplicationQuestionCreateInput['type']; required: boolean; options?: string[] }[];
+    questions: {
+      label: string;
+      helpText?: string;
+      type: Prisma.ApplicationQuestionCreateInput['type'];
+      required: boolean;
+      options?: string[];
+    }[];
   };
 
   const programmeSeeds: ProgrammeSeed[] = [
@@ -262,7 +277,14 @@ async function main() {
       fullDescription:
         'The Kgotso Holdings Technology Bursary supports deserving South African students who demonstrate academic excellence and financial need. We invest in future leaders in technology and related fields, and successful applicants join our graduate programme after completing their studies. The bursary covers the full cost of study and includes a mentorship pairing with a member of our technology team.',
       fundingType: 'BURSARY',
-      coverage: ['TUITION_FEES', 'REGISTRATION_FEES', 'ACCOMMODATION', 'MEALS_LIVING', 'BOOKS_MATERIALS', 'LAPTOP_DEVICE'],
+      coverage: [
+        'TUITION_FEES',
+        'REGISTRATION_FEES',
+        'ACCOMMODATION',
+        'MEALS_LIVING',
+        'BOOKS_MATERIALS',
+        'LAPTOP_DEVICE',
+      ],
       openDays: -90,
       closeDays: 30,
       status: 'PUBLISHED',
@@ -274,7 +296,13 @@ async function main() {
         'University of Cape Town',
         'Tshwane University of Technology',
       ],
-      courses: ['Computer Science', 'Information Technology', 'Information Systems', 'Data Science', 'Software Engineering'],
+      courses: [
+        'Computer Science',
+        'Information Technology',
+        'Information Systems',
+        'Data Science',
+        'Software Engineering',
+      ],
       eligibility: {
         minAcademicAverage: 70,
         qualificationLevels: ['BACHELORS', 'HONOURS'],
@@ -315,7 +343,12 @@ async function main() {
       closeDays: 75,
       status: 'PUBLISHED',
       intakeTarget: 15,
-      institutions: ['University of Pretoria', 'University of Cape Town', 'Stellenbosch University', 'University of Johannesburg'],
+      institutions: [
+        'University of Pretoria',
+        'University of Cape Town',
+        'Stellenbosch University',
+        'University of Johannesburg',
+      ],
       courses: ['Accounting', 'Financial Management', 'Economics'],
       eligibility: {
         minAcademicAverage: 75,
@@ -358,7 +391,13 @@ async function main() {
         'University of KwaZulu-Natal',
         'Cape Peninsula University of Technology',
       ],
-      courses: ['Electrical Engineering', 'Mechanical Engineering', 'Chemical Engineering', 'Computer Engineering', 'Industrial Engineering'],
+      courses: [
+        'Electrical Engineering',
+        'Mechanical Engineering',
+        'Chemical Engineering',
+        'Computer Engineering',
+        'Industrial Engineering',
+      ],
       eligibility: {
         minAcademicAverage: 65,
         qualificationLevels: ['BACHELORS', 'HONOURS', 'MASTERS'],
@@ -425,13 +464,30 @@ async function main() {
       fullDescription:
         'Amandla Mining Group funds students in mining engineering, metallurgical engineering and geology. Bursars complete practical placements at our operations and are offered permanent employment on graduation. Preference is given to students from the provinces where we operate.',
       fundingType: 'BURSARY',
-      coverage: ['TUITION_FEES', 'REGISTRATION_FEES', 'ACCOMMODATION', 'MEALS_LIVING', 'BOOKS_MATERIALS', 'TRANSPORT'],
+      coverage: [
+        'TUITION_FEES',
+        'REGISTRATION_FEES',
+        'ACCOMMODATION',
+        'MEALS_LIVING',
+        'BOOKS_MATERIALS',
+        'TRANSPORT',
+      ],
       openDays: -20,
       closeDays: 95,
       status: 'PUBLISHED',
       intakeTarget: 20,
-      institutions: ['University of the Witwatersrand', 'University of Pretoria', 'University of Johannesburg', 'University of the Free State'],
-      courses: ['Mining Engineering', 'Metallurgical Engineering', 'Geology', 'Chemical Engineering'],
+      institutions: [
+        'University of the Witwatersrand',
+        'University of Pretoria',
+        'University of Johannesburg',
+        'University of the Free State',
+      ],
+      courses: [
+        'Mining Engineering',
+        'Metallurgical Engineering',
+        'Geology',
+        'Chemical Engineering',
+      ],
       eligibility: {
         minAcademicAverage: 68,
         qualificationLevels: ['BACHELORS', 'HONOURS'],
@@ -439,7 +495,14 @@ async function main() {
         citizenship: ['SA_CITIZEN'],
         maxHouseholdIncome: 'R350K_500K',
         requiresFinancialNeed: true,
-        provinces: ['GAUTENG', 'NORTH_WEST', 'LIMPOPO', 'MPUMALANGA', 'FREE_STATE', 'NORTHERN_CAPE'],
+        provinces: [
+          'GAUTENG',
+          'NORTH_WEST',
+          'LIMPOPO',
+          'MPUMALANGA',
+          'FREE_STATE',
+          'NORTHERN_CAPE',
+        ],
         otherRequirements: 'Applicants must be medically fit for underground work.',
         requiredDocuments: ['ID_DOCUMENT', 'ACADEMIC_RECORD', 'PROOF_OF_RESIDENCE'],
       },
@@ -458,7 +521,11 @@ async function main() {
       closeDays: 120,
       status: 'DRAFT',
       intakeTarget: 8,
-      institutions: ['University of Cape Town', 'Stellenbosch University', 'University of the Witwatersrand'],
+      institutions: [
+        'University of Cape Town',
+        'Stellenbosch University',
+        'University of the Witwatersrand',
+      ],
       courses: ['Physics', 'Chemistry', 'Environmental Science', 'Mathematics'],
       eligibility: {
         minAcademicAverage: 72,
@@ -475,7 +542,8 @@ async function main() {
     },
   ];
 
-  const createdProgrammes: { id: string; slug: string; organisationId: string; name: string }[] = [];
+  const createdProgrammes: { id: string; slug: string; organisationId: string; name: string }[] =
+    [];
 
   for (const seed of programmeSeeds) {
     const organisation = organisations[seed.org];
@@ -560,35 +628,101 @@ async function seedStudents({
   organisations: Record<string, { id: string; userId: string }>;
 }) {
   const firstNames = [
-    'Asanda', 'Liam', 'Nomusa', 'Thabo', 'Megan', 'Sipho', 'Lerato', 'Ayesha', 'Kagiso', 'Chloé',
-    'Tumelo', 'Zanele', 'Ruan', 'Naledi', 'Farhaan', 'Palesa', 'Jaco', 'Refilwe', 'Nkosi', 'Amahle',
-    'Bongani', 'Michelle', 'Sizwe', 'Kirsten', 'Mpho', 'Dineo', 'Tebogo', 'Anele', 'Rethabile', 'Karabo',
+    'Asanda',
+    'Liam',
+    'Nomusa',
+    'Thabo',
+    'Megan',
+    'Sipho',
+    'Lerato',
+    'Ayesha',
+    'Kagiso',
+    'Chloé',
+    'Tumelo',
+    'Zanele',
+    'Ruan',
+    'Naledi',
+    'Farhaan',
+    'Palesa',
+    'Jaco',
+    'Refilwe',
+    'Nkosi',
+    'Amahle',
+    'Bongani',
+    'Michelle',
+    'Sizwe',
+    'Kirsten',
+    'Mpho',
+    'Dineo',
+    'Tebogo',
+    'Anele',
+    'Rethabile',
+    'Karabo',
   ];
   const lastNames = [
-    'Nsibande', 'Jacobs', 'Zulu', 'Mokoena', 'Pillay', 'Ndlovu', 'Mahlangu', 'Naidoo', 'Botha', 'Sithole',
-    'Mabaso', 'Van Zyl', 'Khoza', 'Adams', 'Mthembu', 'Fourie', 'Radebe', 'Petersen', 'Dube', 'Motaung',
+    'Nsibande',
+    'Jacobs',
+    'Zulu',
+    'Mokoena',
+    'Pillay',
+    'Ndlovu',
+    'Mahlangu',
+    'Naidoo',
+    'Botha',
+    'Sithole',
+    'Mabaso',
+    'Van Zyl',
+    'Khoza',
+    'Adams',
+    'Mthembu',
+    'Fourie',
+    'Radebe',
+    'Petersen',
+    'Dube',
+    'Motaung',
   ];
 
   const preferenceSets: { courses: string[]; institutions: string[] }[] = [
     {
       courses: ['Computer Science', 'Computer Science', 'Information Technology', 'Data Science'],
-      institutions: ['University of Pretoria', 'University of Johannesburg', 'Tshwane University of Technology', 'University of the Witwatersrand'],
+      institutions: [
+        'University of Pretoria',
+        'University of Johannesburg',
+        'Tshwane University of Technology',
+        'University of the Witwatersrand',
+      ],
     },
     {
       courses: ['Electrical Engineering', 'Mechanical Engineering', 'Computer Engineering'],
-      institutions: ['University of Cape Town', 'Stellenbosch University', 'University of Pretoria'],
+      institutions: [
+        'University of Cape Town',
+        'Stellenbosch University',
+        'University of Pretoria',
+      ],
     },
     {
       courses: ['Accounting', 'Financial Management', 'Economics'],
-      institutions: ['University of Pretoria', 'Stellenbosch University', 'University of Cape Town'],
+      institutions: [
+        'University of Pretoria',
+        'Stellenbosch University',
+        'University of Cape Town',
+      ],
     },
     {
       courses: ['Mining Engineering', 'Geology', 'Metallurgical Engineering'],
-      institutions: ['University of the Witwatersrand', 'University of Johannesburg', 'University of Pretoria'],
+      institutions: [
+        'University of the Witwatersrand',
+        'University of Johannesburg',
+        'University of Pretoria',
+      ],
     },
     {
       courses: ['Nursing', 'Medicine', 'Pharmacy'],
-      institutions: ['University of KwaZulu-Natal', 'University of Cape Town', 'Nelson Mandela University'],
+      institutions: [
+        'University of KwaZulu-Natal',
+        'University of Cape Town',
+        'Nelson Mandela University',
+      ],
     },
     {
       courses: ['Law', 'Public Administration'],
@@ -604,7 +738,16 @@ async function seedStudents({
     },
   ];
 
-  const provinces = ['GAUTENG', 'WESTERN_CAPE', 'KWAZULU_NATAL', 'EASTERN_CAPE', 'LIMPOPO', 'NORTH_WEST', 'FREE_STATE', 'MPUMALANGA'] as const;
+  const provinces = [
+    'GAUTENG',
+    'WESTERN_CAPE',
+    'KWAZULU_NATAL',
+    'EASTERN_CAPE',
+    'LIMPOPO',
+    'NORTH_WEST',
+    'FREE_STATE',
+    'MPUMALANGA',
+  ] as const;
   const cities: Record<string, string> = {
     GAUTENG: 'Pretoria',
     WESTERN_CAPE: 'Cape Town',
@@ -615,7 +758,14 @@ async function seedStudents({
     FREE_STATE: 'Bloemfontein',
     MPUMALANGA: 'Mbombela',
   };
-  const incomes = ['BELOW_50K', 'R50K_100K', 'R100K_200K', 'R200K_350K', 'R350K_500K', 'ABOVE_500K'] as const;
+  const incomes = [
+    'BELOW_50K',
+    'R50K_100K',
+    'R100K_200K',
+    'R200K_350K',
+    'R350K_500K',
+    'ABOVE_500K',
+  ] as const;
 
   const students: { studentProfileId: string; userId: string }[] = [];
 
@@ -644,7 +794,9 @@ async function seedStudents({
     const student = await createStudent({
       firstName: first,
       lastName: last,
-      email: `${first}.${last}.${index}`.toLowerCase().replace(/[^a-z0-9.]/g, '') + '@demo.bursarybridge.local',
+      email:
+        `${first}.${last}.${index}`.toLowerCase().replace(/[^a-z0-9.]/g, '') +
+        '@demo.bursarybridge.local',
       mobile: `08${Math.floor(random() * 4) + 2}${String(Math.floor(random() * 9_999_999)).padStart(7, '0')}`,
       average: 55 + Math.floor(random() * 42),
       province,
@@ -681,8 +833,13 @@ async function seedStudents({
      */
     incompleteProfile?: boolean;
   }) {
-    const preferenceCount = Math.min(input.preferenceSet.courses.length, input.preferenceSet.institutions.length);
-    const interests = [...new Set(input.preferenceSet.courses.map((name) => prog(name).field))].slice(0, 5);
+    const preferenceCount = Math.min(
+      input.preferenceSet.courses.length,
+      input.preferenceSet.institutions.length,
+    );
+    const interests = [
+      ...new Set(input.preferenceSet.courses.map((name) => prog(name).field)),
+    ].slice(0, 5);
 
     const user = await prisma.user.create({
       data: {
@@ -709,7 +866,13 @@ async function seedStudents({
               !input.incompleteProfile && input.average >= 75
                 ? ['SUBJECT_DISTINCTIONS', 'ACADEMIC_AWARDS']
                 : [],
-            fundingNeeds: ['TUITION_FEES', 'ACCOMMODATION', 'BOOKS_MATERIALS', 'MEALS_LIVING', 'FULL_FUNDING'],
+            fundingNeeds: [
+              'TUITION_FEES',
+              'ACCOMMODATION',
+              'BOOKS_MATERIALS',
+              'MEALS_LIVING',
+              'FULL_FUNDING',
+            ],
             fundingSituation: 'NO_FUNDING',
             bursaryStatus: 'NO',
             householdIncome: input.incompleteProfile ? null : input.income,
@@ -743,13 +906,25 @@ async function seedStudents({
 
   // ------------------------------------------------------------ applications
   const publishedProgrammes = createdProgrammes.filter((p) =>
-    ['kgotso-technology-bursary-2026', 'kgotso-ca-scholarship-2026', 'umoya-engineering-bursary-2026', 'thuto-first-generation-grant-2026', 'amandla-mining-bursary-2026'].includes(p.slug),
+    [
+      'kgotso-technology-bursary-2026',
+      'kgotso-ca-scholarship-2026',
+      'umoya-engineering-bursary-2026',
+      'thuto-first-generation-grant-2026',
+      'amandla-mining-bursary-2026',
+    ].includes(p.slug),
   );
 
   const statusPlan: ApplicationStatus[] = [
-    'SUBMITTED', 'SUBMITTED', 'SUBMITTED', 'SUBMITTED',
-    'UNDER_REVIEW', 'UNDER_REVIEW', 'UNDER_REVIEW',
-    'SHORTLISTED', 'SHORTLISTED',
+    'SUBMITTED',
+    'SUBMITTED',
+    'SUBMITTED',
+    'SUBMITTED',
+    'UNDER_REVIEW',
+    'UNDER_REVIEW',
+    'UNDER_REVIEW',
+    'SHORTLISTED',
+    'SHORTLISTED',
     'DOCUMENTS_REQUIRED',
     'APPROVED',
     'UNSUCCESSFUL',
@@ -767,7 +942,9 @@ async function seedStudents({
       organisation: { select: { id: true, name: true, logoUrl: true, industry: true } },
       eligibility: true,
       supportedProgrammes: { include: { programme: { select: { id: true, name: true } } } },
-      supportedInstitutions: { include: { institution: { select: { id: true, name: true, shortName: true } } } },
+      supportedInstitutions: {
+        include: { institution: { select: { id: true, name: true, shortName: true } } },
+      },
     },
   });
 
@@ -846,7 +1023,9 @@ async function seedStudents({
             organisationId: entry.programme.organisationId,
             fundingProgrammeId: entry.programme.id,
             applicationId: application.id,
-            addedById: Object.values(organisations).find((o) => o.id === entry.programme.organisationId)?.userId,
+            addedById: Object.values(organisations).find(
+              (o) => o.id === entry.programme.organisationId,
+            )?.userId,
             status: status === 'APPROVED' ? 'SELECTED' : 'SHORTLISTED',
             selectedAt: status === 'APPROVED' ? new Date() : null,
           },
@@ -868,7 +1047,9 @@ async function seedStudents({
   console.log(`  eligibility spread: ${spread}`);
 
   // A draft application for the demo student, so "My Applications" shows one.
-  const demoDraftProgramme = createdProgrammes.find((p) => p.slug === 'amandla-mining-bursary-2026');
+  const demoDraftProgramme = createdProgrammes.find(
+    (p) => p.slug === 'amandla-mining-bursary-2026',
+  );
   if (demoDraftProgramme) {
     const existing = await prisma.application.findUnique({
       where: {

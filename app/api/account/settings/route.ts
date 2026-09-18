@@ -65,9 +65,18 @@ export async function PUT(request: NextRequest) {
     // Every other session is invalidated so a stolen cookie cannot survive a
     // password change.
     await destroyAllSessions(auth.user.id);
-    await audit({ userId: auth.user.id, action: 'auth.password_changed', entityType: 'User', entityId: auth.user.id });
+    await audit({
+      userId: auth.user.id,
+      action: 'auth.password_changed',
+      entityType: 'User',
+      entityId: auth.user.id,
+    });
 
-    return apiOk({ ok: true, redirectTo: '/login', message: 'Password updated. Please sign in again.' });
+    return apiOk({
+      ok: true,
+      redirectTo: '/login',
+      message: 'Password updated. Please sign in again.',
+    });
   }
 
   const parsed = profileSchema.safeParse(body);
@@ -100,7 +109,12 @@ export async function PUT(request: NextRequest) {
     },
   });
 
-  await audit({ userId: auth.user.id, action: 'user.profile_updated', entityType: 'User', entityId: auth.user.id });
+  await audit({
+    userId: auth.user.id,
+    action: 'user.profile_updated',
+    entityType: 'User',
+    entityId: auth.user.id,
+  });
 
   return apiOk({ ok: true, message: 'Your details have been updated.' });
 }

@@ -87,7 +87,11 @@ export default async function ReportsPage() {
       <PageHeader title="Reports" description="Pipeline and reach across your programmes." />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard value={formatNumber(stats.totalApplications)} label="Total applications" accent="info" />
+        <StatCard
+          value={formatNumber(stats.totalApplications)}
+          label="Total applications"
+          accent="info"
+        />
         <StatCard
           value={formatNumber(stats.eligibleApplications)}
           label="Eligible applicants"
@@ -112,7 +116,9 @@ export default async function ReportsPage() {
               .map((row) => (
                 <div key={row.status}>
                   <div className="mb-1.5 flex items-baseline justify-between">
-                    <span className="text-[13px] text-ink-600">{applicationStatusLabels[row.status]}</span>
+                    <span className="text-[13px] text-ink-600">
+                      {applicationStatusLabels[row.status]}
+                    </span>
                     <span className="text-[13px] font-semibold tabular-nums text-ink">
                       {formatNumber(row._count._all)}
                     </span>
@@ -124,7 +130,10 @@ export default async function ReportsPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Applicants by province" description="Where your applicants come from." />
+          <CardHeader
+            title="Applicants by province"
+            description="Where your applicants come from."
+          />
           <div className="space-y-3.5 px-6 pb-6">
             {provinces.map((province) => (
               <div key={province.name}>
@@ -173,7 +182,7 @@ export default async function ReportsPage() {
                     <Td align="right" className="tabular-nums">
                       {formatNumber(programme.shortlistCount)}
                     </Td>
-                    <Td align="right" className="tabular-nums font-semibold text-ink">
+                    <Td align="right" className="font-semibold tabular-nums text-ink">
                       {rate}%
                     </Td>
                   </Tr>

@@ -45,10 +45,18 @@ export const programmeDetailsSchema = z
     const open = new Date(data.openDate);
     const close = new Date(data.closingDate);
     if (Number.isNaN(open.getTime())) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['openDate'], message: 'Enter a valid date' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['openDate'],
+        message: 'Enter a valid date',
+      });
     }
     if (Number.isNaN(close.getTime())) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['closingDate'], message: 'Enter a valid date' });
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['closingDate'],
+        message: 'Enter a valid date',
+      });
     }
     if (!Number.isNaN(open.getTime()) && !Number.isNaN(close.getTime()) && close <= open) {
       ctx.addIssue({

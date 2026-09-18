@@ -43,15 +43,17 @@ export function Combobox({
   const inputRef = useRef<HTMLInputElement>(null);
   const listboxId = useId();
 
-  const selected = useMemo(() => items.find((item) => item.value === value) ?? null, [items, value]);
+  const selected = useMemo(
+    () => items.find((item) => item.value === value) ?? null,
+    [items, value],
+  );
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items.slice(0, 60);
     return items
       .filter(
-        (item) =>
-          item.label.toLowerCase().includes(q) || item.sublabel?.toLowerCase().includes(q),
+        (item) => item.label.toLowerCase().includes(q) || item.sublabel?.toLowerCase().includes(q),
       )
       .slice(0, 60);
   }, [items, query]);
@@ -154,8 +156,7 @@ export function Combobox({
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder="Type to search…"
-                className="h-9 w-full rounded-md border-0 bg-surface-subtle pl-8 pr-2 text-sm text-ink
-                           placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="h-9 w-full rounded-md border-0 bg-surface-subtle pl-8 pr-2 text-sm text-ink placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
               />
             </div>
           </div>
@@ -180,7 +181,12 @@ export function Combobox({
                       isSelected && 'bg-brand-50',
                     )}
                   >
-                    <span className={cn('text-[13px]', isSelected ? 'font-semibold text-brand-700' : 'text-ink')}>
+                    <span
+                      className={cn(
+                        'text-[13px]',
+                        isSelected ? 'font-semibold text-brand-700' : 'text-ink',
+                      )}
+                    >
                       {item.label}
                     </span>
                     {item.sublabel && <span className="text-xs text-ink-400">{item.sublabel}</span>}
@@ -231,7 +237,9 @@ export function MultiCombobox({
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     const base = q
-      ? items.filter((i) => i.label.toLowerCase().includes(q) || i.sublabel?.toLowerCase().includes(q))
+      ? items.filter(
+          (i) => i.label.toLowerCase().includes(q) || i.sublabel?.toLowerCase().includes(q),
+        )
       : items;
     return base.slice(0, 60);
   }, [items, query]);
@@ -301,12 +309,16 @@ export function MultiCombobox({
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Type to search…"
-                className="h-9 w-full rounded-md border-0 bg-surface-subtle pl-8 pr-2 text-sm
-                           placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
+                className="h-9 w-full rounded-md border-0 bg-surface-subtle pl-8 pr-2 text-sm placeholder:text-ink-300 focus:outline-none focus:ring-2 focus:ring-brand-600"
               />
             </div>
           </div>
-          <ul id={listboxId} role="listbox" aria-multiselectable className="max-h-64 overflow-y-auto p-1.5">
+          <ul
+            id={listboxId}
+            role="listbox"
+            aria-multiselectable
+            className="max-h-64 overflow-y-auto p-1.5"
+          >
             {filtered.length === 0 && (
               <li className="px-3 py-6 text-center text-[13px] text-ink-400">{emptyMessage}</li>
             )}

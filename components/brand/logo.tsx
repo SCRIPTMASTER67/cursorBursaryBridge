@@ -5,7 +5,13 @@ import { cn } from '@/lib/utils';
  * The Bursary-Bridge mark: a stylised bridge span, drawn to match the
  * reference designs. `tone` switches it for dark sidebars.
  */
-export function LogoMark({ className, tone = 'brand' }: { className?: string; tone?: 'brand' | 'light' }) {
+export function LogoMark({
+  className,
+  tone = 'brand',
+}: {
+  className?: string;
+  tone?: 'brand' | 'light';
+}) {
   const stroke = tone === 'light' ? '#FFFFFF' : '#12132B';
   const accent = tone === 'light' ? '#FFFFFF' : '#5B2EDB';
   return (
@@ -13,7 +19,13 @@ export function LogoMark({ className, tone = 'brand' }: { className?: string; to
       <path d="M2 25h36" stroke={stroke} strokeWidth="2" strokeLinecap="round" />
       <path d="M20 3 4 25M20 3l16 22" stroke={accent} strokeWidth="2" strokeLinecap="round" />
       <path d="M20 3v22" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
-      <path d="M11.6 13.5h16.8M8 19h24" stroke={accent} strokeWidth="1.6" strokeLinecap="round" opacity="0.6" />
+      <path
+        d="M11.6 13.5h16.8M8 19h24"
+        stroke={accent}
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
     </svg>
   );
 }
@@ -47,7 +59,11 @@ export function Logo({
 
   if (!href) return content;
   return (
-    <Link href={href} className="rounded-btn focus-visible:ring-offset-0" aria-label="Bursary-Bridge home">
+    <Link
+      href={href}
+      className="rounded-btn focus-visible:ring-offset-0"
+      aria-label="Bursary-Bridge home"
+    >
       {content}
     </Link>
   );

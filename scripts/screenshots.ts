@@ -60,7 +60,12 @@ async function login(page: Page, email: string) {
   await page.waitForURL(/\/(student|corporate)\//, { timeout: 20_000 });
 }
 
-async function capture(browser: Browser, shots: Shot[], viewport: (typeof VIEWPORTS)[number], email?: string) {
+async function capture(
+  browser: Browser,
+  shots: Shot[],
+  viewport: (typeof VIEWPORTS)[number],
+  email?: string,
+) {
   const context = await browser.newContext({
     viewport: { width: viewport.width, height: viewport.height },
     deviceScaleFactor: 1,
@@ -80,7 +85,9 @@ async function capture(browser: Browser, shots: Shot[], viewport: (typeof VIEWPO
       });
       console.log(`  ${viewport.name}/${shot.name}.png`);
     } catch (error) {
-      console.log(`  ${viewport.name}/${shot.name} FAILED — ${(error as Error).message.split('\n')[0]}`);
+      console.log(
+        `  ${viewport.name}/${shot.name} FAILED — ${(error as Error).message.split('\n')[0]}`,
+      );
     }
   }
 
@@ -97,7 +104,10 @@ async function captureDynamic(browser: Browser, viewport: (typeof VIEWPORTS)[num
   await login(page, 'student@demo.bursarybridge.local');
   await page.goto(`${BASE}/student/opportunities`, { waitUntil: 'networkidle' });
 
-  const opportunity = await page.locator('a[href^="/student/opportunities/"]').first().getAttribute('href');
+  const opportunity = await page
+    .locator('a[href^="/student/opportunities/"]')
+    .first()
+    .getAttribute('href');
   if (opportunity) {
     await page.goto(`${BASE}${opportunity}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(300);
@@ -117,7 +127,10 @@ async function captureDynamic(browser: Browser, viewport: (typeof VIEWPORTS)[num
   }
 
   await page.goto(`${BASE}/student/applications`, { waitUntil: 'networkidle' });
-  const application = await page.locator('a[href^="/student/applications/"]').first().getAttribute('href');
+  const application = await page
+    .locator('a[href^="/student/applications/"]')
+    .first()
+    .getAttribute('href');
   if (application) {
     await page.goto(`${BASE}${application}`, { waitUntil: 'networkidle' });
     await page.waitForTimeout(300);

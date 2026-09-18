@@ -46,7 +46,10 @@ export function FundingForm({
   const [situation, setSituation] = useState<string>(initial.fundingSituation ?? '');
 
   const expenseOptions = expenseNeeds.map((value) => ({ value, label: fundingNeedLabels[value] }));
-  const coverageOptions = coverageNeeds.map((value) => ({ value, label: fundingNeedLabels[value] }));
+  const coverageOptions = coverageNeeds.map((value) => ({
+    value,
+    label: fundingNeedLabels[value],
+  }));
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -80,16 +83,27 @@ export function FundingForm({
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
         {fieldErrors.fundingNeeds && (
-          <Alert tone="danger" className="mb-5">{fieldErrors.fundingNeeds}</Alert>
+          <Alert tone="danger" className="mb-5">
+            {fieldErrors.fundingNeeds}
+          </Alert>
         )}
 
         <div className="space-y-6">
           <CheckboxGroup options={expenseOptions} values={needs} onChange={setNeeds} />
 
           <div className="border-t border-line pt-5">
-            <CheckboxGroup options={coverageOptions} values={needs} onChange={setNeeds} exclusive={['NOT_SURE']} />
+            <CheckboxGroup
+              options={coverageOptions}
+              values={needs}
+              onChange={setNeeds}
+              exclusive={['NOT_SURE']}
+            />
           </div>
 
           <Field

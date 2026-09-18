@@ -74,8 +74,12 @@ export function StatCard({
   } as const;
 
   return (
-    <div className={cn('rounded-card border border-line bg-white px-5 py-4 shadow-card', className)}>
-      <p className={cn('text-[28px] font-bold leading-none tracking-[-0.02em]', accents[accent])}>{value}</p>
+    <div
+      className={cn('rounded-card border border-line bg-white px-5 py-4 shadow-card', className)}
+    >
+      <p className={cn('text-[28px] font-bold leading-none tracking-[-0.02em]', accents[accent])}>
+        {value}
+      </p>
       <p className="mt-2 text-[13px] font-medium leading-tight text-ink-600">{label}</p>
       {sublabel && <p className="mt-0.5 text-xs text-ink-400">{sublabel}</p>}
     </div>

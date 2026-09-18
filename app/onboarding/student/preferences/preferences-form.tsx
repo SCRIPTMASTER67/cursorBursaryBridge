@@ -3,7 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { SaveAndExit, StepShell } from '@/components/onboarding/step-shell';
-import { StudyPreferenceEditor, type DraftPreference } from '@/components/student/study-preference-editor';
+import {
+  StudyPreferenceEditor,
+  type DraftPreference,
+} from '@/components/student/study-preference-editor';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { useFormSubmit } from '@/hooks/use-form-submit';
@@ -58,14 +61,24 @@ export function PreferencesForm({
         description="Add up to 6 course and institution combinations you’re considering. Each course is paired with the institution you’d study it at, so we can match you accurately."
         footer={
           <>
-            <Button type="submit" fullWidth size="lg" loading={submitting} disabled={complete.length === 0}>
+            <Button
+              type="submit"
+              fullWidth
+              size="lg"
+              loading={submitting}
+              disabled={complete.length === 0}
+            >
               Continue
             </Button>
             <SaveAndExit />
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         {hasIncomplete && complete.length > 0 && (
           <Alert tone="info" className="mb-5">

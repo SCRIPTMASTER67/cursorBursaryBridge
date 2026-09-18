@@ -31,7 +31,8 @@ export async function POST(request: NextRequest) {
   switch (step) {
     case 'details': {
       const parsed = organisationDetailsSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       const d = parsed.data;
 
       // Organisation names are unique, so a clash needs a readable message
@@ -61,7 +62,8 @@ export async function POST(request: NextRequest) {
 
     case 'role': {
       const parsed = corporateRoleSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       await prisma.corporateProfile.update({
         where: { id: corporateProfileId },
         data: {
@@ -75,7 +77,8 @@ export async function POST(request: NextRequest) {
 
     case 'funding': {
       const parsed = fundingProfileSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       await prisma.organisation.update({
         where: { id: organisationId },
         data: {
@@ -89,7 +92,8 @@ export async function POST(request: NextRequest) {
 
     case 'process': {
       const parsed = currentProcessSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       await prisma.organisation.update({
         where: { id: organisationId },
         data: { processMethods: parsed.data.processMethods, challenges: parsed.data.challenges },

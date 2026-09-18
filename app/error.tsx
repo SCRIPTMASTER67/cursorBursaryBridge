@@ -8,7 +8,13 @@ import { Logo } from '@/components/brand/logo';
  * Root error boundary. Users never see a stack trace — only plain language and
  * a way to recover. The detail is logged for developers instead.
  */
-export default function GlobalError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error('[bursary-bridge] unhandled error', error);

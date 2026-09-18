@@ -42,7 +42,10 @@ export function PasswordChecklist({ value, className }: { value: string; classNa
         return (
           <li
             key={rule.label}
-            className={cn('flex items-center gap-1.5 text-[11px]', passed ? 'text-success-600' : 'text-ink-400')}
+            className={cn(
+              'flex items-center gap-1.5 text-[11px]',
+              passed ? 'text-success-600' : 'text-ink-400',
+            )}
           >
             <span
               className={cn(

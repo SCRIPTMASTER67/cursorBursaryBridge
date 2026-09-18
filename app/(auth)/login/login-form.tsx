@@ -11,7 +11,9 @@ import { useFormSubmit } from '@/hooks/use-form-submit';
 
 export function LoginForm() {
   const router = useRouter();
-  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{ redirectTo: string }>();
+  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{
+    redirectTo: string;
+  }>();
   const [values, setValues] = useState({ email: '', password: '' });
 
   function update(field: 'email' | 'password', value: string) {

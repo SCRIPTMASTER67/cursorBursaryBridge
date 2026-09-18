@@ -12,7 +12,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-wrap justify-between gap-2 border-b border-line/60 py-2 last:border-0">
       <span className="text-[13px] text-ink-500">{label}</span>
-      <span className="text-[14px] text-ink-800">{value}</span>
+      <span className="text-ink-800 text-[14px]">{value}</span>
     </div>
   );
 }
@@ -30,10 +30,10 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
       <div className="space-y-6">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <Link href="/admin/users" className="text-[13px] text-primary-700 hover:underline">
+            <Link href="/admin/users" className="text-primary-700 text-[13px] hover:underline">
               ← Back to accounts
             </Link>
-            <h1 className="mt-1 text-[26px] font-semibold text-ink-900">
+            <h1 className="text-ink-900 mt-1 text-[26px] font-semibold">
               {user.firstName} {user.lastName}
             </h1>
             <p className="mt-1 text-[14px] text-ink-500">
@@ -84,7 +84,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
 
         <div className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
           <Card className="p-5">
-            <h2 className="text-[15px] font-semibold text-ink-900">Account</h2>
+            <h2 className="text-ink-900 text-[15px] font-semibold">Account</h2>
             <div className="mt-3">
               <Row label="Mobile" value={user.mobile ?? '—'} />
               <Row
@@ -105,7 +105,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[15px] font-semibold text-ink-900">Profile summary</h2>
+            <h2 className="text-ink-900 text-[15px] font-semibold">Profile summary</h2>
             {user.studentProfile ? (
               <div className="mt-3">
                 <Row label="Profile strength" value={`${user.studentProfile.profileStrength}%`} />
@@ -156,7 +156,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[15px] font-semibold text-ink-900">Active sessions</h2>
+            <h2 className="text-ink-900 text-[15px] font-semibold">Active sessions</h2>
             <p className="mt-1 text-[12px] text-ink-400">
               Sessions are deleted at sign-out and on expiry, so this is what the account holds now
               rather than a history. Sign-in history is in the activity list.
@@ -192,7 +192,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-[15px] font-semibold text-ink-900">Recent activity</h2>
+            <h2 className="text-ink-900 text-[15px] font-semibold">Recent activity</h2>
             {user.recentActivity.length === 0 ? (
               <p className="mt-3 text-[14px] text-ink-500">Nothing recorded.</p>
             ) : (

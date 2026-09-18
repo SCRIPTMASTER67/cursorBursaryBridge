@@ -28,9 +28,13 @@ export function AcademicForm({
   };
 }) {
   const router = useRouter();
-  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{ redirectTo: string }>();
+  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{
+    redirectTo: string;
+  }>();
 
-  const [average, setAverage] = useState(initial.academicAverage ? String(initial.academicAverage) : '');
+  const [average, setAverage] = useState(
+    initial.academicAverage ? String(initial.academicAverage) : '',
+  );
   const [unknown, setUnknown] = useState(initial.academicAverageUnknown);
   const [resultTypes, setResultTypes] = useState<ResultType[]>(initial.resultTypes);
   const [achievements, setAchievements] = useState<Achievement[]>(initial.achievements);
@@ -75,7 +79,11 @@ export function AcademicForm({
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-6">
           <Field label="What is your latest academic average?" error={fieldErrors.academicAverage}>
@@ -118,7 +126,9 @@ export function AcademicForm({
             <legend className="mb-1 text-[13px] font-medium text-ink-700">
               Do you have any academic achievements?
             </legend>
-            <p className="mb-3 text-[13px] text-ink-400">Optional — this can strengthen your applications.</p>
+            <p className="mb-3 text-[13px] text-ink-400">
+              Optional — this can strengthen your applications.
+            </p>
             <CheckboxGroup
               options={toOptions(achievementLabels)}
               values={achievements}

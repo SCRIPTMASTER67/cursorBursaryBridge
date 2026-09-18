@@ -25,7 +25,9 @@ export async function sendEmail(message: EmailMessage): Promise<{ sent: boolean 
 }
 
 async function sendViaConsole(message: EmailMessage): Promise<{ sent: boolean }> {
-  const action = message.actionUrl ? `\n  Action: ${message.actionLabel} -> ${message.actionUrl}` : '';
+  const action = message.actionUrl
+    ? `\n  Action: ${message.actionLabel} -> ${message.actionUrl}`
+    : '';
   // eslint-disable-next-line no-console
   console.info(
     `\n[email] ---------------------------------------------------\n` +
@@ -46,7 +48,12 @@ async function sendViaSmtp(_message: EmailMessage): Promise<{ sent: boolean }> {
 }
 
 export function renderEmailText(message: EmailMessage): string {
-  return [message.heading, '', message.body, message.actionUrl ? `\n${message.actionLabel}: ${message.actionUrl}` : '']
+  return [
+    message.heading,
+    '',
+    message.body,
+    message.actionUrl ? `\n${message.actionLabel}: ${message.actionUrl}` : '',
+  ]
     .join('\n')
     .trim();
 }

@@ -5,7 +5,10 @@ import { storage } from '@/lib/storage';
 import { refreshProfileStrength } from '@/services/student-profile';
 import { audit } from '@/services/audit';
 
-export async function DELETE(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
   const auth = await apiStudent();
   if (!auth.ok) return auth.response;
 

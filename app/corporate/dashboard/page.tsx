@@ -10,7 +10,11 @@ import { Award, Calendar, Clock, Plus } from '@/components/icons';
 import { requireCorporate } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { deadlineLabel, formatDate, formatNumber, greeting } from '@/lib/utils';
-import { getCorporateStats, getProgrammeSummaries, getRecentActivity } from '@/services/corporate-stats';
+import {
+  getCorporateStats,
+  getProgrammeSummaries,
+  getRecentActivity,
+} from '@/services/corporate-stats';
 
 export const metadata: Metadata = { title: 'Dashboard' };
 
@@ -38,8 +42,7 @@ export default async function CorporateDashboardPage() {
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
-            {greeting()}, {user.firstName}!{' '}
-            <span aria-hidden="true">👋</span>
+            {greeting()}, {user.firstName}! <span aria-hidden="true">👋</span>
           </h1>
           <p className="mt-1.5 text-[13px] text-ink-400">
             Here’s what’s happening with your programmes at {organisation.name}.
@@ -52,8 +55,16 @@ export default async function CorporateDashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <StatCard value={stats.activeProgrammes} label="Active Programmes" />
-        <StatCard value={formatNumber(stats.totalApplications)} label="Total Applications" accent="info" />
-        <StatCard value={formatNumber(stats.eligibleApplications)} label="Eligible Applicants" accent="success" />
+        <StatCard
+          value={formatNumber(stats.totalApplications)}
+          label="Total Applications"
+          accent="info"
+        />
+        <StatCard
+          value={formatNumber(stats.eligibleApplications)}
+          label="Eligible Applicants"
+          accent="success"
+        />
         <StatCard value={formatNumber(stats.shortlisted)} label="Shortlisted" accent="warning" />
         <StatCard value={formatNumber(stats.selected)} label="Selected" accent="success" />
       </div>
@@ -80,7 +91,10 @@ export default async function CorporateDashboardPage() {
               title="No active programmes yet"
               description="Create a funding programme and define who is eligible. Students matching your criteria will see it straight away."
               action={
-                <ButtonLink href="/corporate/programmes/new" leadingIcon={<Plus className="h-4 w-4" />}>
+                <ButtonLink
+                  href="/corporate/programmes/new"
+                  leadingIcon={<Plus className="h-4 w-4" />}
+                >
                   Create New Programme
                 </ButtonLink>
               }
@@ -141,10 +155,15 @@ export default async function CorporateDashboardPage() {
             ) : (
               <ul className="divide-y divide-line border-t border-line">
                 {upcoming.map((programme) => (
-                  <li key={programme.id} className="flex items-start justify-between gap-3 px-6 py-3.5">
+                  <li
+                    key={programme.id}
+                    className="flex items-start justify-between gap-3 px-6 py-3.5"
+                  >
                     <div className="min-w-0">
                       <p className="truncate text-[13px] font-medium text-ink">{programme.name}</p>
-                      <p className="mt-0.5 text-xs text-ink-400">{formatDate(programme.closingDate)}</p>
+                      <p className="mt-0.5 text-xs text-ink-400">
+                        {formatDate(programme.closingDate)}
+                      </p>
                     </div>
                     <span className="shrink-0 text-xs font-semibold text-warning-600">
                       {deadlineLabel(programme.closingDate)}
@@ -158,7 +177,11 @@ export default async function CorporateDashboardPage() {
           <Card>
             <CardHeader title="Recent activity" />
             {activity.length === 0 ? (
-              <EmptyState icon={<Clock className="h-5 w-5" />} title="Nothing yet" className="py-10" />
+              <EmptyState
+                icon={<Clock className="h-5 w-5" />}
+                title="Nothing yet"
+                className="py-10"
+              />
             ) : (
               <ul className="divide-y divide-line border-t border-line">
                 {activity.map((event) => (

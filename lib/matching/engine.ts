@@ -52,8 +52,7 @@ export const MatchingService = {
       .filter((c) => c.status === 'UNKNOWN')
       .reduce((sum, c) => sum + c.weight, 0);
 
-    const hasNoPreferences =
-      student.studyPreferences.length === 0 && !student.currentProgrammeId;
+    const hasNoPreferences = student.studyPreferences.length === 0 && !student.currentProgrammeId;
 
     const needsMoreInformation = unknownWeight > MAX_UNKNOWN_WEIGHT || hasNoPreferences;
 

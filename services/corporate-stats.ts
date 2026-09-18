@@ -45,7 +45,9 @@ export type ProgrammeSummaryRow = {
 };
 
 /** Per-programme counts for the dashboard and the Programmes page. */
-export async function getProgrammeSummaries(organisationId: string): Promise<ProgrammeSummaryRow[]> {
+export async function getProgrammeSummaries(
+  organisationId: string,
+): Promise<ProgrammeSummaryRow[]> {
   const programmes = await prisma.fundingProgramme.findMany({
     where: { organisationId },
     select: {

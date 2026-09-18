@@ -24,7 +24,12 @@ export function Pagination({
 }) {
   if (pageCount <= 1 && total <= pageSize) {
     return (
-      <div className={cn('flex items-center justify-end px-5 py-3.5 text-[13px] text-ink-400', className)}>
+      <div
+        className={cn(
+          'flex items-center justify-end px-5 py-3.5 text-[13px] text-ink-400',
+          className,
+        )}
+      >
         Showing {total} of {total}
       </div>
     );

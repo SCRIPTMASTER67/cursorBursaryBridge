@@ -46,7 +46,11 @@ export default async function OrganisationPage() {
 
       <div className="grid gap-4 sm:grid-cols-4">
         <StatCard value={stats.activeProgrammes} label="Active programmes" />
-        <StatCard value={formatNumber(stats.totalApplications)} label="Applications" accent="info" />
+        <StatCard
+          value={formatNumber(stats.totalApplications)}
+          label="Applications"
+          accent="info"
+        />
         <StatCard value={formatNumber(stats.shortlisted)} label="Shortlisted" accent="warning" />
         <StatCard value={formatNumber(stats.selected)} label="Beneficiaries" accent="success" />
       </div>

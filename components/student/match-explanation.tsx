@@ -70,7 +70,12 @@ export function CriterionRow({ criterion }: { criterion: CriterionResult }) {
 
   return (
     <li className="flex items-start gap-2.5">
-      <span className={cn('mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full', config.wrap)}>
+      <span
+        className={cn(
+          'mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
+          config.wrap,
+        )}
+      >
         {config.icon}
       </span>
       <span className="min-w-0 flex-1">

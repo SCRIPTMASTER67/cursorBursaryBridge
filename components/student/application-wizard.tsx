@@ -113,7 +113,9 @@ export function ApplicationWizard({
 
   // The missing documents this programme asked for, by type.
   const availableTypes = new Set(documents.map((d) => d.type));
-  const missingDocumentTypes = programme.requiredDocuments.filter((type) => !availableTypes.has(type));
+  const missingDocumentTypes = programme.requiredDocuments.filter(
+    (type) => !availableTypes.has(type),
+  );
 
   return (
     <div className="mx-auto max-w-[860px]">
@@ -126,7 +128,9 @@ export function ApplicationWizard({
       </Link>
 
       <div className="mb-6">
-        <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">Apply to {programme.name}</h1>
+        <h1 className="text-[22px] font-bold tracking-[-0.02em] text-ink">
+          Apply to {programme.name}
+        </h1>
         <p className="mt-1.5 text-[13px] text-ink-400">
           {programme.organisationName}
           <span className="mx-1.5">·</span>
@@ -144,7 +148,11 @@ export function ApplicationWizard({
         </div>
       </Card>
 
-      {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+      {error && (
+        <Alert tone="danger" className="mb-5">
+          {error}
+        </Alert>
+      )}
       {draftSaved && (
         <Alert tone="success" className="mb-5">
           Your draft has been saved. You can finish it any time before the closing date.
@@ -211,7 +219,9 @@ export function ApplicationWizard({
                       <li key={type} className="flex items-center gap-2.5 text-[13px]">
                         <span
                           className={`flex h-5 w-5 items-center justify-center rounded-full ${
-                            have ? 'bg-success-50 text-success-600' : 'bg-warning-50 text-warning-600'
+                            have
+                              ? 'bg-success-50 text-success-600'
+                              : 'bg-warning-50 text-warning-600'
                           }`}
                         >
                           {have ? (
@@ -222,7 +232,9 @@ export function ApplicationWizard({
                         </span>
                         <span className={have ? 'text-ink-700' : 'text-ink-600'}>
                           {documentTypeLabels[type]}
-                          {!have && <span className="ml-1.5 text-warning-600">not uploaded yet</span>}
+                          {!have && (
+                            <span className="ml-1.5 text-warning-600">not uploaded yet</span>
+                          )}
                         </span>
                       </li>
                     );
@@ -234,7 +246,9 @@ export function ApplicationWizard({
             {documents.length === 0 ? (
               <div className="rounded-field border border-dashed border-line-strong px-4 py-8 text-center">
                 <FileText className="mx-auto h-6 w-6 text-ink-300" />
-                <p className="mt-3 text-[13px] font-medium text-ink">You haven’t uploaded any documents</p>
+                <p className="mt-3 text-[13px] font-medium text-ink">
+                  You haven’t uploaded any documents
+                </p>
                 <p className="mt-1 text-[13px] text-ink-400">
                   Documents are optional to save a draft, but this funder may ask for them.
                 </p>
@@ -248,7 +262,9 @@ export function ApplicationWizard({
               </div>
             ) : (
               <div>
-                <p className="mb-2.5 text-[13px] font-semibold text-ink">Attach from your documents</p>
+                <p className="mb-2.5 text-[13px] font-semibold text-ink">
+                  Attach from your documents
+                </p>
                 <div className="space-y-2.5">
                   {documents.map((document) => (
                     <Checkbox
@@ -272,7 +288,8 @@ export function ApplicationWizard({
             {missingDocumentTypes.length > 0 && (
               <Alert tone="warning">
                 You can still submit, but the funder may place your application on “Documents
-                Required” until they receive: {missingDocumentTypes.map((t) => documentTypeLabels[t]).join(', ')}.
+                Required” until they receive:{' '}
+                {missingDocumentTypes.map((t) => documentTypeLabels[t]).join(', ')}.
               </Alert>
             )}
           </div>
@@ -285,7 +302,10 @@ export function ApplicationWizard({
           <MatchExplanation match={match} title="How you match this programme" />
 
           <Card>
-            <CardHeader title="Review your application" description="Check everything before you submit." />
+            <CardHeader
+              title="Review your application"
+              description="Check everything before you submit."
+            />
             <div className="space-y-4 px-6 pb-6">
               <ReviewBlock title="Programme">
                 {programme.name} · {programme.organisationName}
@@ -300,7 +320,9 @@ export function ApplicationWizard({
                         <div key={question.id}>
                           <dt className="text-[13px] font-medium text-ink-700">{question.label}</dt>
                           <dd className="mt-0.5 whitespace-pre-line text-[13px] text-ink-500">
-                            {value === undefined || value === '' || (Array.isArray(value) && value.length === 0)
+                            {value === undefined ||
+                            value === '' ||
+                            (Array.isArray(value) && value.length === 0)
                               ? 'Not answered'
                               : Array.isArray(value)
                                 ? value.join(', ')
@@ -433,7 +455,12 @@ function QuestionField({
         />
       )}
       {question.type === 'DATE' && (
-        <Input name={name} type="date" value={stringValue} onChange={(event) => onChange(event.target.value)} />
+        <Input
+          name={name}
+          type="date"
+          value={stringValue}
+          onChange={(event) => onChange(event.target.value)}
+        />
       )}
       {question.type === 'YES_NO' && (
         <Select

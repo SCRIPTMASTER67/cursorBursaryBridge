@@ -17,7 +17,11 @@ export async function POST(request: NextRequest) {
 
   const record = await prisma.verificationToken.findUnique({
     where: { tokenHash },
-    select: { id: true, expiresAt: true, user: { select: { id: true, role: true, emailVerifiedAt: true } } },
+    select: {
+      id: true,
+      expiresAt: true,
+      user: { select: { id: true, role: true, emailVerifiedAt: true } },
+    },
   });
 
   if (!record) {
@@ -41,7 +45,9 @@ export async function POST(request: NextRequest) {
   });
 
   const redirectTo =
-    record.user.role === 'STUDENT' ? '/onboarding/student/education' : homePathForRole(record.user.role);
+    record.user.role === 'STUDENT'
+      ? '/onboarding/student/education'
+      : homePathForRole(record.user.role);
 
   return apiOk({ ok: true, redirectTo });
 }

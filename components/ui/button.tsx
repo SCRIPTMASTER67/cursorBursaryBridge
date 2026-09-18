@@ -9,9 +9,11 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-card',
   secondary: 'bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200',
-  outline: 'bg-white text-ink-700 border border-line hover:bg-surface-subtle hover:border-line-strong active:bg-surface-muted',
+  outline:
+    'bg-white text-ink-700 border border-line hover:bg-surface-subtle hover:border-line-strong active:bg-surface-muted',
   ghost: 'bg-transparent text-ink-600 hover:bg-surface-subtle active:bg-surface-muted',
-  danger: 'bg-white text-danger-600 border border-danger-100 hover:bg-danger-50 active:bg-danger-100',
+  danger:
+    'bg-white text-danger-600 border border-danger-100 hover:bg-danger-50 active:bg-danger-100',
   success: 'bg-success-600 text-white hover:bg-success-700',
 };
 

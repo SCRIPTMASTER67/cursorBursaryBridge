@@ -37,7 +37,10 @@ export default async function ProgrammesPage() {
             title="No programmes yet"
             description="Create your first funding programme and define exactly who is eligible."
             action={
-              <ButtonLink href="/corporate/programmes/new" leadingIcon={<Plus className="h-4 w-4" />}>
+              <ButtonLink
+                href="/corporate/programmes/new"
+                leadingIcon={<Plus className="h-4 w-4" />}
+              >
                 Create New Programme
               </ButtonLink>
             }
@@ -78,7 +81,7 @@ export default async function ProgrammesPage() {
                         <span className="text-xs tabular-nums text-ink-400">{rate}% eligible</span>
                       </div>
                     </Td>
-                    <Td align="right" className="tabular-nums font-medium text-ink">
+                    <Td align="right" className="font-medium tabular-nums text-ink">
                       {formatNumber(programme.applicationCount)}
                     </Td>
                     <Td align="right" className="tabular-nums">

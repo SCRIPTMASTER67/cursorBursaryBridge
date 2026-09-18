@@ -11,7 +11,7 @@ function Stat({ label, value, hint }: { label: string; value: number; hint?: str
   return (
     <Card className="p-5">
       <p className="text-[13px] font-medium text-ink-500">{label}</p>
-      <p className="mt-1 text-[28px] font-semibold leading-none text-ink-900">{value}</p>
+      <p className="text-ink-900 mt-1 text-[28px] font-semibold leading-none">{value}</p>
       {hint ? <p className="mt-1.5 text-[12px] text-ink-400">{hint}</p> : null}
     </Card>
   );
@@ -25,7 +25,7 @@ export default async function AdminDashboardPage() {
     <PageBody>
       <div className="space-y-6">
         <header>
-          <h1 className="text-[26px] font-semibold text-ink-900">Platform overview</h1>
+          <h1 className="text-ink-900 text-[26px] font-semibold">Platform overview</h1>
           <p className="mt-1 text-[14px] text-ink-500">
             Counts across the whole platform. Figures come from the stored records; nothing here
             recalculates a match score or an eligibility verdict.
@@ -63,7 +63,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         <Card className="p-5">
-          <h2 className="text-[15px] font-semibold text-ink-900">Applications by status</h2>
+          <h2 className="text-ink-900 text-[15px] font-semibold">Applications by status</h2>
           {stats.applicationsByStatus.length === 0 ? (
             <p className="mt-2 text-[14px] text-ink-500">No applications yet.</p>
           ) : (
@@ -81,7 +81,7 @@ export default async function AdminDashboardPage() {
                       <td className="py-2 text-ink-700">
                         {applicationStatusLabels[row.status as ApplicationStatus] ?? row.status}
                       </td>
-                      <td className="py-2 text-right font-medium text-ink-900">{row.count}</td>
+                      <td className="text-ink-900 py-2 text-right font-medium">{row.count}</td>
                     </tr>
                   ))}
                 </tbody>

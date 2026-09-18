@@ -57,7 +57,9 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
     {
       label: 'Under review by funder',
       date: application.status === 'UNDER_REVIEW' ? application.lastStatusChangeAt : null,
-      done: ['UNDER_REVIEW', 'SHORTLISTED', 'APPROVED', 'UNSUCCESSFUL'].includes(application.status),
+      done: ['UNDER_REVIEW', 'SHORTLISTED', 'APPROVED', 'UNSUCCESSFUL'].includes(
+        application.status,
+      ),
     },
     {
       label: 'Shortlisted',
@@ -83,8 +85,8 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
 
       {submitted === '1' && (
         <Alert tone="success" title="Application submitted" className="mb-5">
-          {application.fundingProgramme.organisation.name} has received your application. We’ll email
-          you as soon as the status changes.
+          {application.fundingProgramme.organisation.name} has received your application. We’ll
+          email you as soon as the status changes.
         </Alert>
       )}
 
@@ -208,7 +210,9 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
                       )}
                     </span>
                     {index < timeline.length - 1 && (
-                      <span className={`mt-1 w-px flex-1 ${entry.done ? 'bg-brand-200' : 'bg-line'}`} />
+                      <span
+                        className={`mt-1 w-px flex-1 ${entry.done ? 'bg-brand-200' : 'bg-line'}`}
+                      />
                     )}
                   </div>
                   <div className="pb-1">
@@ -248,7 +252,9 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
                       <span className="block text-[13px] text-ink-700">
                         {documentTypeLabels[link.document.type]}
                       </span>
-                      <span className="block truncate text-xs text-ink-400">{link.document.fileName}</span>
+                      <span className="block truncate text-xs text-ink-400">
+                        {link.document.fileName}
+                      </span>
                     </span>
                   </li>
                 ))}

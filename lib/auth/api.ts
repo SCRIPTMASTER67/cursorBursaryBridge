@@ -16,9 +16,9 @@ export function apiOk<T extends object>(data: T, status = 200) {
 }
 
 /** Route-handler equivalent of requireUser — returns 401 rather than redirecting. */
-export async function apiUser(role?: UserRole): Promise<
-  { ok: true; user: SessionUser } | { ok: false; response: NextResponse }
-> {
+export async function apiUser(
+  role?: UserRole,
+): Promise<{ ok: true; user: SessionUser } | { ok: false; response: NextResponse }> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, response: apiError('You need to sign in to continue.', 401) };
   if (role && user.role !== role) {

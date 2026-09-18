@@ -45,8 +45,12 @@ export function PageHeader({
       {breadcrumb && <div className="mb-2.5">{breadcrumb}</div>}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h1 className="text-[22px] font-bold leading-tight tracking-[-0.02em] text-ink">{title}</h1>
-          {description && <p className="mt-1.5 text-[13px] leading-6 text-ink-400">{description}</p>}
+          <h1 className="text-[22px] font-bold leading-tight tracking-[-0.02em] text-ink">
+            {title}
+          </h1>
+          {description && (
+            <p className="mt-1.5 text-[13px] leading-6 text-ink-400">{description}</p>
+          )}
         </div>
         {actions && <div className="flex shrink-0 items-center gap-2.5">{actions}</div>}
       </div>
@@ -55,5 +59,7 @@ export function PageHeader({
 }
 
 export function PageBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('mx-auto max-w-shell px-5 py-6 sm:px-7 sm:py-8', className)}>{children}</div>;
+  return (
+    <div className={cn('mx-auto max-w-shell px-5 py-6 sm:px-7 sm:py-8', className)}>{children}</div>
+  );
 }

@@ -35,12 +35,18 @@ export default async function EditProgrammePage({ params }: { params: Promise<{ 
         title="Edit programme"
         description={programme.name}
         breadcrumb={
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-ink-400">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-[13px] text-ink-400"
+          >
             <Link href="/corporate/programmes" className="hover:text-ink-600">
               Programmes
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link href={`/corporate/programmes/${programme.id}`} className="truncate hover:text-ink-600">
+            <Link
+              href={`/corporate/programmes/${programme.id}`}
+              className="truncate hover:text-ink-600"
+            >
               {programme.name}
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />

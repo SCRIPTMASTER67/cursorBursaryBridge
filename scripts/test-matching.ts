@@ -59,9 +59,21 @@ console.log('\nMatchingService');
 
 {
   const result = MatchingService.score(perfectStudent, baseProgramme);
-  check('a fully qualifying student scores 100', result.matchScore === 100, `got ${result.matchScore}`);
-  check('...and is classified STRONG_MATCH', result.classification === 'STRONG_MATCH', result.classification);
-  check('...with six affirmative reasons', result.reasons.length === 6, `got ${result.reasons.length}`);
+  check(
+    'a fully qualifying student scores 100',
+    result.matchScore === 100,
+    `got ${result.matchScore}`,
+  );
+  check(
+    '...and is classified STRONG_MATCH',
+    result.classification === 'STRONG_MATCH',
+    result.classification,
+  );
+  check(
+    '...with six affirmative reasons',
+    result.reasons.length === 6,
+    `got ${result.reasons.length}`,
+  );
   check(
     '...including "Course supported"',
     result.reasons.includes('Course supported'),
@@ -95,8 +107,16 @@ console.log('\nMatchingService');
   const result = MatchingService.score(belowAverage, baseProgramme);
   const academic = result.criteria.find((c) => c.key === 'academic')!;
   check('an average below the minimum fails the academic criterion', academic.status === 'NOT_MET');
-  check('...costing exactly the 20-point academic weight', result.matchScore === 80, `got ${result.matchScore}`);
-  check('...and dropping to POTENTIAL_MATCH', result.classification === 'POTENTIAL_MATCH', result.classification);
+  check(
+    '...costing exactly the 20-point academic weight',
+    result.matchScore === 80,
+    `got ${result.matchScore}`,
+  );
+  check(
+    '...and dropping to POTENTIAL_MATCH',
+    result.classification === 'POTENTIAL_MATCH',
+    result.classification,
+  );
 }
 
 {
@@ -105,7 +125,11 @@ console.log('\nMatchingService');
   const academic = result.criteria.find((c) => c.key === 'academic')!;
   check('a missing average is UNKNOWN, not a failure', academic.status === 'UNKNOWN');
   check('...earning half credit', academic.awarded === 10, `got ${academic.awarded}`);
-  check('...and surfacing a verification message', academic.reason.includes('verification'), academic.reason);
+  check(
+    '...and surfacing a verification message',
+    academic.reason.includes('verification'),
+    academic.reason,
+  );
 }
 
 {
@@ -145,22 +169,38 @@ console.log('\nMatchingService');
     },
   };
   const result = MatchingService.score(perfectStudent, openProgramme);
-  check('a programme with no restrictions scores 100', result.matchScore === 100, `got ${result.matchScore}`);
+  check(
+    'a programme with no restrictions scores 100',
+    result.matchScore === 100,
+    `got ${result.matchScore}`,
+  );
 }
 
 {
   const richStudent: MatchableStudent = { ...perfectStudent, householdIncome: 'ABOVE_500K' };
   const result = MatchingService.score(richStudent, baseProgramme);
   const financial = result.criteria.find((c) => c.key === 'financial')!;
-  check('income above the funder threshold fails the financial criterion', financial.status === 'NOT_MET');
+  check(
+    'income above the funder threshold fails the financial criterion',
+    financial.status === 'NOT_MET',
+  );
 }
 
 {
   const ranked = MatchingService.rank(perfectStudent, [
-    { ...baseProgramme, id: 'weak', supportedProgrammeIds: ['other'], supportedInstitutionIds: ['other'] },
+    {
+      ...baseProgramme,
+      id: 'weak',
+      supportedProgrammeIds: ['other'],
+      supportedInstitutionIds: ['other'],
+    },
     baseProgramme,
   ]);
-  check('rank() returns best-match first', ranked[0].programme.id === 'funding-1', ranked[0].programme.id);
+  check(
+    'rank() returns best-match first',
+    ranked[0].programme.id === 'funding-1',
+    ranked[0].programme.id,
+  );
 }
 
 console.log('\nEligibilityService');
@@ -184,7 +224,11 @@ console.log('\nEligibilityService');
 {
   const wrongYear: MatchableStudent = { ...perfectStudent, yearOfStudy: 5 };
   const result = EligibilityService.evaluate(wrongYear, baseProgramme);
-  check('an unsupported year of study is NOT_ELIGIBLE', result.outcome === 'NOT_ELIGIBLE', result.outcome);
+  check(
+    'an unsupported year of study is NOT_ELIGIBLE',
+    result.outcome === 'NOT_ELIGIBLE',
+    result.outcome,
+  );
   check(
     '...citing the year-of-study rule',
     result.failed.some((c) => c.label === 'Year of study'),
@@ -195,7 +239,11 @@ console.log('\nEligibilityService');
 {
   const nonCitizen: MatchableStudent = { ...perfectStudent, citizenship: 'OTHER' };
   const result = EligibilityService.evaluate(nonCitizen, baseProgramme);
-  check('a citizenship mismatch is NOT_ELIGIBLE', result.outcome === 'NOT_ELIGIBLE', result.outcome);
+  check(
+    'a citizenship mismatch is NOT_ELIGIBLE',
+    result.outcome === 'NOT_ELIGIBLE',
+    result.outcome,
+  );
 }
 
 console.log(`\n${passed} passed, ${failed} failed\n`);

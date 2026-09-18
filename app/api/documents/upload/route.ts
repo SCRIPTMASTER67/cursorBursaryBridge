@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
   }
   if (file.size === 0) return apiError('That file appears to be empty.', 422);
   if (file.size > MAX_UPLOAD_BYTES) {
-    return apiError('Files must be 5 MB or smaller.', 422, { file: 'This file is larger than 5 MB' });
+    return apiError('Files must be 5 MB or smaller.', 422, {
+      file: 'This file is larger than 5 MB',
+    });
   }
   if (!isAllowedMimeType(file.type)) {
     return apiError('Only PDF, JPG, PNG and WebP files are accepted.', 422, {

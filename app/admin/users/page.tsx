@@ -43,7 +43,7 @@ export default async function AdminUsersPage({
     <PageBody>
       <div className="space-y-6">
         <header>
-          <h1 className="text-[26px] font-semibold text-ink-900">Accounts</h1>
+          <h1 className="text-ink-900 text-[26px] font-semibold">Accounts</h1>
           <p className="mt-1 text-[14px] text-ink-500">
             {total} account{total === 1 ? '' : 's'}. This screen shows account details only; a
             student&apos;s documents and a funder&apos;s applicant data stay governed by their own
@@ -103,7 +103,7 @@ export default async function AdminUsersPage({
             </div>
             <button
               type="submit"
-              className="rounded-field bg-primary-600 px-4 py-2 text-[14px] font-medium text-white"
+              className="bg-primary-600 rounded-field px-4 py-2 text-[14px] font-medium text-white"
             >
               Apply
             </button>
@@ -133,7 +133,7 @@ export default async function AdminUsersPage({
                       <td className="px-4 py-3">
                         <Link
                           href={`/admin/users/${row.id}`}
-                          className="font-medium text-primary-700 hover:underline"
+                          className="text-primary-700 font-medium hover:underline"
                         >
                           {row.firstName} {row.lastName}
                         </Link>

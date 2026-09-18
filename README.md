@@ -93,10 +93,10 @@ so the journey is never blocked while testing.
 Seeded by `npm run db:seed`. The password comes from `DEMO_PASSWORD` in `.env`
 (default `Demo1234!`).
 
-| Role | Email | What you'll see |
-| --- | --- | --- |
-| **Student** | `student@demo.bursarybridge.local` | A complete profile, matched opportunities, and applications at several stages |
-| **Corporate** | `corporate@demo.bursarybridge.local` | Kgotso Holdings, with two live programmes and a full applicant pipeline |
+| Role          | Email                                | What you'll see                                                               |
+| ------------- | ------------------------------------ | ----------------------------------------------------------------------------- |
+| **Student**   | `student@demo.bursarybridge.local`   | A complete profile, matched opportunities, and applications at several stages |
+| **Corporate** | `corporate@demo.bursarybridge.local` | Kgotso Holdings, with two live programmes and a full applicant pipeline       |
 
 Three further funder accounts exist for variety: `umoya@`, `thuto@` and
 `amandla@demo.bursarybridge.local`.
@@ -135,14 +135,14 @@ automated test (see [Testing](#testing)).
 
 ## Architecture
 
-| Layer | Choice | Why |
-| --- | --- | --- |
-| Framework | Next.js 15 (App Router) | Server components for reads, route handlers for writes |
-| Language | TypeScript, `strict` | No `any` in application code |
-| Styling | Tailwind CSS 3.4 | Design tokens transcribed from the approved reference screens |
-| Database | PostgreSQL 16 + Prisma 6 | Relational integrity for a genuinely relational domain |
-| Auth | Server-side sessions | Revocable, unlike a bare JWT |
-| Validation | Zod | One schema shared by the client hint and the server enforcement |
+| Layer      | Choice                   | Why                                                             |
+| ---------- | ------------------------ | --------------------------------------------------------------- |
+| Framework  | Next.js 15 (App Router)  | Server components for reads, route handlers for writes          |
+| Language   | TypeScript, `strict`     | No `any` in application code                                    |
+| Styling    | Tailwind CSS 3.4         | Design tokens transcribed from the approved reference screens   |
+| Database   | PostgreSQL 16 + Prisma 6 | Relational integrity for a genuinely relational domain          |
+| Auth       | Server-side sessions     | Revocable, unlike a bare JWT                                    |
+| Validation | Zod                      | One schema shared by the client hint and the server enforcement |
 
 **Reads** happen in server components, which call a service in `services/`.
 **Writes** go through API route handlers under `app/api/`, so every mutation has one
@@ -193,7 +193,7 @@ institutions are never stored as two unrelated lists. `StudyPreference` holds
 `studentProfileId`, `preferenceNumber`, `programmeId` and `institutionId`
 together, because a bursary that funds Computer Science at one university is not
 necessarily open to the same course elsewhere. The matching engine scores both
-halves of the *same* pair.
+halves of the _same_ pair.
 
 **Eligibility is structured data, not prose.** `EligibilityRule` stores the
 minimum average, qualification levels, years of study, citizenship, income
@@ -215,23 +215,23 @@ tested directly and replaced later without touching the UI.
 
 ### Scoring
 
-| Criterion | Weight |
-| --- | ---: |
-| Course | 30% |
-| Institution | 25% |
-| Academic requirement | 20% |
-| Qualification level | 10% |
-| Location | 10% |
-| Financial requirement | 5% |
+| Criterion             | Weight |
+| --------------------- | -----: |
+| Course                |    30% |
+| Institution           |    25% |
+| Academic requirement  |    20% |
+| Qualification level   |    10% |
+| Location              |    10% |
+| Financial requirement |     5% |
 
 Each criterion returns `MET`, `NOT_MET` or `UNKNOWN`. A criterion we cannot
 evaluate earns **half credit** rather than zero: the student is not penalised as
 though they had failed, but the gap still lowers the score and is surfaced.
 
-| Classification | Rule |
-| --- | --- |
-| **Strong Match** | 85–100% |
-| **Potential Match** | 60–84% |
+| Classification              | Rule                                                    |
+| --------------------------- | ------------------------------------------------------- |
+| **Strong Match**            | 85–100%                                                 |
+| **Potential Match**         | 60–84%                                                  |
 | **More Information Needed** | Below 60%, or more than 25 points of weight unevaluable |
 
 ### Why this match?
@@ -251,10 +251,10 @@ alongside the score, and the UI always shows it:
 
 ### Two services, two questions
 
-- **`MatchingService`** answers the student's question — *how well does this fit
-  me?* — as a ranked, weighted score.
-- **`EligibilityService`** answers the funder's question — *does this applicant
-  meet our stated rules?* — as `ELIGIBLE`, `NOT_ELIGIBLE` or
+- **`MatchingService`** answers the student's question — _how well does this fit
+  me?_ — as a ranked, weighted score.
+- **`EligibilityService`** answers the funder's question — _does this applicant
+  meet our stated rules?_ — as `ELIGIBLE`, `NOT_ELIGIBLE` or
   `PENDING_VERIFICATION`.
 
 Missing information is never an automatic rejection. It surfaces as
@@ -277,7 +277,7 @@ All tuning lives in `lib/matching/config.ts`.
 - **Account enumeration** is prevented — an unknown email and a wrong password
   return byte-identical responses, and the unknown-email path still performs a
   bcrypt comparison so the timing matches.
-- **Rate limiting** on registration, login (per IP *and* per account),
+- **Rate limiting** on registration, login (per IP _and_ per account),
   verification resend, uploads and application submission.
 - **Server-side validation** on every endpoint via Zod. The client hints are
   generated from the same schemas, so the two cannot drift.
@@ -370,14 +370,14 @@ Conventions worth knowing:
 
 See `.env.example` for the annotated list. The essentials:
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `AUTH_SECRET` | 32-byte hex string used to derive session identifiers |
-| `NEXT_PUBLIC_APP_URL` | Base URL used in verification links |
-| `STORAGE_DRIVER` | `local` (development) or `s3` |
-| `EMAIL_DRIVER` | `console` (development) or `smtp` |
-| `DEMO_PASSWORD` | Password for the seeded demo accounts |
+| Variable              | Purpose                                               |
+| --------------------- | ----------------------------------------------------- |
+| `DATABASE_URL`        | PostgreSQL connection string                          |
+| `AUTH_SECRET`         | 32-byte hex string used to derive session identifiers |
+| `NEXT_PUBLIC_APP_URL` | Base URL used in verification links                   |
+| `STORAGE_DRIVER`      | `local` (development) or `s3`                         |
+| `EMAIL_DRIVER`        | `console` (development) or `smtp`                     |
+| `DEMO_PASSWORD`       | Password for the seeded demo accounts                 |
 
 `lib/env.ts` validates these at startup, so a misconfigured deployment fails
 immediately with a readable message rather than at the first request.
@@ -396,12 +396,12 @@ audit trail.
 **Seams left open for production**, each behind an interface so it is a
 replacement rather than a rewrite:
 
-| Concern | Prototype | Production path |
-| --- | --- | --- |
-| File storage | Local disk | `S3StorageProvider` — implement four methods, flip `STORAGE_DRIVER` |
-| Email | Server console | `sendViaSmtp` in `lib/email/` |
-| Rate limiting | In-memory `Map` | Redis — one file changes |
-| Matching | Weighted criteria | The engine's contract stays; the implementation can be replaced |
+| Concern       | Prototype         | Production path                                                     |
+| ------------- | ----------------- | ------------------------------------------------------------------- |
+| File storage  | Local disk        | `S3StorageProvider` — implement four methods, flip `STORAGE_DRIVER` |
+| Email         | Server console    | `sendViaSmtp` in `lib/email/`                                       |
+| Rate limiting | In-memory `Map`   | Redis — one file changes                                            |
+| Matching      | Weighted criteria | The engine's contract stays; the implementation can be replaced     |
 
 **Deliberately excluded:** microservices, Kubernetes, event buses, ML
 infrastructure, payment and billing, and university or government integrations.

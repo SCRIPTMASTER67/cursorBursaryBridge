@@ -19,8 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   openGraph: {
     title: 'Bursary-Bridge — Find funding. Build your future.',
-    description:
-      'Connecting students with bursaries, scholarships and funding opportunities.',
+    description: 'Connecting students with bursaries, scholarships and funding opportunities.',
     type: 'website',
   },
 };

@@ -34,7 +34,7 @@ export default async function AdminAuditPage({
     <PageBody>
       <div className="space-y-6">
         <header>
-          <h1 className="text-[26px] font-semibold text-ink-900">Audit log</h1>
+          <h1 className="text-ink-900 text-[26px] font-semibold">Audit log</h1>
           <p className="mt-1 text-[14px] text-ink-500">
             {total} entr{total === 1 ? 'y' : 'ies'}. The log is append-only and read-only here.
           </p>
@@ -111,7 +111,7 @@ export default async function AdminAuditPage({
             <div className="sm:col-span-2 lg:col-span-5">
               <button
                 type="submit"
-                className="rounded-field bg-primary-600 px-4 py-2 text-[14px] font-medium text-white"
+                className="bg-primary-600 rounded-field px-4 py-2 text-[14px] font-medium text-white"
               >
                 Apply filters
               </button>
@@ -139,8 +139,8 @@ export default async function AdminAuditPage({
                     const meta = row.metadata as Record<string, unknown> | null;
                     const reason = meta && typeof meta.reason === 'string' ? meta.reason : null;
                     return (
-                      <tr key={row.id} className="border-b border-line/60 last:border-0 align-top">
-                        <td className="px-4 py-3 whitespace-nowrap text-ink-600">
+                      <tr key={row.id} className="border-b border-line/60 align-top last:border-0">
+                        <td className="whitespace-nowrap px-4 py-3 text-ink-600">
                           {row.createdAt.toLocaleString('en-ZA')}
                         </td>
                         <td className="px-4 py-3 text-ink-700">
@@ -149,7 +149,7 @@ export default async function AdminAuditPage({
                             <span className="block text-[12px] text-ink-400">{row.user.email}</span>
                           ) : null}
                         </td>
-                        <td className="px-4 py-3 font-medium text-ink-800">{row.action}</td>
+                        <td className="text-ink-800 px-4 py-3 font-medium">{row.action}</td>
                         <td className="px-4 py-3 text-ink-600">
                           {row.entityType}
                           {row.entityId ? (

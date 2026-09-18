@@ -11,7 +11,13 @@ import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { useFormSubmit } from '@/hooks/use-form-submit';
-import { bursaryStatusLabels, citizenshipLabels, incomeBandLabels, toOptions, triStateLabels } from '@/lib/labels';
+import {
+  bursaryStatusLabels,
+  citizenshipLabels,
+  incomeBandLabels,
+  toOptions,
+  triStateLabels,
+} from '@/lib/labels';
 import { studentSteps } from '@/lib/onboarding-steps';
 
 const stepLabels = studentSteps.map((s) => s.label);
@@ -95,10 +101,18 @@ export function FinancialForm({
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-6">
-          <Field label="Approximate annual household income" error={fieldErrors.householdIncome} required>
+          <Field
+            label="Approximate annual household income"
+            error={fieldErrors.householdIncome}
+            required
+          >
             <Select
               options={toOptions(incomeBandLabels)}
               placeholder="Select an income range"
@@ -165,7 +179,9 @@ export function FinancialForm({
                     options={toOptions(triStateLabels)}
                     placeholder="Select"
                     value={values[item.key] ?? ''}
-                    onChange={(event) => update(item.key, (event.target.value || null) as TriState | null)}
+                    onChange={(event) =>
+                      update(item.key, (event.target.value || null) as TriState | null)
+                    }
                   />
                 </Field>
               ))}

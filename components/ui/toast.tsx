@@ -1,12 +1,22 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 import { AlertCircle, CheckCircle, InfoCircle, X } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
 type Toast = { id: number; tone: 'success' | 'error' | 'info'; message: string };
 
-const ToastContext = createContext<{ push: (tone: Toast['tone'], message: string) => void } | null>(null);
+const ToastContext = createContext<{ push: (tone: Toast['tone'], message: string) => void } | null>(
+  null,
+);
 
 /** Transient confirmation of an action, e.g. "Preference removed". */
 export function ToastProvider({ children }: { children: ReactNode }) {

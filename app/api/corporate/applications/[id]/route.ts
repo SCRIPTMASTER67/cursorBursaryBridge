@@ -89,7 +89,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   if (studentFacing[status]) {
     await notify({
       userId: application.studentProfile.userId,
-      type: status === 'DOCUMENTS_REQUIRED' ? 'INFORMATION_REQUESTED' : 'APPLICATION_STATUS_CHANGED',
+      type:
+        status === 'DOCUMENTS_REQUIRED' ? 'INFORMATION_REQUESTED' : 'APPLICATION_STATUS_CHANGED',
       title: `Application ${applicationStatusLabels[status].toLowerCase()}`,
       body: note ? `${studentFacing[status]} ${note}` : studentFacing[status],
       link: `/student/applications/${application.id}`,

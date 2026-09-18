@@ -47,7 +47,9 @@ export default async function RegisterChooserPage() {
             href={path.href}
             className="flex items-center gap-4 rounded-card border border-line p-4 transition-colors hover:border-brand-300 hover:bg-brand-50/40"
           >
-            <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] ${path.tone}`}>
+            <span
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] ${path.tone}`}
+            >
               {path.icon}
             </span>
             <span className="min-w-0 flex-1">

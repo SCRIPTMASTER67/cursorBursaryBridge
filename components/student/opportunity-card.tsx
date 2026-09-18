@@ -98,7 +98,9 @@ export function OpportunityCard({
         >
           <Calendar className="h-4 w-4" />
           Closes {formatDate(programme.closingDate)}
-          {closingSoon && <span className="font-semibold">· {days === 0 ? 'today' : `${days} days left`}</span>}
+          {closingSoon && (
+            <span className="font-semibold">· {days === 0 ? 'today' : `${days} days left`}</span>
+          )}
         </p>
 
         {applied ? (

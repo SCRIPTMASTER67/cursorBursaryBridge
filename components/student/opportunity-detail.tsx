@@ -7,7 +7,15 @@ import { ApplicationStatusBadge, Badge, MatchBadge } from '@/components/ui/badge
 import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs } from '@/components/ui/tabs';
-import { Calendar, Check, FileText, GraduationCap, MapPin, Users, Wallet } from '@/components/icons';
+import {
+  Calendar,
+  Check,
+  FileText,
+  GraduationCap,
+  MapPin,
+  Users,
+  Wallet,
+} from '@/components/icons';
 import {
   citizenshipLabels,
   documentTypeLabels,
@@ -54,7 +62,9 @@ export function OpportunityDetail({
               <h1 className="text-[22px] font-bold leading-tight tracking-[-0.02em] text-ink">
                 {programme.name}
               </h1>
-              <p className="mt-1.5 text-[13px] font-medium text-ink-500">{programme.organisation.name}</p>
+              <p className="mt-1.5 text-[13px] font-medium text-ink-500">
+                {programme.organisation.name}
+              </p>
             </div>
             <MatchBadge score={match.matchScore} classification={match.classification} />
           </div>
@@ -115,7 +125,9 @@ export function OpportunityDetail({
                 <div>
                   <h3 className="text-[13px] font-semibold text-ink">Supported courses</h3>
                   <p className="mt-1.5 text-[13px] leading-6 text-ink-500">
-                    {courses.length === 0 ? 'Open to all courses and programmes.' : courses.join(', ')}
+                    {courses.length === 0
+                      ? 'Open to all courses and programmes.'
+                      : courses.join(', ')}
                   </p>
                 </div>
 
@@ -146,7 +158,9 @@ export function OpportunityDetail({
                     label="Qualification level"
                     value={
                       eligibility && eligibility.qualificationLevels.length > 0
-                        ? eligibility.qualificationLevels.map((q) => qualificationLabels[q]).join(', ')
+                        ? eligibility.qualificationLevels
+                            .map((q) => qualificationLabels[q])
+                            .join(', ')
                         : 'All qualification levels'
                     }
                   />
@@ -196,7 +210,10 @@ export function OpportunityDetail({
                 <h2 className="text-[15px] font-semibold text-ink">What it covers</h2>
                 <ul className="mt-3 space-y-2.5">
                   {programme.coverage.map((coverage) => (
-                    <li key={coverage} className="flex items-center gap-2.5 text-[13px] text-ink-600">
+                    <li
+                      key={coverage}
+                      className="flex items-center gap-2.5 text-[13px] text-ink-600"
+                    >
                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success-50 text-success-600">
                         <Check className="h-3.5 w-3.5" strokeWidth={2.8} />
                       </span>
@@ -239,7 +256,10 @@ export function OpportunityDetail({
                     <h3 className="text-[13px] font-semibold text-ink">Required documents</h3>
                     <ul className="mt-2.5 space-y-2">
                       {eligibility.requiredDocuments.map((document) => (
-                        <li key={document} className="flex items-center gap-2.5 text-[13px] text-ink-600">
+                        <li
+                          key={document}
+                          className="flex items-center gap-2.5 text-[13px] text-ink-600"
+                        >
                           <FileText className="h-4 w-4 shrink-0 text-ink-300" />
                           {documentTypeLabels[document]}
                         </li>
@@ -297,8 +317,12 @@ export function OpportunityDetail({
 
         <Card className="p-5">
           <h3 className="text-[13px] font-semibold text-ink">About the funder</h3>
-          <p className="mt-1.5 text-[13px] font-medium text-ink-600">{programme.organisation.name}</p>
-          <p className="mt-1 text-[13px] text-ink-400">{industryLabels[programme.organisation.industry]}</p>
+          <p className="mt-1.5 text-[13px] font-medium text-ink-600">
+            {programme.organisation.name}
+          </p>
+          <p className="mt-1 text-[13px] text-ink-400">
+            {industryLabels[programme.organisation.industry]}
+          </p>
           <p className="mt-3 flex items-center gap-2 text-[13px] text-ink-400">
             <MapPin className="h-4 w-4" />
             South Africa
@@ -324,7 +348,9 @@ function Fact({
     <div className="flex items-start gap-2.5">
       <span className="mt-0.5 text-ink-300">{icon}</span>
       <div className="min-w-0">
-        <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-ink-400">{label}</dt>
+        <dt className="text-[11px] font-semibold uppercase tracking-[0.04em] text-ink-400">
+          {label}
+        </dt>
         <dd className="mt-0.5 truncate text-[13px] font-semibold text-ink">{value}</dd>
         {hint && <p className="text-xs text-ink-400">{hint}</p>}
       </div>

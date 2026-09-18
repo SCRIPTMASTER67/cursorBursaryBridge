@@ -10,11 +10,7 @@ import type {
   MatchableStudent,
 } from './types';
 
-function build(
-  key: CriterionKey,
-  status: CriterionStatus,
-  reason: string,
-): CriterionResult {
+function build(key: CriterionKey, status: CriterionStatus, reason: string): CriterionResult {
   const weight = CRITERION_WEIGHTS[key];
   const awarded =
     status === 'MET' ? weight : status === 'UNKNOWN' ? weight * UNKNOWN_CREDIT_RATIO : 0;
@@ -114,7 +110,11 @@ export function evaluateCourse(match: PreferenceMatch): CriterionResult {
 
 export function evaluateInstitution(match: PreferenceMatch): CriterionResult {
   if (match.unknown && !match.institutionSupported) {
-    return build('institution', 'UNKNOWN', 'Add a study preference so we can check the institution');
+    return build(
+      'institution',
+      'UNKNOWN',
+      'Add a study preference so we can check the institution',
+    );
   }
   return match.institutionSupported
     ? build('institution', 'MET', 'Institution supported')
@@ -130,15 +130,15 @@ export function evaluateAcademic(
     return build('academic', 'MET', 'No minimum average required');
   }
   if (student.academicAverage === null) {
-    return build('academic', 'UNKNOWN', `Academic average needs verification (${minimum}% required)`);
+    return build(
+      'academic',
+      'UNKNOWN',
+      `Academic average needs verification (${minimum}% required)`,
+    );
   }
   return student.academicAverage >= minimum
     ? build('academic', 'MET', 'Academic requirement met')
-    : build(
-        'academic',
-        'NOT_MET',
-        `Academic average below the ${minimum}% required`,
-      );
+    : build('academic', 'NOT_MET', `Academic average below the ${minimum}% required`);
 }
 
 export function evaluateQualification(

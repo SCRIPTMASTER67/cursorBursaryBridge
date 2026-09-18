@@ -93,7 +93,9 @@ export default async function StudentProfilePage() {
                         className="flex items-center justify-between gap-3 rounded-btn px-2.5 py-2 text-[13px] text-ink-600 transition-colors hover:bg-surface-subtle"
                       >
                         <span className="truncate">{section.label}</span>
-                        <span className="shrink-0 font-semibold text-success-600">+{section.weight}%</span>
+                        <span className="shrink-0 font-semibold text-success-600">
+                          +{section.weight}%
+                        </span>
                       </Link>
                     </li>
                   ))}
@@ -111,7 +113,10 @@ export default async function StudentProfilePage() {
                 <p className="mt-5 text-[13px] font-semibold text-ink">Completed</p>
                 <ul className="mt-2.5 space-y-1.5">
                   {complete.map((section) => (
-                    <li key={section.key} className="flex items-center gap-2 px-2.5 text-[13px] text-ink-400">
+                    <li
+                      key={section.key}
+                      className="flex items-center gap-2 px-2.5 text-[13px] text-ink-400"
+                    >
                       <Check className="h-3.5 w-3.5 shrink-0 text-success-600" strokeWidth={2.6} />
                       {section.label}
                     </li>
@@ -124,9 +129,9 @@ export default async function StudentProfilePage() {
           <Card className="bg-brand-50/60 p-5">
             <h2 className="text-[15px] font-semibold text-ink">Why we ask</h2>
             <p className="mt-1.5 text-[13px] leading-6 text-ink-500">
-              Funders set rules about courses, institutions, results, income and location. The more of
-              your profile we hold, the more accurately we can tell you what you qualify for — and the
-              fewer questions you face at application time.
+              Funders set rules about courses, institutions, results, income and location. The more
+              of your profile we hold, the more accurately we can tell you what you qualify for —
+              and the fewer questions you face at application time.
             </p>
           </Card>
         </div>

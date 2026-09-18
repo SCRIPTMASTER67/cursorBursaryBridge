@@ -77,7 +77,10 @@ export function ShortlistTable({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ applicationIds: selected, action }),
       });
-      const payload = (await response.json().catch(() => ({}))) as { error?: string; affected?: number };
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        affected?: number;
+      };
 
       if (!response.ok) {
         toast.push('error', payload.error ?? 'That action could not be completed.');
@@ -113,7 +116,8 @@ export function ShortlistTable({
     );
   }
 
-  const allVisibleSelected = visible.length > 0 && visible.every((row) => selected.includes(row.applicationId));
+  const allVisibleSelected =
+    visible.length > 0 && visible.every((row) => selected.includes(row.applicationId));
 
   return (
     <Card>
@@ -218,7 +222,11 @@ export function ShortlistTable({
                     href={`/corporate/applications/${row.applicationId}`}
                     className="flex items-center gap-3"
                   >
-                    <Avatar firstName={firstName} lastName={rest.join(' ') || firstName} size="sm" />
+                    <Avatar
+                      firstName={firstName}
+                      lastName={rest.join(' ') || firstName}
+                      size="sm"
+                    />
                     <span className="min-w-0">
                       <span className="block font-semibold text-ink hover:text-brand-700">
                         {row.studentName}

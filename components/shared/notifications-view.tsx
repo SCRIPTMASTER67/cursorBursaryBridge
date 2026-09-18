@@ -93,7 +93,9 @@ export function NotificationsView({ notifications }: { notifications: Notificati
                 <span
                   className={cn(
                     'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-                    notification.readAt ? 'bg-surface-subtle text-ink-400' : 'bg-brand-100 text-brand-600',
+                    notification.readAt
+                      ? 'bg-surface-subtle text-ink-400'
+                      : 'bg-brand-100 text-brand-600',
                   )}
                 >
                   {icons[notification.type]}
@@ -104,7 +106,9 @@ export function NotificationsView({ notifications }: { notifications: Notificati
                     {!notification.readAt && <Badge tone="brand">New</Badge>}
                   </div>
                   <p className="mt-1 text-[13px] leading-6 text-ink-500">{notification.body}</p>
-                  <p className="mt-1.5 text-xs text-ink-300">{formatDate(notification.createdAt)}</p>
+                  <p className="mt-1.5 text-xs text-ink-300">
+                    {formatDate(notification.createdAt)}
+                  </p>
                 </div>
               </div>
             );

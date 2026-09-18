@@ -16,8 +16,13 @@
     font-feature-settings: 'cv11', 'ss01';
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply text-ink font-semibold tracking-[-0.015em];
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-[-0.015em] text-ink;
   }
 
   /* Visible, consistent focus ring for keyboard users across the app. */
@@ -42,9 +47,7 @@
 
 @layer components {
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50
-           focus:rounded-btn focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm
-           focus:font-semibold focus:text-white;
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-btn focus:bg-brand-600 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white;
   }
 
   .shimmer {

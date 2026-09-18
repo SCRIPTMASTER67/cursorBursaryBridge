@@ -31,10 +31,12 @@ export function ApplicationsList({ applications }: { applications: ApplicationRo
       all: applications.length,
       draft: applications.filter((a) => a.status === 'DRAFT').length,
       submitted: applications.filter((a) => a.status === 'SUBMITTED').length,
-      review: applications.filter((a) => a.status === 'UNDER_REVIEW' || a.status === 'DOCUMENTS_REQUIRED')
-        .length,
+      review: applications.filter(
+        (a) => a.status === 'UNDER_REVIEW' || a.status === 'DOCUMENTS_REQUIRED',
+      ).length,
       shortlisted: applications.filter((a) => a.status === 'SHORTLISTED').length,
-      decided: applications.filter((a) => a.status === 'APPROVED' || a.status === 'UNSUCCESSFUL').length,
+      decided: applications.filter((a) => a.status === 'APPROVED' || a.status === 'UNSUCCESSFUL')
+        .length,
     }),
     [applications],
   );
@@ -79,7 +81,10 @@ export function ApplicationsList({ applications }: { applications: ApplicationRo
       />
 
       {visible.length === 0 ? (
-        <EmptyState title="Nothing here yet" description="No applications currently have this status." />
+        <EmptyState
+          title="Nothing here yet"
+          description="No applications currently have this status."
+        />
       ) : (
         <ul className="divide-y divide-line">
           {visible.map((application) => (
@@ -90,8 +95,12 @@ export function ApplicationsList({ applications }: { applications: ApplicationRo
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[14px] font-semibold text-ink">{application.programmeName}</p>
-                    <p className="mt-0.5 text-[13px] text-ink-400">{application.organisationName}</p>
+                    <p className="text-[14px] font-semibold text-ink">
+                      {application.programmeName}
+                    </p>
+                    <p className="mt-0.5 text-[13px] text-ink-400">
+                      {application.organisationName}
+                    </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     {application.matchScore !== null && (
@@ -112,11 +121,15 @@ export function ApplicationsList({ applications }: { applications: ApplicationRo
                   </div>
                   <div className="flex gap-1.5">
                     <dt className="text-ink-400">Closes</dt>
-                    <dd className="font-medium text-ink-600">{formatDate(application.closingDate)}</dd>
+                    <dd className="font-medium text-ink-600">
+                      {formatDate(application.closingDate)}
+                    </dd>
                   </div>
                   <div className="flex gap-1.5">
                     <dt className="text-ink-400">Last update</dt>
-                    <dd className="font-medium text-ink-600">{formatDate(application.lastUpdate)}</dd>
+                    <dd className="font-medium text-ink-600">
+                      {formatDate(application.lastUpdate)}
+                    </dd>
                   </div>
                 </dl>
               </Link>

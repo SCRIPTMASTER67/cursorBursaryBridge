@@ -19,7 +19,11 @@ export default async function VerifyPage({
 
   return (
     <Card className="p-7 text-center sm:p-9">
-      <VerifyPanel token={token ?? null} email={user?.email ?? null} verified={Boolean(user?.emailVerifiedAt)} />
+      <VerifyPanel
+        token={token ?? null}
+        email={user?.email ?? null}
+        verified={Boolean(user?.emailVerifiedAt)}
+      />
     </Card>
   );
 }

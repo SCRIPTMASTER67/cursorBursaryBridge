@@ -29,7 +29,7 @@ export default async function AdminCataloguePage({
     <PageBody>
       <div className="space-y-6">
         <header>
-          <h1 className="text-[26px] font-semibold text-ink-900">Catalogue</h1>
+          <h1 className="text-ink-900 text-[26px] font-semibold">Catalogue</h1>
           <p className="mt-1 text-[14px] text-ink-500">
             The institutions and courses that students choose between and that funders base their
             eligibility rules on. An entry already in use cannot be removed.
@@ -52,7 +52,7 @@ export default async function AdminCataloguePage({
             </div>
             <button
               type="submit"
-              className="rounded-field bg-primary-600 px-4 py-2 text-[14px] font-medium text-white"
+              className="bg-primary-600 rounded-field px-4 py-2 text-[14px] font-medium text-white"
             >
               Search
             </button>
@@ -61,7 +61,7 @@ export default async function AdminCataloguePage({
 
         <Card className="p-0">
           <div className="border-b border-line px-4 py-3">
-            <h2 className="text-[15px] font-semibold text-ink-900">
+            <h2 className="text-ink-900 text-[15px] font-semibold">
               Institutions ({institutions.length})
             </h2>
           </div>
@@ -81,7 +81,7 @@ export default async function AdminCataloguePage({
                   const inUse = isCatalogueEntryInUse(row._count);
                   return (
                     <tr key={row.id} className="border-b border-line/60 last:border-0">
-                      <td className="px-4 py-3 text-ink-800">
+                      <td className="text-ink-800 px-4 py-3">
                         {row.name}
                         {row.shortName ? (
                           <span className="text-ink-400"> ({row.shortName})</span>
@@ -105,7 +105,7 @@ export default async function AdminCataloguePage({
 
         <Card className="p-0">
           <div className="border-b border-line px-4 py-3">
-            <h2 className="text-[15px] font-semibold text-ink-900">Courses ({courses.length})</h2>
+            <h2 className="text-ink-900 text-[15px] font-semibold">Courses ({courses.length})</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-[14px]">
@@ -122,7 +122,7 @@ export default async function AdminCataloguePage({
                   const inUse = isCatalogueEntryInUse(row._count);
                   return (
                     <tr key={row.id} className="border-b border-line/60 last:border-0">
-                      <td className="px-4 py-3 text-ink-800">{row.name}</td>
+                      <td className="text-ink-800 px-4 py-3">{row.name}</td>
                       <td className="px-4 py-3 text-ink-600">{row.field}</td>
                       <td className="px-4 py-3 text-ink-600">{row.qualificationLevels.length}</td>
                       <td className="px-4 py-3 text-right text-ink-600">

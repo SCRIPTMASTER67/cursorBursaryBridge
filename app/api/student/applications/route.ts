@@ -25,9 +25,10 @@ export async function POST(request: NextRequest) {
     return apiError('You are submitting too quickly. Please wait a moment and try again.', 429);
   }
 
-  const body = (await request.json().catch(() => null)) as
-    | { intent?: 'draft' | 'submit'; [key: string]: unknown }
-    | null;
+  const body = (await request.json().catch(() => null)) as {
+    intent?: 'draft' | 'submit';
+    [key: string]: unknown;
+  } | null;
   if (!body) return apiError('Invalid request.');
 
   const intent = body.intent === 'submit' ? 'submit' : 'draft';
@@ -106,7 +107,9 @@ export async function POST(request: NextRequest) {
   }
 
   const match =
-    intent === 'submit' ? await getMatchAndEligibility(auth.studentProfileId, fundingProgrammeId) : null;
+    intent === 'submit'
+      ? await getMatchAndEligibility(auth.studentProfileId, fundingProgrammeId)
+      : null;
   const now = new Date();
 
   const application = await prisma.application.upsert({
@@ -180,6 +183,8 @@ export async function POST(request: NextRequest) {
     ok: true,
     applicationId: application.id,
     redirectTo:
-      intent === 'submit' ? `/student/applications/${application.id}?submitted=1` : '/student/applications',
+      intent === 'submit'
+        ? `/student/applications/${application.id}?submitted=1`
+        : '/student/applications',
   });
 }

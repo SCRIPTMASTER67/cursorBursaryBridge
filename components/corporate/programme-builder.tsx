@@ -160,7 +160,10 @@ export function ProgrammeBuilder({
       },
       questions: draft.questions.map((question) => ({
         ...question,
-        options: question.type === 'SINGLE_SELECT' || question.type === 'MULTI_SELECT' ? question.options : [],
+        options:
+          question.type === 'SINGLE_SELECT' || question.type === 'MULTI_SELECT'
+            ? question.options
+            : [],
       })),
       publish,
     };
@@ -196,7 +199,11 @@ export function ProgrammeBuilder({
       </Card>
 
       <div>
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         {/* ------------------------------------------------ 1. Details */}
         {step === 1 && (
@@ -252,14 +259,22 @@ export function ProgrammeBuilder({
               </Field>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Application open date" error={fieldErrors['details.openDate']} required>
+                <Field
+                  label="Application open date"
+                  error={fieldErrors['details.openDate']}
+                  required
+                >
                   <Input
                     type="date"
                     value={draft.details.openDate}
                     onChange={(event) => setDetails('openDate', event.target.value)}
                   />
                 </Field>
-                <Field label="Application closing date" error={fieldErrors['details.closingDate']} required>
+                <Field
+                  label="Application closing date"
+                  error={fieldErrors['details.closingDate']}
+                  required
+                >
                   <Input
                     type="date"
                     value={draft.details.closingDate}
@@ -321,7 +336,9 @@ export function ProgrammeBuilder({
               </Field>
 
               <fieldset>
-                <legend className="mb-3 text-[13px] font-medium text-ink-700">Qualification level</legend>
+                <legend className="mb-3 text-[13px] font-medium text-ink-700">
+                  Qualification level
+                </legend>
                 <CheckboxGroup
                   options={toOptions(qualificationLabels)}
                   values={draft.eligibility.qualificationLevels}
@@ -380,7 +397,9 @@ export function ProgrammeBuilder({
                   Citizenship / residency requirement
                 </legend>
                 <CheckboxGroup
-                  options={toOptions(citizenshipLabels).filter((o) => o.value !== 'PREFER_NOT_TO_SAY')}
+                  options={toOptions(citizenshipLabels).filter(
+                    (o) => o.value !== 'PREFER_NOT_TO_SAY',
+                  )}
                   values={draft.eligibility.citizenship}
                   onChange={(values) => setEligibility('citizenship', values)}
                   columns={2}
@@ -404,7 +423,9 @@ export function ProgrammeBuilder({
                 </Field>
                 <Checkbox
                   checked={draft.eligibility.requiresFinancialNeed}
-                  onChange={(event) => setEligibility('requiresFinancialNeed', event.target.checked)}
+                  onChange={(event) =>
+                    setEligibility('requiresFinancialNeed', event.target.checked)
+                  }
                   label="Applicants must demonstrate financial need"
                 />
               </div>
@@ -445,7 +466,9 @@ export function ProgrammeBuilder({
             />
             <div className="space-y-5 px-6 pb-6">
               <fieldset>
-                <legend className="mb-3 text-[13px] font-medium text-ink-700">Funding provided</legend>
+                <legend className="mb-3 text-[13px] font-medium text-ink-700">
+                  Funding provided
+                </legend>
                 <CheckboxGroup
                   options={toOptions(fundingCoverageLabels)}
                   values={draft.details.coverage}
@@ -494,7 +517,13 @@ export function ProgrammeBuilder({
                         ...current,
                         questions: [
                           ...current.questions,
-                          { label: '', helpText: '', type: 'LONG_TEXT', required: false, options: [] },
+                          {
+                            label: '',
+                            helpText: '',
+                            type: 'LONG_TEXT',
+                            required: false,
+                            options: [],
+                          },
                         ],
                       }))
                     }
@@ -545,7 +574,11 @@ export function ProgrammeBuilder({
               <ReviewRow label="Programme name" value={draft.details.name || 'Not set'} />
               <ReviewRow
                 label="Type"
-                value={draft.details.fundingType ? fundingTypeLabels[draft.details.fundingType] : 'Not set'}
+                value={
+                  draft.details.fundingType
+                    ? fundingTypeLabels[draft.details.fundingType]
+                    : 'Not set'
+                }
               />
               <ReviewRow
                 label="Applications"
@@ -591,13 +624,17 @@ export function ProgrammeBuilder({
                 label="Required documents"
                 value={
                   draft.eligibility.requiredDocuments.length > 0
-                    ? draft.eligibility.requiredDocuments.map((d) => documentTypeLabels[d]).join(', ')
+                    ? draft.eligibility.requiredDocuments
+                        .map((d) => documentTypeLabels[d])
+                        .join(', ')
                     : 'None'
                 }
               />
               <ReviewRow
                 label="Programme questions"
-                value={draft.questions.length === 0 ? 'None' : `${draft.questions.length} question(s)`}
+                value={
+                  draft.questions.length === 0 ? 'None' : `${draft.questions.length} question(s)`
+                }
               />
             </div>
           </Card>
@@ -689,7 +726,9 @@ function QuestionEditor({
                 { value: 'YES_NO', label: 'Yes / No' },
               ]}
               value={question.type}
-              onChange={(event) => onChange({ ...question, type: event.target.value as QuestionType })}
+              onChange={(event) =>
+                onChange({ ...question, type: event.target.value as QuestionType })
+              }
             />
           </Field>
           <Field label="Help text" optional>
@@ -709,7 +748,10 @@ function QuestionEditor({
               onChange={(event) =>
                 onChange({
                   ...question,
-                  options: event.target.value.split('\n').map((o) => o.trim()).filter(Boolean),
+                  options: event.target.value
+                    .split('\n')
+                    .map((o) => o.trim())
+                    .filter(Boolean),
                 })
               }
               placeholder={'Solar\nWind\nBattery storage'}

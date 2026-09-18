@@ -45,7 +45,9 @@ export function StudyPreferenceEditor({
   );
 
   function update(index: number, patch: Partial<DraftPreference>) {
-    onChange(preferences.map((preference, i) => (i === index ? { ...preference, ...patch } : preference)));
+    onChange(
+      preferences.map((preference, i) => (i === index ? { ...preference, ...patch } : preference)),
+    );
   }
 
   function remove(index: number) {

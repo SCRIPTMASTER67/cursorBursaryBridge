@@ -18,7 +18,10 @@ export async function requireStudent(): Promise<{ user: SessionUser; studentProf
 }
 
 /** As above, but also forces onboarding to be finished first. */
-export async function requireOnboardedStudent(): Promise<{ user: SessionUser; studentProfileId: string }> {
+export async function requireOnboardedStudent(): Promise<{
+  user: SessionUser;
+  studentProfileId: string;
+}> {
   const user = await requireRole('STUDENT');
   const profile = await prisma.studentProfile.findUnique({
     where: { userId: user.id },
@@ -44,7 +47,8 @@ export async function requireCorporate(): Promise<{
     select: { id: true, organisationId: true, onboardingCompletedAt: true, onboardingStep: true },
   });
   if (!profile) redirect('/register/organisation');
-  if (!profile.onboardingCompletedAt) redirect(`/onboarding/organisation/${profile.onboardingStep}`);
+  if (!profile.onboardingCompletedAt)
+    redirect(`/onboarding/organisation/${profile.onboardingStep}`);
   return { user, corporateProfileId: profile.id, organisationId: profile.organisationId };
 }
 

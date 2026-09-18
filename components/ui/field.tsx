@@ -53,7 +53,12 @@ export function Field({
           <div className="mb-1.5 flex items-baseline justify-between gap-3">
             <label htmlFor={id} className="text-[13px] font-medium text-ink-700">
               {label}
-              {required && <span className="ml-0.5 text-danger-600" aria-hidden="true"> *</span>}
+              {required && (
+                <span className="ml-0.5 text-danger-600" aria-hidden="true">
+                  {' '}
+                  *
+                </span>
+              )}
               {optional && <span className="ml-1.5 font-normal text-ink-300">Optional</span>}
             </label>
             {hint}
@@ -81,5 +86,7 @@ export const controlClasses =
   'transition-colors focus:outline-none focus:ring-0 disabled:cursor-not-allowed ' +
   'disabled:bg-surface-subtle disabled:text-ink-300';
 
-export const controlBorder = 'border-line hover:border-line-strong focus:border-brand-600 focus:shadow-focus';
-export const controlBorderError = 'border-danger-600 focus:border-danger-600 focus:shadow-none focus:ring-2 focus:ring-danger-100';
+export const controlBorder =
+  'border-line hover:border-line-strong focus:border-brand-600 focus:shadow-focus';
+export const controlBorderError =
+  'border-danger-600 focus:border-danger-600 focus:shadow-none focus:ring-2 focus:ring-danger-100';

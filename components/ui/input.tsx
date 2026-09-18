@@ -22,7 +22,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       ref={ref}
       id={props.id ?? field?.id}
       aria-invalid={isInvalid || undefined}
-      aria-describedby={[field?.descriptionId, field?.errorId].filter(Boolean).join(' ') || undefined}
+      aria-describedby={
+        [field?.descriptionId, field?.errorId].filter(Boolean).join(' ') || undefined
+      }
       className={cn(
         controlClasses,
         'h-11',
@@ -46,7 +48,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
       {control}
       {trailingSlot && (
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">{trailingSlot}</span>
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-ink-400">
+          {trailingSlot}
+        </span>
       )}
     </div>
   );

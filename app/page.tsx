@@ -110,8 +110,7 @@ const testimonials = [
     detail: 'Wits University',
   },
   {
-    quote:
-      'The reminders and tracking feature helped me stay on top of all my applications.',
+    quote: 'The reminders and tracking feature helped me stay on top of all my applications.',
     name: 'Ayesha K.',
     detail: 'Stellenbosch University',
   },
@@ -158,7 +157,11 @@ export default function LandingPage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/register/student" size="lg" trailingIcon={<ArrowRight className="h-4 w-4" />}>
+                <ButtonLink
+                  href="/register/student"
+                  size="lg"
+                  trailingIcon={<ArrowRight className="h-4 w-4" />}
+                >
                   I’m a Student
                 </ButtonLink>
                 <ButtonLink
@@ -177,7 +180,10 @@ export default function LandingPage() {
                   { icon: <Users className="h-4 w-4" />, label: 'Trusted by organisations' },
                   { icon: <Globe className="h-4 w-4" />, label: 'Opportunities nationwide' },
                 ].map((item) => (
-                  <li key={item.label} className="flex items-center gap-2 text-[13px] font-medium text-ink-500">
+                  <li
+                    key={item.label}
+                    className="flex items-center gap-2 text-[13px] font-medium text-ink-500"
+                  >
                     <span className="text-ink-400">{item.icon}</span>
                     {item.label}
                   </li>
@@ -204,7 +210,9 @@ export default function LandingPage() {
             <div className="mt-10 grid gap-5 md:grid-cols-3">
               {audiences.map((audience) => (
                 <Card key={audience.title} className="flex flex-col p-6">
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-[12px] ${audience.tone}`}>
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-[12px] ${audience.tone}`}
+                  >
                     {audience.icon}
                   </span>
                   <h3 className="mt-5 text-base font-semibold text-ink">{audience.title}</h3>
@@ -226,7 +234,9 @@ export default function LandingPage() {
         <section id="how-it-works" className="border-b border-line bg-white">
           <div className="mx-auto max-w-shell px-5 py-16 sm:px-8">
             <div className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">How it works</h2>
+              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
+                How it works
+              </h2>
               <p className="mt-3 text-[15px] leading-7 text-ink-400">
                 Three simple steps for students to find and apply for funding.
               </p>
@@ -276,7 +286,9 @@ export default function LandingPage() {
                     {benefit.icon}
                   </span>
                   <h3 className="mt-4 text-[15px] font-semibold text-ink">{benefit.title}</h3>
-                  <p className="mx-auto mt-2 max-w-xs text-[13px] leading-6 text-ink-400">{benefit.body}</p>
+                  <p className="mx-auto mt-2 max-w-xs text-[13px] leading-6 text-ink-400">
+                    {benefit.body}
+                  </p>
                 </div>
               ))}
             </div>
@@ -298,7 +310,10 @@ export default function LandingPage() {
             <div className="mt-10 grid gap-5 md:grid-cols-3">
               {testimonials.map((testimonial) => (
                 <Card key={testimonial.name} className="p-6">
-                  <span aria-hidden="true" className="text-2xl font-bold leading-none text-brand-200">
+                  <span
+                    aria-hidden="true"
+                    className="text-2xl font-bold leading-none text-brand-200"
+                  >
                     “
                   </span>
                   <blockquote className="mt-3 text-[13px] leading-6 text-ink-600">
@@ -309,7 +324,9 @@ export default function LandingPage() {
                       {testimonial.name.charAt(0)}
                     </span>
                     <span>
-                      <span className="block text-[13px] font-semibold text-ink">{testimonial.name}</span>
+                      <span className="block text-[13px] font-semibold text-ink">
+                        {testimonial.name}
+                      </span>
                       <span className="block text-xs text-ink-400">{testimonial.detail}</span>
                     </span>
                   </figcaption>
@@ -346,7 +363,8 @@ export default function LandingPage() {
                 Ready to take the next step?
               </h2>
               <p className="mt-2 max-w-xl text-[13px] leading-6 text-brand-100">
-                Join thousands of students finding funding and organisations building brighter futures.
+                Join thousands of students finding funding and organisations building brighter
+                futures.
               </p>
             </div>
             <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
@@ -383,12 +401,23 @@ function StepArtwork({ index }: { index: number }) {
         {index === 0 && (
           <>
             <circle cx="46" cy="38" r="11" fill="#EBE6FD" />
-            <path d="M38 56c0-5 4-8 8-8s8 3 8 8" stroke="#5B2EDB" strokeWidth="2.4" strokeLinecap="round" />
+            <path
+              d="M38 56c0-5 4-8 8-8s8 3 8 8"
+              stroke="#5B2EDB"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
             <rect x="66" y="30" width="76" height="7" rx="3.5" fill="#EBE6FD" />
             <rect x="66" y="45" width="56" height="7" rx="3.5" fill="#F4F4F9" />
             <rect x="38" y="68" width="104" height="7" rx="3.5" fill="#F4F4F9" />
             <circle cx="140" cy="72" r="13" fill="#12874A" />
-            <path d="m134.5 72 4 4 7-7.5" stroke="white" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="m134.5 72 4 4 7-7.5"
+              stroke="white"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </>
         )}
         {index === 1 && (

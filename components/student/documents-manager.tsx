@@ -114,7 +114,9 @@ export function DocumentsManager({ documents }: { documents: DocumentRow[] }) {
                   <FileText className="h-[18px] w-[18px]" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] font-semibold text-ink">{documentTypeLabels[document.type]}</p>
+                  <p className="text-[13px] font-semibold text-ink">
+                    {documentTypeLabels[document.type]}
+                  </p>
                   <p className="mt-0.5 truncate text-xs text-ink-400">
                     {document.fileName}
                     <span className="mx-1.5">·</span>
@@ -175,10 +177,7 @@ export function DocumentsManager({ documents }: { documents: DocumentRow[] }) {
                 setFile(event.target.files?.[0] ?? null);
                 setError(null);
               }}
-              className="block w-full cursor-pointer rounded-field border border-line bg-white text-sm text-ink-600
-                         file:mr-3 file:cursor-pointer file:rounded-l-field file:border-0 file:bg-surface-subtle
-                         file:px-4 file:py-2.5 file:text-[13px] file:font-semibold file:text-ink-700
-                         hover:file:bg-line"
+              className="block w-full cursor-pointer rounded-field border border-line bg-white text-sm text-ink-600 file:mr-3 file:cursor-pointer file:rounded-l-field file:border-0 file:bg-surface-subtle file:px-4 file:py-2.5 file:text-[13px] file:font-semibold file:text-ink-700 hover:file:bg-line"
             />
           </Field>
 

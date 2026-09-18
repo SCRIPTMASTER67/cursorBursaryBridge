@@ -33,7 +33,8 @@ export function Avatar({
     'bg-warning-100 text-warning-700',
   ];
   const seed = `${firstName}${lastName}`.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
-  const colour = tone === 'neutral' ? 'bg-surface-subtle text-ink-600' : palette[seed % palette.length];
+  const colour =
+    tone === 'neutral' ? 'bg-surface-subtle text-ink-600' : palette[seed % palette.length];
 
   return (
     <span
@@ -51,7 +52,15 @@ export function Avatar({
 }
 
 /** Square logo tile used for organisations. */
-export function OrgAvatar({ name, size = 'md', className }: { name: string; size?: keyof typeof sizes; className?: string }) {
+export function OrgAvatar({
+  name,
+  size = 'md',
+  className,
+}: {
+  name: string;
+  size?: keyof typeof sizes;
+  className?: string;
+}) {
   return (
     <span
       className={cn(

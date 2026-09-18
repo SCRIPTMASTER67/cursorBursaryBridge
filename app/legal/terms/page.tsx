@@ -27,8 +27,8 @@ export default function TermsPage() {
           <section>
             <h2 className="text-[15px] font-semibold text-ink">Your account</h2>
             <p className="mt-2">
-              You are responsible for the accuracy of the information in your profile and for keeping
-              your password secure. Funders make decisions based on what you tell them, so
+              You are responsible for the accuracy of the information in your profile and for
+              keeping your password secure. Funders make decisions based on what you tell them, so
               information that is knowingly false may result in an application being rejected.
             </p>
           </section>

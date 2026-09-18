@@ -99,7 +99,10 @@ export function ApplicantsTable({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ applicationIds: selected, action }),
       });
-      const payload = (await response.json().catch(() => ({}))) as { error?: string; affected?: number };
+      const payload = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        affected?: number;
+      };
 
       if (!response.ok) {
         toast.push('error', payload.error ?? 'That action could not be completed.');
@@ -242,20 +245,10 @@ export function ApplicantsTable({
             {selected.length} applicant{selected.length === 1 ? '' : 's'} selected
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setSelected([])}
-              disabled={bulkBusy}
-            >
+            <Button size="sm" variant="outline" onClick={() => setSelected([])} disabled={bulkBusy}>
               Clear
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => bulk('REMOVE')}
-              loading={bulkBusy}
-            >
+            <Button size="sm" variant="outline" onClick={() => bulk('REMOVE')} loading={bulkBusy}>
               Remove from shortlist
             </Button>
             <Button
@@ -330,14 +323,19 @@ export function ApplicantsTable({
                           href={`/corporate/applications/${row.id}`}
                           className="flex items-center gap-3"
                         >
-                          <Avatar firstName={firstName} lastName={rest.join(' ') || firstName} size="sm" />
+                          <Avatar
+                            firstName={firstName}
+                            lastName={rest.join(' ') || firstName}
+                            size="sm"
+                          />
                           <span className="min-w-0">
                             <span className="block font-semibold text-ink hover:text-brand-700">
                               {row.studentName}
                             </span>
                             <span className="block truncate text-xs text-ink-400">
                               {row.programme ?? 'Programme not set'}
-                              {row.qualification && ` · ${qualificationLabels[row.qualification as keyof typeof qualificationLabels]}`}
+                              {row.qualification &&
+                                ` · ${qualificationLabels[row.qualification as keyof typeof qualificationLabels]}`}
                             </span>
                             <span className="block truncate text-xs text-ink-300">
                               {row.institution ?? 'Institution not set'}

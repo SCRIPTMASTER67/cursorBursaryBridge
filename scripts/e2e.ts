@@ -206,7 +206,9 @@ async function main() {
 
   const up = catalogue.body.institutions.find((i) => i.name === 'University of Pretoria')!;
   const uj = catalogue.body.institutions.find((i) => i.name === 'University of Johannesburg')!;
-  const tut = catalogue.body.institutions.find((i) => i.name === 'Tshwane University of Technology')!;
+  const tut = catalogue.body.institutions.find(
+    (i) => i.name === 'Tshwane University of Technology',
+  )!;
   const cs = catalogue.body.programmes.find((p) => p.name === 'Computer Science')!;
   const it = catalogue.body.programmes.find((p) => p.name === 'Information Technology')!;
 
@@ -240,7 +242,8 @@ async function main() {
   );
   check(
     '   an enrolled student without an institution is rejected',
-    incompleteEducation.status === 422 && Boolean(incompleteEducation.body.fields?.currentInstitutionId),
+    incompleteEducation.status === 422 &&
+      Boolean(incompleteEducation.body.fields?.currentInstitutionId),
     `status ${incompleteEducation.status}`,
   );
 
@@ -255,7 +258,11 @@ async function main() {
       ],
     }),
   });
-  check('4. three study preferences save', preferences.status === 200, `status ${preferences.status}`);
+  check(
+    '4. three study preferences save',
+    preferences.status === 200,
+    `status ${preferences.status}`,
+  );
 
   const overLimit = await student.json<{ error?: string }>('/api/student/preferences', {
     method: 'PUT',
@@ -314,7 +321,12 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({
       step: 'academic',
-      data: { academicAverage: 140, academicAverageUnknown: false, resultTypes: [], achievements: [] },
+      data: {
+        academicAverage: 140,
+        academicAverageUnknown: false,
+        resultTypes: [],
+        achievements: [],
+      },
     }),
   });
   check('   an average above 100% is rejected', badAverage.status === 422);
@@ -396,15 +408,29 @@ async function main() {
   check('    opportunities list renders', opportunities.status === 200);
 
   const opportunityIds = [
-    ...new Set([...opportunities.html.matchAll(/\/student\/opportunities\/(c[a-z0-9]{20,})/g)].map((m) => m[1])),
+    ...new Set(
+      [...opportunities.html.matchAll(/\/student\/opportunities\/(c[a-z0-9]{20,})/g)].map(
+        (m) => m[1],
+      ),
+    ),
   ];
-  check('    at least one opportunity is matched', opportunityIds.length > 0, `found ${opportunityIds.length}`);
+  check(
+    '    at least one opportunity is matched',
+    opportunityIds.length > 0,
+    `found ${opportunityIds.length}`,
+  );
 
   // 11. Opportunity detail shows the reasoning, not just a score
   const detail = await student.page(`/student/opportunities/${opportunityIds[0]}`);
   check('11. opportunity detail renders', detail.status === 200, `status ${detail.status}`);
-  check('    it lists eligibility requirements', detail.html.includes('Apply Now') || detail.html.includes('Apply'));
-  check('    it shows the per-criterion breakdown', detail.html.includes('Course') && detail.html.includes('worth'));
+  check(
+    '    it lists eligibility requirements',
+    detail.html.includes('Apply Now') || detail.html.includes('Apply'),
+  );
+  check(
+    '    it shows the per-criterion breakdown',
+    detail.html.includes('Course') && detail.html.includes('worth'),
+  );
 
   // 12. Apply — draft, then submit
   const draft = await student.json<{ applicationId?: string }>('/api/student/applications', {
@@ -496,7 +522,11 @@ async function main() {
       acceptedTerms: true,
     }),
   });
-  check('1. corporate registers', corpRegistration.status === 201, `status ${corpRegistration.status}`);
+  check(
+    '1. corporate registers',
+    corpRegistration.status === 201,
+    `status ${corpRegistration.status}`,
+  );
 
   const details = await corporate.json('/api/corporate/onboarding', {
     method: 'POST',
@@ -533,7 +563,11 @@ async function main() {
       },
     }),
   });
-  check('4. funding profile saves', fundingProfile.status === 200, `status ${fundingProfile.status}`);
+  check(
+    '4. funding profile saves',
+    fundingProfile.status === 200,
+    `status ${fundingProfile.status}`,
+  );
 
   const currentProcess = await corporate.json('/api/corporate/onboarding', {
     method: 'POST',
@@ -545,7 +579,11 @@ async function main() {
       },
     }),
   });
-  check('5. current process saves', currentProcess.status === 200, `status ${currentProcess.status}`);
+  check(
+    '5. current process saves',
+    currentProcess.status === 200,
+    `status ${currentProcess.status}`,
+  );
 
   const tooManyChallenges = await corporate.json('/api/corporate/onboarding', {
     method: 'POST',
@@ -689,11 +727,19 @@ async function main() {
   section('Funder reviews, shortlists and selects');
   // =========================================================================
   const applicantList = await corporate.page(`/corporate/applications?programme=${programmeId}`);
-  check('the funder sees the applicant', applicantList.html.includes('Journey'), 'applicant not listed');
+  check(
+    'the funder sees the applicant',
+    applicantList.html.includes('Journey'),
+    'applicant not listed',
+  );
   check('   with an eligibility verdict', applicantList.html.includes('Eligible'));
 
   const applicantPage = await corporate.page(`/corporate/applications/${newApplicationId}`);
-  check('the applicant profile renders', applicantPage.status === 200, `status ${applicantPage.status}`);
+  check(
+    'the applicant profile renders',
+    applicantPage.status === 200,
+    `status ${applicantPage.status}`,
+  );
   check('   showing the study preferences', applicantPage.html.includes('Study preferences'));
   check('   and the eligibility assessment', applicantPage.html.includes('Eligibility'));
 
@@ -701,7 +747,11 @@ async function main() {
     method: 'PATCH',
     body: JSON.stringify({ status: 'SHORTLISTED', note: '' }),
   });
-  check('the funder shortlists the applicant', shortlisted.status === 200, `status ${shortlisted.status}`);
+  check(
+    'the funder shortlists the applicant',
+    shortlisted.status === 200,
+    `status ${shortlisted.status}`,
+  );
 
   const shortlistPage = await corporate.page('/corporate/shortlists');
   check('   they appear on the shortlist', shortlistPage.html.includes('Journey'));
@@ -719,7 +769,10 @@ async function main() {
   check('the student sees the approved status', studentView.html.includes('Approved'));
 
   const notifications = await student.page('/student/notifications');
-  check('   and was notified', notifications.html.includes('approved') || notifications.html.includes('Approved'));
+  check(
+    '   and was notified',
+    notifications.html.includes('approved') || notifications.html.includes('Approved'),
+  );
 
   // =========================================================================
   section('Access control');
@@ -882,7 +935,11 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ email: studentEmail, password: 'WrongPassword1' }),
   });
-  check('a wrong password is rejected', wrongPassword.status === 401, `status ${wrongPassword.status}`);
+  check(
+    'a wrong password is rejected',
+    wrongPassword.status === 401,
+    `status ${wrongPassword.status}`,
+  );
 
   const unknownEmail = await new Session().json<{ error?: string }>('/api/auth/login', {
     method: 'POST',
@@ -927,26 +984,42 @@ async function main() {
   );
 
   const adminDashboard = await admin.page('/admin/dashboard');
-  check('the admin dashboard renders', adminDashboard.status === 200, `status ${adminDashboard.status}`);
+  check(
+    'the admin dashboard renders',
+    adminDashboard.status === 200,
+    `status ${adminDashboard.status}`,
+  );
 
   // --- the guard rejects everyone else -------------------------------------
   const anonAdminApi = await new Session().json('/api/admin/users/whatever', {
     method: 'POST',
     body: JSON.stringify({ action: 'SUSPEND', reason: 'attempting without a session' }),
   });
-  check('an anonymous request to an admin route is 401', anonAdminApi.status === 401, `status ${anonAdminApi.status}`);
+  check(
+    'an anonymous request to an admin route is 401',
+    anonAdminApi.status === 401,
+    `status ${anonAdminApi.status}`,
+  );
 
   const studentAdminApi = await student.json('/api/admin/users/whatever', {
     method: 'POST',
     body: JSON.stringify({ action: 'SUSPEND', reason: 'a student attempting an admin action' }),
   });
-  check('a student calling an admin route is 403', studentAdminApi.status === 403, `status ${studentAdminApi.status}`);
+  check(
+    'a student calling an admin route is 403',
+    studentAdminApi.status === 403,
+    `status ${studentAdminApi.status}`,
+  );
 
   const corporateAdminApi = await corporate.json('/api/admin/programmes/whatever', {
     method: 'POST',
     body: JSON.stringify({ action: 'SUSPEND', reason: 'a funder attempting an admin action' }),
   });
-  check('a funder calling an admin route is 403', corporateAdminApi.status === 403, `status ${corporateAdminApi.status}`);
+  check(
+    'a funder calling an admin route is 403',
+    corporateAdminApi.status === 403,
+    `status ${corporateAdminApi.status}`,
+  );
 
   const studentAdminPage = await student.page('/admin/dashboard');
   check(
@@ -960,7 +1033,11 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ action: 'SUSPEND', reason: 'short' }),
   });
-  check('an action without a proper reason is rejected', noReason.status === 422, `status ${noReason.status}`);
+  check(
+    'an action without a proper reason is rejected',
+    noReason.status === 422,
+    `status ${noReason.status}`,
+  );
 
   // --- suspend a programme -------------------------------------------------
   const targetProgramme = await db.fundingProgramme.findFirstOrThrow({
@@ -972,13 +1049,21 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ action: 'SUSPEND', reason: 'Breaches the platform content policy.' }),
   });
-  check('an admin can suspend a programme', suspendProgramme.status === 200, `status ${suspendProgramme.status}`);
+  check(
+    'an admin can suspend a programme',
+    suspendProgramme.status === 200,
+    `status ${suspendProgramme.status}`,
+  );
 
   const afterSuspend = await db.fundingProgramme.findUniqueOrThrow({
     where: { id: targetProgramme.id },
     select: { status: true },
   });
-  check('the programme is SUSPENDED in the database', afterSuspend.status === 'SUSPENDED', afterSuspend.status);
+  check(
+    'the programme is SUSPENDED in the database',
+    afterSuspend.status === 'SUSPENDED',
+    afterSuspend.status,
+  );
 
   // The point of the new status: the owner cannot undo it.
   const funderRepublish = await corporate.json(`/api/corporate/programmes/${targetProgramme.id}`, {
@@ -995,13 +1080,21 @@ async function main() {
     where: { id: targetProgramme.id },
     select: { status: true },
   });
-  check('and it is still SUSPENDED afterwards', stillSuspended.status === 'SUSPENDED', stillSuspended.status);
+  check(
+    'and it is still SUSPENDED afterwards',
+    stillSuspended.status === 'SUSPENDED',
+    stillSuspended.status,
+  );
 
   const suspendAudit = await db.auditLog.findFirst({
     where: { action: 'admin.programme_suspended', entityId: targetProgramme.id },
     select: { metadata: true, userId: true },
   });
-  check('the suspension is in the audit log with its reason', Boolean(suspendAudit), 'no audit entry');
+  check(
+    'the suspension is in the audit log with its reason',
+    Boolean(suspendAudit),
+    'no audit entry',
+  );
   check(
     'the audit entry records the reason',
     typeof (suspendAudit?.metadata as { reason?: string } | null)?.reason === 'string',
@@ -1012,12 +1105,20 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ action: 'RESTORE', reason: 'Policy breach resolved by the funder.' }),
   });
-  check('an admin can restore it', restoreProgramme.status === 200, `status ${restoreProgramme.status}`);
+  check(
+    'an admin can restore it',
+    restoreProgramme.status === 200,
+    `status ${restoreProgramme.status}`,
+  );
   const afterRestore = await db.fundingProgramme.findUniqueOrThrow({
     where: { id: targetProgramme.id },
     select: { status: true },
   });
-  check('it returns to DRAFT rather than PUBLISHED', afterRestore.status === 'DRAFT', afterRestore.status);
+  check(
+    'it returns to DRAFT rather than PUBLISHED',
+    afterRestore.status === 'DRAFT',
+    afterRestore.status,
+  );
 
   // --- suspend an account --------------------------------------------------
   const studentRecord = await db.user.findUniqueOrThrow({
@@ -1025,17 +1126,31 @@ async function main() {
     select: { id: true },
   });
 
-  const selfSuspend = await admin.json(`/api/admin/users/${(await db.user.findUniqueOrThrow({ where: { email: adminEmail }, select: { id: true } })).id}`, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'SUSPEND', reason: 'attempting to suspend my own account' }),
-  });
-  check('an admin cannot suspend their own account', selfSuspend.status === 422, `status ${selfSuspend.status}`);
+  const selfSuspend = await admin.json(
+    `/api/admin/users/${(await db.user.findUniqueOrThrow({ where: { email: adminEmail }, select: { id: true } })).id}`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ action: 'SUSPEND', reason: 'attempting to suspend my own account' }),
+    },
+  );
+  check(
+    'an admin cannot suspend their own account',
+    selfSuspend.status === 422,
+    `status ${selfSuspend.status}`,
+  );
 
   const suspendStudent = await admin.json(`/api/admin/users/${studentRecord.id}`, {
     method: 'POST',
-    body: JSON.stringify({ action: 'SUSPEND', reason: 'Suspected fraudulent application activity.' }),
+    body: JSON.stringify({
+      action: 'SUSPEND',
+      reason: 'Suspected fraudulent application activity.',
+    }),
   });
-  check('an admin can suspend a student account', suspendStudent.status === 200, `status ${suspendStudent.status}`);
+  check(
+    'an admin can suspend a student account',
+    suspendStudent.status === 200,
+    `status ${suspendStudent.status}`,
+  );
 
   // Suspension is enforced by getCurrentUser, so the student's existing cookie
   // must stop working on the very next request.
@@ -1060,26 +1175,45 @@ async function main() {
     method: 'POST',
     body: JSON.stringify({ action: 'REACTIVATE', reason: 'Investigation closed with no finding.' }),
   });
-  check('an admin can reactivate the account', reactivate.status === 200, `status ${reactivate.status}`);
+  check(
+    'an admin can reactivate the account',
+    reactivate.status === 200,
+    `status ${reactivate.status}`,
+  );
 
   const reactivatedLogin = await new Session().json('/api/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email: studentEmail, password: PASSWORD }),
   });
-  check('and the student can sign in again', reactivatedLogin.status === 200, `status ${reactivatedLogin.status}`);
+  check(
+    'and the student can sign in again',
+    reactivatedLogin.status === 200,
+    `status ${reactivatedLogin.status}`,
+  );
 
   // --- force a password reset ----------------------------------------------
   const forceReset = await admin.json(`/api/admin/users/${studentRecord.id}`, {
     method: 'POST',
-    body: JSON.stringify({ action: 'FORCE_PASSWORD_RESET', reason: 'Credentials shared in a public forum.' }),
+    body: JSON.stringify({
+      action: 'FORCE_PASSWORD_RESET',
+      reason: 'Credentials shared in a public forum.',
+    }),
   });
-  check('an admin can force a password reset', forceReset.status === 200, `status ${forceReset.status}`);
+  check(
+    'an admin can force a password reset',
+    forceReset.status === 200,
+    `status ${forceReset.status}`,
+  );
   const flagged = await db.user.findUniqueOrThrow({
     where: { id: studentRecord.id },
     select: { mustResetPassword: true, sessions: { select: { id: true } } },
   });
   check('the account is flagged for reset', flagged.mustResetPassword === true, 'flag not set');
-  check('and its sessions were ended', flagged.sessions.length === 0, `${flagged.sessions.length} session(s) left`);
+  check(
+    'and its sessions were ended',
+    flagged.sessions.length === 0,
+    `${flagged.sessions.length} session(s) left`,
+  );
 
   // --- the audit log is read-only ------------------------------------------
   const auditPage = await admin.page('/admin/audit');

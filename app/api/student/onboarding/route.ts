@@ -34,7 +34,8 @@ export async function POST(request: NextRequest) {
   switch (step) {
     case 'education': {
       const parsed = educationSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       const d = parsed.data;
       const isSchoolLearner = d.educationStage === 'GRADE_10' || d.educationStage === 'GRADE_11';
       const isEnrolled = d.studyStatus === 'CURRENTLY_ENROLLED';
@@ -55,7 +56,8 @@ export async function POST(request: NextRequest) {
 
     case 'academic': {
       const parsed = academicSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       const d = parsed.data;
       await prisma.studentProfile.update({
         where: { id: studentProfileId },
@@ -71,17 +73,22 @@ export async function POST(request: NextRequest) {
 
     case 'funding': {
       const parsed = fundingSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       await prisma.studentProfile.update({
         where: { id: studentProfileId },
-        data: { fundingNeeds: parsed.data.fundingNeeds, fundingSituation: parsed.data.fundingSituation },
+        data: {
+          fundingNeeds: parsed.data.fundingNeeds,
+          fundingSituation: parsed.data.fundingSituation,
+        },
       });
       break;
     }
 
     case 'financial': {
       const parsed = financialSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       const d = parsed.data;
       await prisma.studentProfile.update({
         where: { id: studentProfileId },
@@ -100,7 +107,8 @@ export async function POST(request: NextRequest) {
 
     case 'location': {
       const parsed = locationSchema.safeParse(body.data);
-      if (!parsed.success) return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
+      if (!parsed.success)
+        return apiError('Please check the highlighted fields.', 422, zodFields(parsed.error));
       const d = parsed.data;
       await prisma.studentProfile.update({
         where: { id: studentProfileId },

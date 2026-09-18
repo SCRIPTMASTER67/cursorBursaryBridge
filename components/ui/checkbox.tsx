@@ -23,9 +23,7 @@ export function Checkbox({ label, description, className, id, ...props }: Checkb
         <input
           id={inputId}
           type="checkbox"
-          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-[5px] border border-line-strong
-                     bg-white transition-colors checked:border-brand-600 checked:bg-brand-600
-                     hover:border-brand-400 disabled:cursor-not-allowed disabled:bg-surface-subtle"
+          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-[5px] border border-line-strong bg-white transition-colors checked:border-brand-600 checked:bg-brand-600 hover:border-brand-400 disabled:cursor-not-allowed disabled:bg-surface-subtle"
           {...props}
         />
         <Check
@@ -33,9 +31,14 @@ export function Checkbox({ label, description, className, id, ...props }: Checkb
           strokeWidth={3}
         />
       </span>
-      <label htmlFor={inputId} className="cursor-pointer select-none text-[13px] leading-[18px] text-ink-700">
+      <label
+        htmlFor={inputId}
+        className="cursor-pointer select-none text-[13px] leading-[18px] text-ink-700"
+      >
         {label}
-        {description && <span className="mt-0.5 block text-[13px] text-ink-400">{description}</span>}
+        {description && (
+          <span className="mt-0.5 block text-[13px] text-ink-400">{description}</span>
+        )}
       </label>
     </div>
   );
@@ -56,15 +59,18 @@ export function Radio({ label, description, className, id, ...props }: RadioProp
         <input
           id={inputId}
           type="radio"
-          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-full border border-line-strong
-                     bg-white transition-colors checked:border-[5px] checked:border-brand-600
-                     hover:border-brand-400 disabled:cursor-not-allowed disabled:bg-surface-subtle"
+          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-full border border-line-strong bg-white transition-colors checked:border-[5px] checked:border-brand-600 hover:border-brand-400 disabled:cursor-not-allowed disabled:bg-surface-subtle"
           {...props}
         />
       </span>
-      <label htmlFor={inputId} className="cursor-pointer select-none text-[13px] leading-[18px] text-ink-700">
+      <label
+        htmlFor={inputId}
+        className="cursor-pointer select-none text-[13px] leading-[18px] text-ink-700"
+      >
         {label}
-        {description && <span className="mt-0.5 block text-[13px] text-ink-400">{description}</span>}
+        {description && (
+          <span className="mt-0.5 block text-[13px] text-ink-400">{description}</span>
+        )}
       </label>
     </div>
   );
@@ -85,7 +91,9 @@ export function RadioCard({
       htmlFor={inputId}
       className={cn(
         'flex cursor-pointer items-start gap-3 rounded-field border p-3.5 transition-colors',
-        checked ? 'border-brand-600 bg-brand-50/60 shadow-focus' : 'border-line bg-white hover:border-brand-300',
+        checked
+          ? 'border-brand-600 bg-brand-50/60 shadow-focus'
+          : 'border-line bg-white hover:border-brand-300',
         className,
       )}
     >
@@ -94,8 +102,7 @@ export function RadioCard({
           id={inputId}
           type="radio"
           checked={checked}
-          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-full border border-line-strong
-                     bg-white checked:border-[5px] checked:border-brand-600"
+          className="peer h-[18px] w-[18px] cursor-pointer appearance-none rounded-full border border-line-strong bg-white checked:border-[5px] checked:border-brand-600"
           {...props}
         />
       </span>

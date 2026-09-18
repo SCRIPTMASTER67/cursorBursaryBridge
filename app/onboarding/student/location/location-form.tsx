@@ -102,7 +102,11 @@ export function LocationForm({
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-6">
           <Field label="Province" error={fieldErrors.province} required>
@@ -149,7 +153,9 @@ export function LocationForm({
           </fieldset>
 
           <div className="border-t border-line pt-5">
-            <p className="text-[13px] font-medium text-ink-700">What careers or industries interest you?</p>
+            <p className="text-[13px] font-medium text-ink-700">
+              What careers or industries interest you?
+            </p>
             <p className="mb-3 mt-1 text-[13px] text-ink-400">
               Select up to {MAX_CAREER_INTERESTS}. {interests.length} selected.
             </p>

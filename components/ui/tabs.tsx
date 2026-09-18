@@ -40,7 +40,12 @@ export function Tabs({
             >
               {tab.label}
               {typeof tab.count === 'number' && (
-                <span className={cn('ml-1.5 tabular-nums', selected ? 'text-brand-500' : 'text-ink-300')}>
+                <span
+                  className={cn(
+                    'ml-1.5 tabular-nums',
+                    selected ? 'text-brand-500' : 'text-ink-300',
+                  )}
+                >
                   ({tab.count.toLocaleString('en-ZA')})
                 </span>
               )}

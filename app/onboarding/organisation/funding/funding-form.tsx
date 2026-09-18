@@ -100,7 +100,11 @@ export function FundingProfileForm({
           </Button>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-6">
           <fieldset>

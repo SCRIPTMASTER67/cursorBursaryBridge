@@ -18,7 +18,9 @@ const programmeInclude = {
   organisation: { select: { id: true, name: true, logoUrl: true, industry: true } },
   eligibility: true,
   supportedProgrammes: { include: { programme: { select: { id: true, name: true } } } },
-  supportedInstitutions: { include: { institution: { select: { id: true, name: true, shortName: true } } } },
+  supportedInstitutions: {
+    include: { institution: { select: { id: true, name: true, shortName: true } } },
+  },
 } satisfies Prisma.FundingProgrammeInclude;
 
 export type ProgrammeWithRelations = Prisma.FundingProgrammeGetPayload<{

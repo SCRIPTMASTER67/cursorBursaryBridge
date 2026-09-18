@@ -18,7 +18,10 @@ export default async function NewProgrammePage() {
         title="Create New Programme"
         description="Set up your funding programme and eligibility criteria."
         breadcrumb={
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-ink-400">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex items-center gap-1.5 text-[13px] text-ink-400"
+          >
             <Link href="/corporate/programmes" className="hover:text-ink-600">
               Programmes
             </Link>

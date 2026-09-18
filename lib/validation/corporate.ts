@@ -38,7 +38,10 @@ export const organisationDetailsSchema = z.object({
     .max(200)
     .optional()
     .or(z.literal(''))
-    .refine((v) => !v || /^https?:\/\/.+\..+/.test(v), 'Enter a valid website URL, including https://'),
+    .refine(
+      (v) => !v || /^https?:\/\/.+\..+/.test(v),
+      'Enter a valid website URL, including https://',
+    ),
   country: z.string().min(1, 'Country is required').default('South Africa'),
 });
 

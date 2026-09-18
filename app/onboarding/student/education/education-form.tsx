@@ -10,7 +10,13 @@ import { Field } from '@/components/ui/field';
 import { Select } from '@/components/ui/select';
 import { useFormSubmit } from '@/hooks/use-form-submit';
 import type { CatalogInstitution, CatalogProgramme } from '@/services/catalog';
-import { educationStageLabels, qualificationLabels, schoolStages, studyStatusLabels, toOptions } from '@/lib/labels';
+import {
+  educationStageLabels,
+  qualificationLabels,
+  schoolStages,
+  studyStatusLabels,
+  toOptions,
+} from '@/lib/labels';
 import { studentSteps } from '@/lib/onboarding-steps';
 import type { EducationStage, QualificationLevel, StudyStatus } from '@prisma/client';
 
@@ -40,7 +46,9 @@ export function EducationForm({
   catalog: { institutions: CatalogInstitution[]; programmes: CatalogProgramme[] };
 }) {
   const router = useRouter();
-  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{ redirectTo: string }>();
+  const { submitting, error, fieldErrors, submit, clearFieldError } = useFormSubmit<{
+    redirectTo: string;
+  }>();
 
   const [values, setValues] = useState({
     educationStage: initial.educationStage ?? '',
@@ -116,10 +124,18 @@ export function EducationForm({
           </>
         }
       >
-        {error && <Alert tone="danger" className="mb-5">{error}</Alert>}
+        {error && (
+          <Alert tone="danger" className="mb-5">
+            {error}
+          </Alert>
+        )}
 
         <div className="space-y-5">
-          <Field label="What is your current education stage?" error={fieldErrors.educationStage} required>
+          <Field
+            label="What is your current education stage?"
+            error={fieldErrors.educationStage}
+            required
+          >
             <Select
               options={toOptions(educationStageLabels)}
               placeholder="Select your education stage"
@@ -139,7 +155,9 @@ export function EducationForm({
                 options={toOptions(qualificationLabels)}
                 placeholder="Select a qualification level"
                 value={values.qualificationLevel}
-                onChange={(event) => update('qualificationLevel', event.target.value as QualificationLevel)}
+                onChange={(event) =>
+                  update('qualificationLevel', event.target.value as QualificationLevel)
+                }
               />
             </Field>
           )}

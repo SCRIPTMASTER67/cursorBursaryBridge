@@ -45,7 +45,9 @@ export function nextCorporateStep(key: CorporateStepKey): (typeof corporateSteps
   return corporateSteps[index + 1] ?? null;
 }
 
-export function previousCorporateStep(key: CorporateStepKey): (typeof corporateSteps)[number] | null {
+export function previousCorporateStep(
+  key: CorporateStepKey,
+): (typeof corporateSteps)[number] | null {
   const index = corporateSteps.findIndex((step) => step.key === key);
   return index > 0 ? corporateSteps[index - 1] : null;
 }

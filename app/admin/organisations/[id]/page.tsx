@@ -26,11 +26,11 @@ export default async function AdminOrganisationDetailPage({
           <div>
             <Link
               href="/admin/organisations"
-              className="text-[13px] text-primary-700 hover:underline"
+              className="text-primary-700 text-[13px] hover:underline"
             >
               ← Back to organisations
             </Link>
-            <h1 className="mt-1 text-[26px] font-semibold text-ink-900">{organisation.name}</h1>
+            <h1 className="text-ink-900 mt-1 text-[26px] font-semibold">{organisation.name}</h1>
             <p className="mt-1 text-[14px] text-ink-500">
               {organisation.type} ·{' '}
               <Badge tone={organisation.status === 'ACTIVE' ? 'success' : 'danger'}>
@@ -61,7 +61,7 @@ export default async function AdminOrganisationDetailPage({
         </header>
 
         <Card className="p-5">
-          <h2 className="text-[15px] font-semibold text-ink-900">Funding programmes</h2>
+          <h2 className="text-ink-900 text-[15px] font-semibold">Funding programmes</h2>
           {organisation.programmes.length === 0 ? (
             <p className="mt-2 text-[14px] text-ink-500">No programmes yet.</p>
           ) : (
@@ -78,7 +78,7 @@ export default async function AdminOrganisationDetailPage({
                 <tbody>
                   {organisation.programmes.map((programme) => (
                     <tr key={programme.id} className="border-b border-line/60 last:border-0">
-                      <td className="py-2 text-ink-800">{programme.name}</td>
+                      <td className="text-ink-800 py-2">{programme.name}</td>
                       <td className="py-2">
                         <ProgrammeStatusBadge status={programme.status} />
                       </td>
@@ -97,7 +97,7 @@ export default async function AdminOrganisationDetailPage({
         </Card>
 
         <Card className="p-5">
-          <h2 className="text-[15px] font-semibold text-ink-900">Members</h2>
+          <h2 className="text-ink-900 text-[15px] font-semibold">Members</h2>
           <ul className="mt-3 space-y-1.5">
             {organisation.members.map((member) => (
               <li key={member.id} className="flex flex-wrap justify-between gap-2 text-[14px]">

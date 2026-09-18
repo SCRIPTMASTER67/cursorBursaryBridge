@@ -24,7 +24,10 @@ export class LocalStorageProvider implements StorageProvider {
   }
 
   async put(input: PutObjectInput): Promise<StoredObject> {
-    const extension = path.extname(input.fileName).slice(0, 10).replace(/[^A-Za-z0-9.]/g, '');
+    const extension = path
+      .extname(input.fileName)
+      .slice(0, 10)
+      .replace(/[^A-Za-z0-9.]/g, '');
     const key = path.posix.join(input.prefix, `${randomUUID()}${extension}`);
     const target = this.resolveSafe(key);
     await mkdir(path.dirname(target), { recursive: true });
@@ -39,7 +42,9 @@ export class LocalStorageProvider implements StorageProvider {
       const body = await readFile(target);
       let contentType = 'application/octet-stream';
       try {
-        const meta = JSON.parse(await readFile(`${target}.meta`, 'utf8')) as { contentType?: string };
+        const meta = JSON.parse(await readFile(`${target}.meta`, 'utf8')) as {
+          contentType?: string;
+        };
         if (meta.contentType) contentType = meta.contentType;
       } catch {
         // Missing sidecar is not fatal — fall back to the generic type.
