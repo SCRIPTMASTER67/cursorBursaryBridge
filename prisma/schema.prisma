@@ -541,6 +541,7 @@ model StudentProfile {
   studyPreferences   StudyPreference[]
   applications       Application[]
   documents          Document[]
+  autoFillJobs       AutoFillJob[]
 
   @@index([province])
   @@index([educationStage])
@@ -845,4 +846,176 @@ model AuditLog {
   @@index([entityType, entityId])
   @@index([createdAt])
   @@index([action, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Form auto-filling
+//
+// A student uploads one completed bursary form and any number of blank ones.
+// The completed form is read into canonical values; each blank form is mapped
+// against them field by field. Every decision is stored with the reason behind
+// it, because the student is asked to check the result before submitting it
+// and cannot check what they cannot see.
+//
+// Filled PDFs are not stored. They are produced from the original upload and
+// the current field values whenever one is downloaded, so an edited value can
+// never disagree with the file the student sends to a funder.
+// ---------------------------------------------------------------------------
+
+enum AutoFillJobStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  /// The completed form could not be read, so no target could be attempted.
+  FAILED
+}
+
+enum AutoFillFormStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  /// This form alone failed. The rest of the batch is unaffected.
+  FAILED
+}
+
+/// The outcome of one field on one target form. Mirrors MappingStatus in
+/// lib/pdf/map.ts; only FILLED and NEEDS_REVIEW carry a value.
+enum AutoFillFieldStatus {
+  FILLED
+  NEEDS_REVIEW
+  MISSING
+  AMBIGUOUS
+  SIGNATURE
+  MANUAL
+}
+
+enum AutoFillConfidence {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+model AutoFillJob {
+  id               String            @id @default(cuid())
+  studentProfileId String
+  status           AutoFillJobStatus @default(DRAFT)
+
+  sourceFileName   String
+  sourceStorageKey String @unique
+  sourceSizeBytes  Int
+  sourcePageCount  Int?
+
+  /// Why the completed form could not be read, in words shown to the student.
+  failureReason String?
+  /// Which matcher produced this mapping, so a result can be reproduced.
+  matcher       String?
+
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  studentProfile  StudentProfile           @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  targetForms     AutoFillTargetForm[]
+  extractedValues AutoFillExtractedValue[]
+
+  @@index([studentProfileId, createdAt])
+}
+
+/// One piece of information read out of the completed form.
+model AutoFillExtractedValue {
+  id           String             @id @default(cuid())
+  jobId        String
+  canonicalKey String
+  kind         String
+  /// Normalised form, e.g. an ISO date.
+  value        String
+  /// What the source literally said, kept for display and audit.
+  raw          String
+  confidence   AutoFillConfidence
+
+  sourcePage       Int?
+  sourceFieldLabel String
+  /// "acroform" when read from a real field, "text-layout" when inferred.
+  method           String
+
+  job AutoFillJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, canonicalKey])
+  @@index([jobId])
+}
+
+model AutoFillTargetForm {
+  id                 String             @id @default(cuid())
+  jobId              String
+  status             AutoFillFormStatus @default(PENDING)
+  originalFileName   String
+  originalStorageKey String             @unique
+  sizeBytes          Int
+  pageCount          Int?
+
+  /// Set when this form alone could not be processed.
+  failureReason String?
+
+  fieldsTotal       Int @default(0)
+  fieldsFilled      Int @default(0)
+  fieldsOutstanding Int @default(0)
+
+  processedAt DateTime?
+
+  job    AutoFillJob     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fields AutoFillField[]
+
+  @@index([jobId])
+}
+
+model AutoFillField {
+  id           String              @id @default(cuid())
+  targetFormId String
+  /// The PDF field name, or a synthetic id for a label found in the text layer.
+  fieldName    String
+  label        String
+  kind         String
+  page         Int
+  status       AutoFillFieldStatus
+  /// Null whenever nothing is written. Never a guess.
+  value        String?
+  canonicalKey String?
+  confidence   AutoFillConfidence?
+  /// Why this outcome was reached, in words the student can read.
+  reason       String
+  options      String[]
+
+  /// Where the value came from, so a populated field can be traced back.
+  sourceDocumentName String?
+  sourcePage         Int?
+  sourceFieldLabel   String?
+
+  /// Widget rectangle, used to highlight the field on the page preview.
+  rectX      Float?
+  rectY      Float?
+  rectWidth  Float?
+  rectHeight Float?
+
+  /// True once the student has changed this value themselves.
+  editedByStudent Boolean @default(false)
+
+  targetForm AutoFillTargetForm  @relation(fields: [targetFormId], references: [id], onDelete: Cascade)
+  edits      AutoFillFieldEdit[]
+
+  @@unique([targetFormId, fieldName])
+  @@index([targetFormId])
+}
+
+/// Every change a student makes to a populated field, kept so a submitted
+/// form can always be explained.
+model AutoFillFieldEdit {
+  id            String   @id @default(cuid())
+  fieldId       String
+  previousValue String?
+  newValue      String?
+  editedAt      DateTime @default(now())
+
+  field AutoFillField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([fieldId, editedAt])
 }
