@@ -16,6 +16,8 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:demo": "tsx prisma/seed-demo.ts",
+    "purge:mock": "tsx scripts/purge-mock-data.ts",
     "db:reset": "prisma migrate reset --force",
     "db:studio": "prisma studio",
     "test:matching": "tsx scripts/test-matching.ts",
