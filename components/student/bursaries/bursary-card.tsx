@@ -35,7 +35,9 @@ export function BursaryCard({ row }: { row: DirectoryRow }) {
       <div className="flex items-start gap-3">
         <OrgAvatar name={row.organisation.name} />
         <div className="min-w-0 flex-1">
-          <h3 className="truncate text-[15px] font-semibold text-ink">{row.name}</h3>
+          <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug text-ink">
+            {row.name}
+          </h3>
           <p className="truncate text-[13px] text-ink-500">{row.organisation.name}</p>
         </div>
         <BursaryStatusBadge status={row.status} />

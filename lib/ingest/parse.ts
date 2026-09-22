@@ -183,17 +183,36 @@ function findFormLink($: cheerio.CheerioAPI, pageUrl: string): string | undefine
 }
 
 /**
+ * Subjects that name what a bursary is FOR, not who is offering it.
+ *
+ * Only stripped when the word sits immediately before the funding word, which
+ * is where a subject appears ("Holdings Engineering Bursary"). A company with
+ * the word in its own name keeps it, because something else follows it there
+ * ("Nkosi Engineering Trust Bursary").
+ */
+const SUBJECT_WORDS =
+  /^(engineering|science|sciences|technology|medical|medicine|nursing|law|legal|accounting|accountancy|finance|financial|teaching|education|agriculture|agricultural|mining|geoscience|it|ict|computing|computer|pharmacy|veterinary|commerce|business|actuarial|architecture|construction|artisan|postgraduate|undergraduate|honours|masters|doctoral|bachelor|bachelors)$/i;
+
+/**
  * The funder's name, taken from the start of the listing title.
  *
- * "Sasol Bursaries 2027" gives "Sasol". When nothing is left after the funding
- * words are removed, the whole title is returned and validation decides: it is
- * better to refuse a record than to attribute a bursary to the wrong company.
+ * "Sasol Bursaries 2027" gives "Sasol". This is a reading of what the source
+ * wrote, not a lookup: a title that does not name its funder clearly will
+ * produce an imprecise name, and the record is refused rather than guessed at
+ * when nothing usable is left. An official source later in the pipeline
+ * outranks a listing and corrects it.
  */
 export function organisationFromTitle(title: string): string {
   const cut = title.split(
     /\s+(?:bursar(?:y|ies)|scholarships?|grants?|programme|program|fund(?:ing)?)\b/i,
   )[0];
-  const cleaned = tidy(cut.replace(/\b20\d{2}\b/g, ''));
+  let cleaned = tidy(cut.replace(/\b20\d{2}\b/g, ''));
+
+  const words = cleaned.split(' ');
+  if (words.length > 2 && SUBJECT_WORDS.test(words[words.length - 1])) {
+    cleaned = words.slice(0, -1).join(' ');
+  }
+
   return cleaned.length >= 2 ? cleaned : tidy(title);
 }
 

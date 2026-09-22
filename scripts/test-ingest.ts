@@ -15,6 +15,7 @@ import { readAvailability, readDeadline } from '../lib/ingest/normalise';
 import { dedupeKey, identityWords, titleSimilarity } from '../lib/ingest/dedupe';
 import { validate, mayDisplayAsOpen } from '../lib/ingest/validate';
 import { runSource } from '../lib/ingest/pipeline';
+import { organisationFromTitle } from '../lib/ingest/parse';
 import { SOURCES } from '../lib/ingest/source-registry';
 import { finishRun, persistOutcome, startRun } from '../services/opportunity-ingest';
 import {
@@ -220,6 +221,23 @@ async function main() {
   check(
     'a missing deadline is a warning, not a fabrication',
     good.ok && good.warnings.some((w) => /no deadline/i.test(w)),
+  );
+
+  console.log('\nThe funder is read from the title, not invented');
+  check(
+    'a subject before the funding word is not part of the name',
+    organisationFromTitle('Ndlovu Test Holdings Engineering Bursary 2027') ===
+      'Ndlovu Test Holdings',
+    organisationFromTitle('Ndlovu Test Holdings Engineering Bursary 2027'),
+  );
+  check(
+    'a subject inside a company name is kept',
+    organisationFromTitle('Nkosi Engineering Trust Bursary') === 'Nkosi Engineering Trust',
+  );
+  check('a two-word name is left alone', organisationFromTitle('Sasol Bursaries 2027') === 'Sasol');
+  check(
+    'the year is not part of the name',
+    !/20\d{2}/.test(organisationFromTitle('Mopane Group Accounting Bursary 2026')),
   );
 
   console.log('\nThe same bursary is recognised across sources');
