@@ -7,6 +7,7 @@ import {
   HelpCircle,
   LayoutGrid,
   Settings,
+  Sparkles,
   User,
 } from '@/components/icons';
 import { requireOnboardedStudent } from '@/lib/auth/guards';
@@ -49,6 +50,11 @@ export default async function StudentLayout({ children }: { children: React.Reac
       href: '/student/documents',
       label: 'Documents',
       icon: <FileText className="h-[18px] w-[18px]" />,
+    },
+    {
+      href: '/student/auto-fill',
+      label: 'Auto-Fill Forms',
+      icon: <Sparkles className="h-[18px] w-[18px]" />,
     },
   ];
 

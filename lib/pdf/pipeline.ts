@@ -135,7 +135,8 @@ async function processTarget(
   let analysis: DocumentAnalysis;
   try {
     analysis = await analyseDocument(target.bytes);
-  } catch {
+  } catch (error) {
+    console.error(`[auto-fill] target "${target.documentName}" could not be analysed`, error);
     return fail(
       'This PDF could not be opened. It may be damaged or in an unsupported format.',
       null,
@@ -168,7 +169,8 @@ async function processTarget(
   let filled: Awaited<ReturnType<typeof fillTarget>>;
   try {
     filled = await fillTarget(target.bytes, checked.fields);
-  } catch {
+  } catch (error) {
+    console.error(`[auto-fill] target "${target.documentName}" could not be written to`, error);
     return fail('This form could not be written to. The original file is unchanged.', analysis);
   }
 

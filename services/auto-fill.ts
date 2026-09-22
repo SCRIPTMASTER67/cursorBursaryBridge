@@ -248,6 +248,7 @@ export async function processJob(input: {
         pageCount: outcome.analysis.pageCount,
         fieldsTotal: outcome.summary.total,
         fieldsFilled: outcome.summary.filled,
+        fieldsToConfirm: outcome.summary.needsReview,
         fieldsOutstanding: outcome.summary.outstanding,
         processedAt: new Date(),
         fields: { create: outcome.fields.map((field) => toFieldRow(field)) },
@@ -349,6 +350,7 @@ export async function getJob(jobId: string, studentProfileId: string) {
           failureReason: true,
           fieldsTotal: true,
           fieldsFilled: true,
+          fieldsToConfirm: true,
           fieldsOutstanding: true,
           processedAt: true,
         },
@@ -369,6 +371,7 @@ export async function getTargetForm(targetFormId: string, studentProfileId: stri
       failureReason: true,
       fieldsTotal: true,
       fieldsFilled: true,
+      fieldsToConfirm: true,
       fieldsOutstanding: true,
       job: { select: { id: true, sourceFileName: true, status: true } },
       fields: {
@@ -490,9 +493,15 @@ async function recountForm(tx: Prisma.TransactionClient, targetFormId: string) {
     counts.find((c) => c.status === status)?._count._all ?? 0;
   const total = counts.reduce((n, c) => n + c._count._all, 0);
   const filled = by('FILLED');
+  const toConfirm = by('NEEDS_REVIEW');
   await tx.autoFillTargetForm.update({
     where: { id: targetFormId },
-    data: { fieldsTotal: total, fieldsFilled: filled, fieldsOutstanding: total - filled },
+    data: {
+      fieldsTotal: total,
+      fieldsFilled: filled,
+      fieldsToConfirm: toConfirm,
+      fieldsOutstanding: total - filled,
+    },
   });
 }
 

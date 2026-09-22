@@ -28,6 +28,9 @@ export async function readSourceForm(
   try {
     analysis = await analyseDocument(bytes);
   } catch (error) {
+    // The student is told something they can act on; the detail goes to the
+    // server log, because a swallowed cause is a defect nobody can diagnose.
+    console.error('[auto-fill] source form could not be analysed', error);
     return {
       ok: false,
       reason: 'This PDF could not be opened. It may be damaged or in an unsupported format.',

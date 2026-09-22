@@ -17,3 +17,5 @@ next-env.d.ts
 /coverage
 .screenshots/
 /tmp/
+/public/pdf.worker.min.mjs
+/public/pdf-standard-fonts/

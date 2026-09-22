@@ -3,6 +3,13 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  /**
+   * pdfjs-dist is loaded by Node, not bundled. It resolves its worker through a
+   * dynamic import at runtime, and a bundler rewrites that path to one that
+   * does not exist, so reading a PDF on the server fails with "Setting up fake
+   * worker failed". Leaving it external lets Node resolve it normally.
+   */
+  serverExternalPackages: ['pdfjs-dist'],
   images: {
     formats: ['image/avif', 'image/webp'],
   },

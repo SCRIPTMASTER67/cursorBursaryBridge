@@ -958,6 +958,10 @@ model AutoFillTargetForm {
 
   fieldsTotal       Int @default(0)
   fieldsFilled      Int @default(0)
+  /// Populated, but the student is asked to confirm it. Counted separately
+  /// because "no field is confirmed" and "no field has an answer" are very
+  /// different things to tell someone looking at a filled-in page.
+  fieldsToConfirm   Int @default(0)
   fieldsOutstanding Int @default(0)
 
   processedAt DateTime?
