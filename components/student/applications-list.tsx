@@ -16,7 +16,7 @@ export type ApplicationRow = {
   status: ApplicationStatus;
   programmeName: string;
   organisationName: string;
-  closingDate: string;
+  closingDate: string | null;
   submittedAt: string | null;
   lastUpdate: string;
   matchScore: number | null;

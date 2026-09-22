@@ -53,7 +53,7 @@ export function ApplicationWizard({
     id: string;
     name: string;
     organisationName: string;
-    closingDate: string;
+    closingDate: string | null;
     requiredDocuments: DocumentType[];
   };
   match: MatchResult;

@@ -34,7 +34,7 @@ export type OpportunityItem = {
   shortDescription: string;
   fundingType: FundingType;
   coverage: FundingCoverage[];
-  closingDate: string;
+  closingDate: string | null;
   courses: { id: string; name: string }[];
   institutions: { id: string; name: string }[];
   qualificationLevels: QualificationLevel[];
@@ -129,15 +129,23 @@ export function OpportunitiesBrowser({
       if (filters.minMatch && item.matchScore < Number(filters.minMatch)) return false;
       if (filters.closing) {
         const days = daysUntil(item.closingDate);
-        if (days > Number(filters.closing)) return false;
+        // An opportunity with no closing date cannot satisfy "closing within N
+        // days", so it is filtered out rather than assumed to be urgent.
+        if (days === null || days > Number(filters.closing)) return false;
       }
       if (filters.hideApplied && item.applied) return false;
       return true;
     });
 
     return result.sort((a, b) => {
-      if (sort === 'closing')
+      if (sort === 'closing') {
+        // Opportunities with no closing date sort last: they are not urgent,
+        // and they are not overdue either.
+        if (!a.closingDate && !b.closingDate) return 0;
+        if (!a.closingDate) return 1;
+        if (!b.closingDate) return -1;
         return new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime();
+      }
       if (sort === 'name') return a.name.localeCompare(b.name);
       return b.matchScore - a.matchScore;
     });
@@ -352,7 +360,7 @@ function FilterSelect({
 
 function OpportunityRow({ item }: { item: OpportunityItem }) {
   const days = daysUntil(item.closingDate);
-  const closingSoon = days >= 0 && days <= 14;
+  const closingSoon = days !== null && days >= 0 && days <= 14;
 
   return (
     <article className="rounded-card border border-line bg-white p-5 shadow-card transition-shadow hover:shadow-elevated">

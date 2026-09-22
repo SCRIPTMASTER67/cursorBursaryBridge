@@ -37,7 +37,7 @@ export type ProgrammeSummaryRow = {
   id: string;
   name: string;
   status: ProgrammeStatus;
-  closingDate: Date;
+  closingDate: Date | null;
   applicationCount: number;
   eligibleCount: number;
   shortlistCount: number;

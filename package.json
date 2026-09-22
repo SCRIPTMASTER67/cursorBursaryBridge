@@ -23,8 +23,11 @@
     "test:pdf": "tsx scripts/test-pdf-autofill.ts",
     "test:pdf:labels": "tsx scripts/test-matching-labels.ts",
     "test:autofill": "tsx --conditions=react-server scripts/test-auto-fill-service.ts",
-    "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:e2e",
-    "screenshots": "tsx scripts/screenshots.ts"
+    "test:ingest": "tsx --conditions=react-server scripts/test-ingest.ts",
+    "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:ingest && npm run test:e2e",
+    "screenshots": "tsx scripts/screenshots.ts",
+    "ingest": "tsx --conditions=react-server scripts/ingest.ts",
+    "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -32,6 +35,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
     "jszip": "^3.10.1",
     "next": "15.5.4",

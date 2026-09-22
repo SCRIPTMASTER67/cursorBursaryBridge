@@ -83,7 +83,7 @@ export default async function AdminOrganisationDetailPage({
                         <ProgrammeStatusBadge status={programme.status} />
                       </td>
                       <td className="py-2 text-ink-600">
-                        {programme.closingDate.toLocaleDateString('en-ZA')}
+                        {programme.closingDate?.toLocaleDateString('en-ZA') ?? 'No fixed deadline'}
                       </td>
                       <td className="py-2 text-right text-ink-700">
                         {programme._count.applications}

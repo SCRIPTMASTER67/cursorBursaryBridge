@@ -35,7 +35,12 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const parsed = statusSchema.safeParse(body);
   if (!parsed.success) return apiError('Invalid status.', 422, zodFields(parsed.error));
 
-  if (parsed.data.status === 'PUBLISHED' && programme.closingDate.getTime() < Date.now()) {
+  // A programme with no fixed closing date cannot be past one.
+  if (
+    parsed.data.status === 'PUBLISHED' &&
+    programme.closingDate !== null &&
+    programme.closingDate.getTime() < Date.now()
+  ) {
     return apiError('Set a future closing date before publishing this programme.', 422);
   }
 

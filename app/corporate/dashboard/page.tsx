@@ -32,9 +32,11 @@ export default async function CorporateDashboardPage() {
   ]);
 
   const activeProgrammes = programmes.filter((p) => p.status === 'PUBLISHED');
+  // Only programmes with a real closing date can appear in a deadline list;
+  // one that accepts applications all year has no deadline to show here.
   const upcoming = activeProgrammes
-    .filter((p) => p.closingDate.getTime() >= Date.now())
-    .sort((a, b) => a.closingDate.getTime() - b.closingDate.getTime())
+    .filter((p) => p.closingDate !== null && p.closingDate.getTime() >= Date.now())
+    .sort((a, b) => a.closingDate!.getTime() - b.closingDate!.getTime())
     .slice(0, 3);
 
   return (

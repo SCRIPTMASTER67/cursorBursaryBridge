@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
   if (!programme || programme.status !== 'PUBLISHED') {
     return apiError('This opportunity is no longer accepting applications.', 404);
   }
-  if (programme.closingDate.getTime() < Date.now()) {
+  if (programme.closingDate !== null && programme.closingDate.getTime() < Date.now()) {
     return apiError('This opportunity has closed.', 409);
   }
 

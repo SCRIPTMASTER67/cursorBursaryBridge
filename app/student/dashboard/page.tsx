@@ -10,7 +10,7 @@ import { ProgressBar } from '@/components/ui/progress';
 import { ArrowRight, Bookmark, Calendar, Clock, Sparkles, TrendingUp } from '@/components/icons';
 import { requireOnboardedStudent } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
-import { deadlineLabel, formatDate, greeting } from '@/lib/utils';
+import { daysUntil, deadlineLabel, formatDate, greeting } from '@/lib/utils';
 import { getRankedOpportunities } from '@/services/matching';
 import { improvementPrompts } from '@/services/profile-strength';
 
@@ -67,10 +67,8 @@ export default async function StudentDashboardPage() {
   // closes within the next 30 days.
   const upcomingDeadlines = opportunities
     .filter((entry) => {
-      const days = Math.ceil(
-        (new Date(entry.programme.closingDate).getTime() - Date.now()) / 86_400_000,
-      );
-      return days >= 0 && days <= 30;
+      const days = daysUntil(entry.programme.closingDate);
+      return days !== null && days >= 0 && days <= 30;
     })
     .slice(0, 4);
 

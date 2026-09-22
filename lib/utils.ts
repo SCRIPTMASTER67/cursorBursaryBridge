@@ -36,9 +36,17 @@ export function formatNumber(value: number): string {
   return new Intl.NumberFormat('en-ZA').format(value);
 }
 
-/** Whole days between now and `date`; negative once the date has passed. */
-export function daysUntil(date: Date | string): number {
+/**
+ * Whole days between now and `date`; negative once the date has passed.
+ *
+ * Null when there is no date. Not every real opportunity has a closing date —
+ * some accept applications all year, some close when the places are filled —
+ * and counting down to a date that does not exist would mean inventing one.
+ */
+export function daysUntil(date: Date | string | null | undefined): number | null {
+  if (date === null || date === undefined) return null;
   const d = typeof date === 'string' ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) return null;
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const end = new Date(d);
@@ -47,8 +55,9 @@ export function daysUntil(date: Date | string): number {
 }
 
 /** "5 days left", "Closes today", "Closed" — used by deadline badges. */
-export function deadlineLabel(date: Date | string): string {
+export function deadlineLabel(date: Date | string | null | undefined): string {
   const days = daysUntil(date);
+  if (days === null) return 'No fixed deadline';
   if (days < 0) return 'Closed';
   if (days === 0) return 'Closes today';
   if (days === 1) return '1 day left';

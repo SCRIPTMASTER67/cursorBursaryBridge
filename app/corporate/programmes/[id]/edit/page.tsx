@@ -65,8 +65,8 @@ export default async function EditProgrammePage({ params }: { params: Promise<{ 
             fullDescription: programme.fullDescription,
             fundingType: programme.fundingType,
             coverage: programme.coverage,
-            openDate: programme.openDate.toISOString().slice(0, 10),
-            closingDate: programme.closingDate.toISOString().slice(0, 10),
+            openDate: programme.openDate?.toISOString().slice(0, 10) ?? '',
+            closingDate: programme.closingDate?.toISOString().slice(0, 10) ?? '',
             intakeTarget: programme.intakeTarget ? String(programme.intakeTarget) : '',
           },
           eligibility: {

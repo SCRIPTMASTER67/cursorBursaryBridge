@@ -585,6 +585,13 @@ model Organisation {
   description String?
   logoUrl     String?
 
+  /// REGISTERED means somebody from this organisation signed up and published
+  /// here. EXTERNAL means the organisation was recorded because a public
+  /// source named it as a funder; it has no account and has not been contacted.
+  origin    OrganisationOrigin @default(REGISTERED)
+  /// The page that named this organisation as a funder, for an EXTERNAL record.
+  sourceUrl String?
+
   // Funding profile
   offersFunding     OffersFunding?
   programmeTypes    ProgrammeTypeOffered[]
@@ -637,10 +644,49 @@ model FundingProgramme {
   fullDescription  String
   fundingType      FundingType
   coverage         FundingCoverage[]
-  openDate         DateTime
-  closingDate      DateTime
-  status           ProgrammeStatus   @default(DRAFT)
-  intakeTarget     Int?
+
+  /// Nullable because not every real opportunity has fixed dates. A bursary
+  /// with rolling applications must not be given an invented deadline to
+  /// satisfy a column.
+  openDate     DateTime?
+  closingDate  DateTime?
+  deadlineKind DeadlineKind @default(FIXED)
+  /// The deadline exactly as the source words it, when it is not a plain date
+  /// ("Applications close at 23:59 on 15 October", "Until filled").
+  deadlineNote String?
+
+  status       ProgrammeStatus @default(DRAFT)
+  intakeTarget Int?
+
+  /// Where this opportunity came from. FIRST_PARTY means the funder published
+  /// it here themselves; EXTERNAL means it was discovered on a public source
+  /// and carries that source's provenance.
+  origin OpportunityOrigin @default(FIRST_PARTY)
+
+  /// Whether applications are actually open right now. Separate from `status`,
+  /// which is the publication lifecycle: a PUBLISHED programme whose window
+  /// has not opened is UPCOMING, not OPEN.
+  availability Availability @default(UNKNOWN)
+
+  /// Primary source, denormalised from `sources` for listing queries. Written
+  /// only by recordSources() so the two cannot drift.
+  sourceUrl      String?
+  sourceName     String?
+  sourceType     SourceType?
+  officialSource Boolean     @default(false)
+
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  /// When the opportunity was last confirmed against its source.
+  lastVerifiedAt     DateTime?
+  /// When a check was last attempted, successful or not.
+  lastCheckedAt      DateTime?
+
+  /// Where the student actually applies, when the source states it.
+  applicationUrl String?
+
+  /// Stable identity for deduplication: the same programme listed on three
+  /// sites must not become three opportunities.
+  dedupeKey String? @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -654,10 +700,16 @@ model FundingProgramme {
   questions             ApplicationQuestion[]
   applications          Application[]
   shortlists            Shortlist[]
+  sources               OpportunitySource[]
+  applicationForms      ApplicationForm[]
+  conflicts             SourceConflict[]
 
   @@index([organisationId])
   @@index([status])
   @@index([closingDate])
+  @@index([availability, closingDate])
+  @@index([origin])
+  @@index([verificationStatus])
 }
 
 /// The machine-readable rule set the eligibility & matching services evaluate.
@@ -1022,4 +1074,209 @@ model AutoFillFieldEdit {
   field AutoFillField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 
   @@index([fieldId, editedAt])
+}
+
+// ---------------------------------------------------------------------------
+// Opportunity provenance and ingestion
+//
+// Every opportunity shown to a student must be traceable to a real source. The
+// models below record where each one came from, when it was last confirmed,
+// where its sources disagree, and what each ingestion run actually did.
+//
+// Nothing here manufactures an opportunity. An opportunity with no source is
+// not an opportunity; it is a defect, and validation refuses it.
+// ---------------------------------------------------------------------------
+
+enum OpportunityOrigin {
+  /// Published here by the funding organisation itself. Bursary-Bridge is the
+  /// official source for these.
+  FIRST_PARTY
+  /// Discovered on a public source and recorded with that source's provenance.
+  EXTERNAL
+}
+
+enum OrganisationOrigin {
+  REGISTERED
+  EXTERNAL
+}
+
+/// The source hierarchy. Lower is more authoritative, and the ingestion
+/// pipeline prefers the lowest available when sources disagree.
+enum SourceType {
+  /// Level 1: the organisation offering the bursary.
+  OFFICIAL_ORGANISATION
+  /// Level 2: a university, government department or other official institution.
+  OFFICIAL_INSTITUTION
+  /// Level 3: a reputable publication that links back to the original.
+  SECONDARY_PUBLICATION
+  /// Level 4: anything else, used only where credibility has been established.
+  OTHER
+}
+
+/// Whether a student can apply right now. Derived from the source's own words
+/// first and from dates only as a fallback — never guessed.
+enum Availability {
+  OPEN
+  UPCOMING
+  CLOSED
+  UNKNOWN
+}
+
+enum VerificationStatus {
+  /// Confirmed against its source inside the freshness window.
+  VERIFIED
+  /// Recorded but not yet checked against its source.
+  UNVERIFIED
+  /// The last successful check is too old to rely on.
+  STALE
+  /// Sources disagree and no official source settles it.
+  CONFLICTED
+  /// The source no longer carries this opportunity.
+  SOURCE_GONE
+}
+
+enum DeadlineKind {
+  FIXED
+  ROLLING
+  UNTIL_FILLED
+  UNKNOWN
+}
+
+/// One source that carries this opportunity. An opportunity may appear on
+/// several sites; all of them are kept, and the most authoritative is primary.
+model OpportunitySource {
+  id                 String     @id @default(cuid())
+  fundingProgrammeId String
+  url                String
+  name               String
+  type               SourceType
+  /// True when this is the funder's own website.
+  official           Boolean    @default(false)
+  isPrimary          Boolean    @default(false)
+
+  /// Hash of the extracted content, so an unchanged page is recognised
+  /// without re-parsing it.
+  contentHash String?
+
+  firstSeenAt    DateTime  @default(now())
+  lastCheckedAt  DateTime?
+  lastVerifiedAt DateTime?
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+
+  @@unique([fundingProgrammeId, url])
+  @@index([fundingProgrammeId])
+}
+
+/// Two sources state different things. Recorded rather than silently resolved,
+/// so a wrong deadline can always be traced back.
+model SourceConflict {
+  id                 String    @id @default(cuid())
+  fundingProgrammeId String
+  /// The field they disagree about, e.g. "closingDate".
+  field              String
+  officialValue      String?
+  officialSourceUrl  String?
+  otherValue         String
+  otherSourceUrl     String
+  /// What was used, and why.
+  resolution         String
+  resolvedAt         DateTime?
+  createdAt          DateTime  @default(now())
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+
+  @@index([fundingProgrammeId])
+}
+
+/// An official application form published by the funder.
+///
+/// A form is only stored when its source permits it. `storageKey` is null for
+/// a form that is linked but not mirrored, and the student is sent to the
+/// source instead.
+model ApplicationForm {
+  id                 String  @id @default(cuid())
+  fundingProgrammeId String
+  name               String
+  /// The page the form was found on.
+  sourceUrl          String
+  /// The file's own address on the source.
+  fileUrl            String
+  fileType           String
+  sizeBytes          Int?
+  /// Set only when the file was mirrored. Null means link-only.
+  storageKey         String? @unique
+  /// SHA-256 of the mirrored file, so a silent change is detectable.
+  fileHash           String?
+  official           Boolean @default(true)
+  /// Names the funder, so the student cannot mistake it for a Bursary-Bridge form.
+  providedBy         String
+
+  lastVerifiedAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+
+  @@index([fundingProgrammeId])
+}
+
+enum IngestionRunStatus {
+  RUNNING
+  SUCCEEDED
+  FAILED
+  /// Could not run: no network egress, or every source refused by robots.txt.
+  BLOCKED
+}
+
+/// What one pass of the ingestion pipeline actually did. Surfaced in the admin
+/// portal so nobody has to guess whether the data is fresh.
+model IngestionRun {
+  id      String             @id @default(cuid())
+  status  IngestionRunStatus @default(RUNNING)
+  /// "scheduled", "manual" or "import".
+  trigger String
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  sourcesAttempted Int @default(0)
+  sourcesSucceeded Int @default(0)
+  /// Refused by the source's own robots.txt, and therefore not fetched.
+  sourcesBlocked   Int @default(0)
+  sourcesFailed    Int @default(0)
+
+  opportunitiesFound   Int @default(0)
+  opportunitiesCreated Int @default(0)
+  opportunitiesUpdated Int @default(0)
+  duplicatesMerged     Int @default(0)
+  /// Failed validation and were not written. A rejected record is a record
+  /// that would have been invented.
+  rejected             Int @default(0)
+
+  notes String?
+
+  events IngestionEvent[]
+
+  @@index([startedAt])
+}
+
+enum IngestionEventLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+model IngestionEvent {
+  id         String              @id @default(cuid())
+  runId      String
+  level      IngestionEventLevel @default(INFO)
+  sourceName String?
+  sourceUrl  String?
+  message    String
+  createdAt  DateTime            @default(now())
+
+  run IngestionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId, createdAt])
 }

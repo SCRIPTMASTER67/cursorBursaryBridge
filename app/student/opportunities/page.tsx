@@ -36,7 +36,7 @@ export default async function OpportunitiesPage() {
     shortDescription: entry.programme.shortDescription,
     fundingType: entry.programme.fundingType,
     coverage: entry.programme.coverage,
-    closingDate: entry.programme.closingDate.toISOString(),
+    closingDate: entry.programme.closingDate?.toISOString() ?? null,
     courses: entry.programme.supportedProgrammes.map((p) => ({
       id: p.programme.id,
       name: p.programme.name,

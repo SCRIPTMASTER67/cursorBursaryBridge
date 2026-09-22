@@ -55,7 +55,7 @@ export default async function ApplyPage({ params }: Params) {
           id: result.programme.id,
           name: result.programme.name,
           organisationName: result.programme.organisation.name,
-          closingDate: result.programme.closingDate.toISOString(),
+          closingDate: result.programme.closingDate?.toISOString() ?? null,
           requiredDocuments: result.programme.eligibility?.requiredDocuments ?? [],
         }}
         match={result.match}

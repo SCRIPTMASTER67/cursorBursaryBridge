@@ -39,7 +39,7 @@ export default async function ApplicationsPage() {
           status: application.status,
           programmeName: application.fundingProgramme.name,
           organisationName: application.fundingProgramme.organisation.name,
-          closingDate: application.fundingProgramme.closingDate.toISOString(),
+          closingDate: application.fundingProgramme.closingDate?.toISOString() ?? null,
           submittedAt: application.submittedAt?.toISOString() ?? null,
           lastUpdate: (application.lastStatusChangeAt ?? application.updatedAt).toISOString(),
           matchScore: application.matchScore,

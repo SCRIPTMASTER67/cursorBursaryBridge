@@ -25,7 +25,7 @@ export function OpportunityCard({
   applied?: boolean;
 }) {
   const days = daysUntil(programme.closingDate);
-  const closingSoon = days >= 0 && days <= 14;
+  const closingSoon = days !== null && days >= 0 && days <= 14;
 
   const courses = programme.supportedProgrammes.map((p) => p.programme.name);
   const institutions = programme.supportedInstitutions.map(
