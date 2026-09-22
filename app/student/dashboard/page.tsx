@@ -4,7 +4,7 @@ import { PageBody } from '@/components/layout/app-shell';
 import { OpportunityCard } from '@/components/student/opportunity-card';
 import { ApplicationStatusBadge, Badge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
-import { Card, CardHeader, StatCard } from '@/components/ui/card';
+import { Card, CardBody, CardHeader, StatCard } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ProgressBar } from '@/components/ui/progress';
 import { ArrowRight, Bookmark, Calendar, Clock, Sparkles, TrendingUp } from '@/components/icons';
@@ -12,6 +12,7 @@ import { requireOnboardedStudent } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { daysUntil, deadlineLabel, formatDate, greeting } from '@/lib/utils';
 import { getRankedOpportunities } from '@/services/matching';
+import { directoryTotals } from '@/services/bursary-directory';
 import { improvementPrompts } from '@/services/profile-strength';
 
 export const metadata: Metadata = { title: 'Dashboard' };
@@ -19,7 +20,7 @@ export const metadata: Metadata = { title: 'Dashboard' };
 export default async function StudentDashboardPage() {
   const { user, studentProfileId } = await requireOnboardedStudent();
 
-  const [profile, applications, opportunities] = await Promise.all([
+  const [profile, applications, opportunities, directory] = await Promise.all([
     prisma.studentProfile.findUniqueOrThrow({
       where: { id: studentProfileId },
       select: {
@@ -58,6 +59,7 @@ export default async function StudentDashboardPage() {
       orderBy: { updatedAt: 'desc' },
     }),
     getRankedOpportunities(studentProfileId),
+    directoryTotals(),
   ]);
 
   const appliedProgrammeIds = new Set(applications.map((a) => a.fundingProgrammeId));
@@ -90,8 +92,15 @@ export default async function StudentDashboardPage() {
         <p className="mt-1.5 text-[13px] text-ink-400">Here are your funding matches today.</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        <StatCard value={opportunities.length} label="Matches" sublabel="Opportunities for you" />
+      {/* Every figure below comes from a query. A zero is shown as a zero. */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard value={opportunities.length} label="My matches" sublabel="Fit your profile" />
+        <StatCard
+          value={directory.counts.OPEN}
+          label="Open now"
+          sublabel={`of ${directory.counts.ALL} in the directory`}
+          accent="success"
+        />
         <StatCard
           value={activeApplications.length}
           label="Applications"
@@ -104,6 +113,45 @@ export default async function StudentDashboardPage() {
           sublabel="Closing within 30 days"
           accent="warning"
         />
+      </div>
+
+      {/* The two experiences are reachable separately and described
+          differently, because they answer different questions. */}
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <Card>
+          <CardBody className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">
+                {opportunities.length === 0
+                  ? 'No bursaries match your profile yet'
+                  : `${opportunities.length} bursar${opportunities.length === 1 ? 'y matches' : 'ies match'} your profile`}
+              </p>
+              <p className="mt-0.5 text-[13px] text-ink-500">
+                Checked against your course, institution, results and circumstances.
+              </p>
+            </div>
+            <ButtonLink href="/student/opportunities" size="sm" variant="outline">
+              View my matches
+            </ButtonLink>
+          </CardBody>
+        </Card>
+        <Card>
+          <CardBody className="flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-ink">
+                {directory.counts.ALL === 0
+                  ? 'The directory is empty'
+                  : `${directory.counts.ALL} bursar${directory.counts.ALL === 1 ? 'y' : 'ies'} in the directory`}
+              </p>
+              <p className="mt-0.5 text-[13px] text-ink-500">
+                Everything we hold, whether or not it fits your profile.
+              </p>
+            </div>
+            <ButtonLink href="/student/bursaries" size="sm" variant="outline">
+              Explore all bursaries
+            </ButtonLink>
+          </CardBody>
+        </Card>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr] lg:items-start [&>*]:min-w-0">

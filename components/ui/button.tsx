@@ -78,6 +78,12 @@ export type ButtonLinkProps = {
   className?: string;
   children: ReactNode;
   prefetch?: boolean;
+  /**
+   * Opens in a new tab with a rel that withholds the referrer and the opener.
+   * Used for links to a funder's own site: an external page should never be
+   * handed a window reference back into a signed-in session.
+   */
+  external?: boolean;
 };
 
 /** A link styled as a button — keeps navigation semantics intact. */
@@ -91,11 +97,13 @@ export function ButtonLink({
   className,
   children,
   prefetch,
+  external,
 }: ButtonLinkProps) {
   return (
     <Link
       href={href}
       prefetch={prefetch}
+      {...(external ? { target: '_blank', rel: 'noopener noreferrer nofollow' } : {})}
       className={cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
     >
       {leadingIcon}

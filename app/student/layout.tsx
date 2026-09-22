@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Settings,
   Sparkles,
+  Target,
   User,
 } from '@/components/icons';
 import { requireOnboardedStudent } from '@/lib/auth/guards';
@@ -29,9 +30,16 @@ export default async function StudentLayout({ children }: { children: React.Reac
       label: 'Dashboard',
       icon: <LayoutGrid className="h-[18px] w-[18px]" />,
     },
+    // Two separate experiences, deliberately not merged. My Matches answers
+    // "what fits me"; All Bursaries answers "what exists".
     {
       href: '/student/opportunities',
-      label: 'Opportunities',
+      label: 'My Matches',
+      icon: <Target className="h-[18px] w-[18px]" />,
+    },
+    {
+      href: '/student/bursaries',
+      label: 'All Bursaries',
       icon: <Bookmark className="h-[18px] w-[18px]" />,
     },
     {

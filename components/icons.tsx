@@ -271,6 +271,14 @@ export const Bookmark = (p: IconProps) => (
     <path d="M6 3.5h12a1 1 0 0 1 1 1V21l-7-4-7 4V4.5a1 1 0 0 1 1-1Z" />
   </Icon>
 );
+export const ExternalLink = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M15 3h6v6" />
+    <path d="M10 14 21 3" />
+    <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+  </Icon>
+);
+
 export const Share = (p: IconProps) => (
   <Icon {...p}>
     <circle cx="18" cy="5.5" r="2.5" />
