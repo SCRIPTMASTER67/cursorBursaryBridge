@@ -18,7 +18,9 @@
     "db:studio": "prisma studio",
     "test:matching": "tsx scripts/test-matching.ts",
     "test:e2e": "tsx scripts/e2e.ts",
-    "test": "npm run test:matching && npm run test:e2e",
+    "test:pdf": "tsx scripts/test-pdf-autofill.ts",
+    "test:pdf:labels": "tsx scripts/test-matching-labels.ts",
+    "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:e2e",
     "screenshots": "tsx scripts/screenshots.ts"
   },
   "prisma": {
@@ -28,7 +30,10 @@
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^2.4.3",
     "clsx": "^2.1.1",
+    "jszip": "^3.10.1",
     "next": "15.5.4",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.10.38",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "server-only": "^0.0.1",
