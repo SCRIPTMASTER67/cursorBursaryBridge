@@ -19,6 +19,7 @@ import '../lib/load-env';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { institutions, programmes } from './seed-data';
+import { canonicalise } from '../lib/catalogue';
 
 const prisma = new PrismaClient();
 
@@ -37,9 +38,14 @@ async function main() {
       select: { id: true },
     });
     if (existing) {
-      await prisma.institution.update({ where: { id: existing.id }, data: institution });
+      await prisma.institution.update({
+        where: { id: existing.id },
+        data: { ...institution, canonicalName: canonicalise(institution.name) },
+      });
     } else {
-      await prisma.institution.create({ data: institution });
+      await prisma.institution.create({
+        data: { ...institution, canonicalName: canonicalise(institution.name) },
+      });
       institutionsAdded += 1;
     }
   }
@@ -51,9 +57,14 @@ async function main() {
       select: { id: true },
     });
     if (existing) {
-      await prisma.programme.update({ where: { id: existing.id }, data: programme });
+      await prisma.programme.update({
+        where: { id: existing.id },
+        data: { ...programme, canonicalName: canonicalise(programme.name) },
+      });
     } else {
-      await prisma.programme.create({ data: programme });
+      await prisma.programme.create({
+        data: { ...programme, canonicalName: canonicalise(programme.name) },
+      });
       coursesAdded += 1;
     }
   }

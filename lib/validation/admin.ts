@@ -42,12 +42,23 @@ export const institutionSchema = z.object({
     'WESTERN_CAPE',
   ]),
   city: z.string().trim().min(2, 'City is required').max(80),
+  website: z.string().trim().max(300).optional().or(z.literal('')),
+  code: z.string().trim().max(40).optional().or(z.literal('')),
 });
 
 export const courseSchema = z.object({
   name: z.string().trim().min(2, 'Name is required').max(160),
   field: z.string().trim().min(2, 'Field is required'),
   qualificationLevels: z.array(z.string()).min(1, 'Select at least one qualification level'),
+  code: z.string().trim().max(40).optional().or(z.literal('')),
+  /// The institutions that actually offer this course. Replaced wholesale on
+  /// update, so removing one here removes the link.
+  institutionIds: z.array(z.string()).max(200).optional(),
+});
+
+/** Retiring and restoring a catalogue entry. There is no delete. */
+export const catalogueStatusSchema = z.object({
+  status: z.enum(['ACTIVE', 'INACTIVE']),
 });
 
 /** Audit log filters. Every field is optional; an empty filter lists everything. */
@@ -63,5 +74,6 @@ export const auditFilterSchema = z.object({
 
 export type SuspendAccountInput = z.infer<typeof suspendAccountSchema>;
 export type InstitutionInput = z.infer<typeof institutionSchema>;
+export type CatalogueStatusInput = z.infer<typeof catalogueStatusSchema>;
 export type CourseInput = z.infer<typeof courseSchema>;
 export type AuditFilter = z.infer<typeof auditFilterSchema>;

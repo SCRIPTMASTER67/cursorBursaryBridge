@@ -21,6 +21,7 @@ import {
 } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { institutions, programmes } from './seed-data';
+import { canonicalise } from '../lib/catalogue';
 
 const prisma = new PrismaClient();
 
@@ -111,8 +112,14 @@ async function main() {
   await prisma.programme.deleteMany();
 
   // ------------------------------------------------------------- catalogue
-  await prisma.institution.createMany({ data: institutions });
-  await prisma.programme.createMany({ data: programmes });
+  // Canonical names are what stop two spellings of one institution existing,
+  // so they are derived here rather than typed into the catalogue data.
+  await prisma.institution.createMany({
+    data: institutions.map((i) => ({ ...i, canonicalName: canonicalise(i.name) })),
+  });
+  await prisma.programme.createMany({
+    data: programmes.map((p) => ({ ...p, canonicalName: canonicalise(p.name) })),
+  });
 
   const institutionRows = await prisma.institution.findMany();
   const programmeRows = await prisma.programme.findMany();

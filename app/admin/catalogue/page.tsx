@@ -1,143 +1,106 @@
-import { PageBody } from '@/components/layout/app-shell';
-import { Card } from '@/components/ui';
+import type { Metadata } from 'next';
+import { PageBody, PageHeader } from '@/components/layout/app-shell';
+import { CatalogueManager } from '@/components/admin/catalogue-manager';
+import { Card, CardBody } from '@/components/ui/card';
+import { InfoCircle } from '@/components/icons';
 import { requireAdmin } from '@/lib/auth/guards';
-import { isCatalogueEntryInUse, listCourses, listInstitutions } from '@/services/admin-catalogue';
+import { listInstitutions, listProgrammes } from '@/services/catalogue';
+import { careerInterestLabels, provinceLabels } from '@/lib/labels';
+import type { CareerInterest, Province } from '@prisma/client';
 
-export const metadata = { title: 'Catalogue · Bursary-Bridge admin' };
+export const metadata: Metadata = { title: 'Catalogue · Bursary-Bridge admin' };
+export const dynamic = 'force-dynamic';
 
 /**
- * Shared reference data.
+ * The single catalogue the whole application reads from.
  *
- * Study Preferences and Eligibility Rules both point at these rows, so the
- * usage counts matter: an entry in use cannot be deleted, because the foreign
- * keys from StudyPreference are declared `onDelete: Restrict`.
+ * Study preferences, funder eligibility rules, corporate programme creation
+ * and the matching engine all resolve through these rows. There is no second
+ * hard-coded list anywhere: adding a course here makes it available in every
+ * one of those places.
  */
-export default async function AdminCataloguePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>;
-}) {
+export default async function AdminCataloguePage() {
   await requireAdmin();
-  const params = await searchParams;
 
+  // The whole catalogue is loaded and filtered in the browser: it is a few
+  // dozen rows, and instant filtering is worth more here than pagination.
   const [institutions, courses] = await Promise.all([
-    listInstitutions(params.q),
-    listCourses(params.q),
+    listInstitutions({ status: 'ALL', pageSize: 1000 }),
+    listProgrammes({ status: 'ALL', pageSize: 1000 }),
   ]);
+
+  const provinces = [...new Set(institutions.rows.map((i) => i.province))].sort((a, b) =>
+    provinceLabels[a].localeCompare(provinceLabels[b]),
+  ) as Province[];
+  const fields = [...new Set(courses.rows.map((c) => c.field))].sort((a, b) =>
+    careerInterestLabels[a].localeCompare(careerInterestLabels[b]),
+  ) as CareerInterest[];
+
+  const allProvinces = (
+    provinces.length > 0 ? provinces : (Object.keys(provinceLabels) as Province[])
+  ).slice();
+  const allFields = (
+    fields.length > 0 ? fields : (Object.keys(careerInterestLabels) as CareerInterest[])
+  ).slice();
 
   return (
     <PageBody>
-      <div className="space-y-6">
-        <header>
-          <h1 className="text-ink-900 text-[26px] font-semibold">Catalogue</h1>
-          <p className="mt-1 text-[14px] text-ink-500">
-            The institutions and courses that students choose between and that funders base their
-            eligibility rules on. An entry already in use cannot be removed.
-          </p>
-        </header>
+      <PageHeader
+        title="Catalogue"
+        description="The institutions and courses students choose between, funders write eligibility rules against, and the matching engine compares. One list, used everywhere."
+      />
 
-        <Card className="p-4">
-          <form className="flex flex-wrap items-end gap-3" method="get">
-            <div className="min-w-0 flex-1">
-              <label className="block text-[13px] font-medium text-ink-700" htmlFor="q">
-                Search both lists
-              </label>
-              <input
-                id="q"
-                name="q"
-                defaultValue={params.q ?? ''}
-                placeholder="Institution, city or course"
-                className="mt-1.5 w-full rounded-field border border-line px-3 py-2 text-[14px]"
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-primary-600 rounded-field px-4 py-2 text-[14px] font-medium text-white"
-            >
-              Search
-            </button>
-          </form>
-        </Card>
+      <Card className="mb-5">
+        <CardBody className="flex gap-3">
+          <InfoCircle className="h-[18px] w-[18px] shrink-0 text-ink-400" />
+          <div className="text-[13px] text-ink-600">
+            <p className="font-semibold text-ink">Entries are retired, never deleted</p>
+            <p className="mt-1">
+              A student who chose an institution, and a funder who wrote a rule against a course,
+              both point at these rows. Retiring one stops it being offered for new choices and
+              leaves every existing record intact.
+            </p>
+          </div>
+        </CardBody>
+      </Card>
 
-        <Card className="p-0">
-          <div className="border-b border-line px-4 py-3">
-            <h2 className="text-ink-900 text-[15px] font-semibold">
-              Institutions ({institutions.length})
-            </h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-[14px]">
-              <thead>
-                <tr className="border-b border-line text-[12px] uppercase tracking-[0.04em] text-ink-400">
-                  <th className="px-4 py-3 font-semibold">Name</th>
-                  <th className="px-4 py-3 font-semibold">Type</th>
-                  <th className="px-4 py-3 font-semibold">Province</th>
-                  <th className="px-4 py-3 font-semibold">City</th>
-                  <th className="px-4 py-3 text-right font-semibold">In use</th>
-                </tr>
-              </thead>
-              <tbody>
-                {institutions.map((row) => {
-                  const inUse = isCatalogueEntryInUse(row._count);
-                  return (
-                    <tr key={row.id} className="border-b border-line/60 last:border-0">
-                      <td className="text-ink-800 px-4 py-3">
-                        {row.name}
-                        {row.shortName ? (
-                          <span className="text-ink-400"> ({row.shortName})</span>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3 text-ink-600">{row.type}</td>
-                      <td className="px-4 py-3 text-ink-600">{row.province}</td>
-                      <td className="px-4 py-3 text-ink-600">{row.city}</td>
-                      <td className="px-4 py-3 text-right text-ink-600">
-                        {inUse
-                          ? `${row._count.studyPreferences + row._count.currentStudents + row._count.supportedInProgram} reference(s)`
-                          : 'unused'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-
-        <Card className="p-0">
-          <div className="border-b border-line px-4 py-3">
-            <h2 className="text-ink-900 text-[15px] font-semibold">Courses ({courses.length})</h2>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-left text-[14px]">
-              <thead>
-                <tr className="border-b border-line text-[12px] uppercase tracking-[0.04em] text-ink-400">
-                  <th className="px-4 py-3 font-semibold">Name</th>
-                  <th className="px-4 py-3 font-semibold">Field</th>
-                  <th className="px-4 py-3 font-semibold">Levels</th>
-                  <th className="px-4 py-3 text-right font-semibold">In use</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((row) => {
-                  const inUse = isCatalogueEntryInUse(row._count);
-                  return (
-                    <tr key={row.id} className="border-b border-line/60 last:border-0">
-                      <td className="text-ink-800 px-4 py-3">{row.name}</td>
-                      <td className="px-4 py-3 text-ink-600">{row.field}</td>
-                      <td className="px-4 py-3 text-ink-600">{row.qualificationLevels.length}</td>
-                      <td className="px-4 py-3 text-right text-ink-600">
-                        {inUse
-                          ? `${row._count.studyPreferences + row._count.currentStudents + row._count.supportedInProgram} reference(s)`
-                          : 'unused'}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Card>
-      </div>
+      <CatalogueManager
+        provinces={allProvinces}
+        fields={allFields}
+        institutions={institutions.rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          shortName: row.shortName,
+          type: row.type,
+          province: row.province,
+          city: row.city,
+          website: row.website,
+          code: row.code,
+          status: row.status,
+          inUse:
+            row._count.studyPreferences +
+            row._count.currentStudents +
+            row._count.supportedInProgram,
+          offeredProgrammes: row._count.offeredProgrammes,
+        }))}
+        courses={courses.rows.map((row) => ({
+          id: row.id,
+          name: row.name,
+          field: row.field,
+          qualificationLevels: row.qualificationLevels,
+          code: row.code,
+          status: row.status,
+          inUse:
+            row._count.studyPreferences +
+            row._count.currentStudents +
+            row._count.supportedInProgram,
+          institutions: row.offeredAt.map((link) => ({
+            id: link.institution.id,
+            name: link.institution.name,
+            shortName: link.institution.shortName,
+          })),
+        }))}
+      />
     </PageBody>
   );
 }

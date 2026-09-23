@@ -388,15 +388,16 @@ model User {
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  sessions           Session[]
-  verificationToken  VerificationToken?
-  passwordResetToken PasswordResetToken?
-  studentProfile     StudentProfile?
-  corporateProfile   CorporateProfile?
-  notifications      Notification[]
-  auditLogs          AuditLog[]
-  createdProgrammes  FundingProgramme[]  @relation("ProgrammeCreator")
-  shortlistEntries   Shortlist[]         @relation("ShortlistAddedBy")
+  sessions            Session[]
+  verificationToken   VerificationToken?
+  passwordResetToken  PasswordResetToken?
+  studentProfile      StudentProfile?
+  corporateProfile    CorporateProfile?
+  notifications       Notification[]
+  informationRequests InformationRequest[] @relation("InformationRequester")
+  auditLogs           AuditLog[]
+  createdProgrammes   FundingProgramme[]   @relation("ProgrammeCreator")
+  shortlistEntries    Shortlist[]          @relation("ShortlistAddedBy")
 
   @@index([role])
   @@index([status])
@@ -457,14 +458,31 @@ model Institution {
   type      InstitutionType
   province  Province
   city      String
-  createdAt DateTime        @default(now())
+  website   String?
+  /// The institution's own code, where it has one (e.g. a DHET number).
+  code      String?
+
+  /// Institutions are retired, never deleted: a student's chosen institution
+  /// and a funder's eligibility rules both point at these rows, and removing
+  /// one would rewrite history. An inactive institution stops being offered
+  /// to new choices while every existing reference keeps working.
+  status CatalogueStatus @default(ACTIVE)
+
+  /// Lower-case, punctuation-free form of the name. Unique, so "University of
+  /// Johannesburg" and "university of johannesburg " cannot both exist.
+  canonicalName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   studyPreferences   StudyPreference[]
   currentStudents    StudentProfile[]              @relation("CurrentInstitution")
   supportedInProgram FundingProgrammeInstitution[]
+  offeredProgrammes  ProgrammeInstitution[]
 
   @@index([province])
   @@index([type])
+  @@index([status])
 }
 
 /// A standardised course / programme of study (e.g. "Computer Science").
@@ -473,13 +491,25 @@ model Programme {
   name                String               @unique
   field               CareerInterest
   qualificationLevels QualificationLevel[]
-  createdAt           DateTime             @default(now())
+  /// The institution's or SAQA's code for the qualification, where known.
+  code                String?
+
+  status CatalogueStatus @default(ACTIVE)
+
+  /// Lower-case, punctuation-free form of the name; unique, to stop the same
+  /// course arriving twice under two spellings.
+  canonicalName String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   studyPreferences   StudyPreference[]
   currentStudents    StudentProfile[]            @relation("CurrentProgramme")
   supportedInProgram FundingProgrammeProgramme[]
+  offeredAt          ProgrammeInstitution[]
 
   @@index([field])
+  @@index([status])
 }
 
 // ===========================================================================
@@ -535,13 +565,15 @@ model StudentProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  currentInstitution Institution?      @relation("CurrentInstitution", fields: [currentInstitutionId], references: [id], onDelete: SetNull)
-  currentProgramme   Programme?        @relation("CurrentProgramme", fields: [currentProgrammeId], references: [id], onDelete: SetNull)
-  studyPreferences   StudyPreference[]
-  applications       Application[]
-  documents          Document[]
-  autoFillJobs       AutoFillJob[]
+  user                User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentInstitution  Institution?           @relation("CurrentInstitution", fields: [currentInstitutionId], references: [id], onDelete: SetNull)
+  currentProgramme    Programme?             @relation("CurrentProgramme", fields: [currentProgrammeId], references: [id], onDelete: SetNull)
+  studyPreferences    StudyPreference[]
+  applications        Application[]
+  documents           Document[]
+  autoFillJobs        AutoFillJob[]
+  subjectResults      StudentSubjectResult[]
+  motivationalLetters MotivationalLetter[]
 
   @@index([province])
   @@index([educationStage])
@@ -604,10 +636,11 @@ model Organisation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  members      CorporateProfile[]
-  programmes   FundingProgramme[]
-  applications Application[]
-  shortlists   Shortlist[]
+  members             CorporateProfile[]
+  programmes          FundingProgramme[]
+  applications        Application[]
+  shortlists          Shortlist[]
+  informationRequests InformationRequest[]
 }
 
 model CorporateProfile {
@@ -703,6 +736,7 @@ model FundingProgramme {
   sources               OpportunitySource[]
   applicationForms      ApplicationForm[]
   conflicts             SourceConflict[]
+  motivationalLetters   MotivationalLetter[]
 
   @@index([organisationId])
   @@index([status])
@@ -730,7 +764,8 @@ model EligibilityRule {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  fundingProgramme    FundingProgramme                @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  subjectRequirements EligibilitySubjectRequirement[]
 }
 
 model FundingProgrammeInstitution {
@@ -799,11 +834,12 @@ model Application {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  studentProfile   StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  fundingProgramme FundingProgramme      @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
-  organisation     Organisation          @relation(fields: [organisationId], references: [id], onDelete: Cascade)
-  documents        ApplicationDocument[]
-  shortlist        Shortlist?
+  studentProfile      StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  fundingProgramme    FundingProgramme      @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  organisation        Organisation          @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  documents           ApplicationDocument[]
+  informationRequests InformationRequest[]
+  shortlist           Shortlist?
 
   @@unique([studentProfileId, fundingProgrammeId])
   @@index([fundingProgrammeId, status])
@@ -823,8 +859,9 @@ model Document {
   storageKey       String       @unique
   uploadedAt       DateTime     @default(now())
 
-  studentProfile StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  studentProfile StudentProfile           @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
   applications   ApplicationDocument[]
+  requestItems   InformationRequestItem[]
 
   @@index([studentProfileId])
 }
@@ -1117,6 +1154,8 @@ enum SourceType {
 /// first and from dates only as a fallback — never guessed.
 enum Availability {
   OPEN
+  /// Open, with the deadline close enough that a student should act now.
+  CLOSING_SOON
   UPCOMING
   CLOSED
   UNKNOWN
@@ -1279,4 +1318,244 @@ model IngestionEvent {
   run IngestionRun @relation(fields: [runId], references: [id], onDelete: Cascade)
 
   @@index([runId, createdAt])
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue, results, letters and information requests
+//
+// One canonical catalogue of institutions and courses underpins study
+// preferences, funder eligibility and matching, so a course chosen by a
+// student and a course named by a funder are the same row rather than two
+// spellings that never meet.
+// ---------------------------------------------------------------------------
+
+enum CatalogueStatus {
+  ACTIVE
+  /// Kept for the records that reference it, but no longer offered for new
+  /// choices. Catalogue entries are never deleted.
+  INACTIVE
+}
+
+/// Where a course is actually offered.
+///
+/// A course and an institution are not independent lists: "Computer Science"
+/// means something different at each university that teaches it, and a student
+/// choosing a pair that nobody offers is choosing something that does not
+/// exist.
+model ProgrammeInstitution {
+  programmeId   String
+  institutionId String
+  /// This institution's own code for the course, where it differs.
+  code          String?
+  createdAt     DateTime @default(now())
+
+  programme   Programme   @relation(fields: [programmeId], references: [id], onDelete: Cascade)
+  institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+
+  @@id([programmeId, institutionId])
+  @@index([institutionId])
+}
+
+// --- Subject and module results --------------------------------------------
+
+enum SubjectLevel {
+  /// A school subject, taken towards the National Senior Certificate.
+  SCHOOL
+  /// A module or course taken at a university, university of technology,
+  /// TVET college or other tertiary institution.
+  TERTIARY
+}
+
+enum ResultKind {
+  /// The mark as it stands now.
+  CURRENT
+  /// The final, confirmed mark.
+  FINAL
+  /// A mark the institution or teacher expects.
+  PREDICTED
+  /// The most recent mark available, where its kind is not stated.
+  LATEST
+}
+
+/// The shared list of subjects and modules.
+///
+/// Students pick from this where they can, so "Mathematics", "mathematics" and
+/// "Maths" do not become three different subjects that a bursary requirement
+/// can only match one of. A student may still type something not on the list;
+/// it is stored, marked custom, and never silently merged with an existing row.
+model SubjectCatalogue {
+  id            String          @id @default(cuid())
+  name          String
+  canonicalName String          @unique
+  level         SubjectLevel
+  status        CatalogueStatus @default(ACTIVE)
+  /// True when a student typed it rather than choosing it. Kept visible so an
+  /// administrator can promote it into the catalogue or merge it deliberately.
+  custom        Boolean         @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  results      StudentSubjectResult[]
+  requirements EligibilitySubjectRequirement[]
+
+  @@index([level, status])
+}
+
+/// One subject or module result a student has entered.
+model StudentSubjectResult {
+  id               String @id @default(cuid())
+  studentProfileId String
+  subjectId        String
+
+  /// The mark as a percentage. Null when the student knows the subject but not
+  /// yet the mark — which is a real state, and not the same as a zero.
+  percentage Int?
+  /// The symbol or grade, where that is how the result was given.
+  grade      String?
+  year       Int
+  /// "Semester 1", "Term 3" — free text, because institutions differ.
+  term       String?
+  kind       ResultKind   @default(LATEST)
+  level      SubjectLevel
+
+  /// The student's own ordering.
+  position Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  studentProfile StudentProfile   @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  subject        SubjectCatalogue @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  /// One result per subject per year: a re-sit replaces the mark rather than
+  /// adding a second row that matching would have to choose between.
+  @@unique([studentProfileId, subjectId, year])
+  @@index([studentProfileId, position])
+}
+
+/// A subject mark a funder requires, e.g. Mathematics at 70% or above.
+model EligibilitySubjectRequirement {
+  id                String @id @default(cuid())
+  eligibilityRuleId String
+  subjectId         String
+  minimumPercentage Int
+
+  createdAt DateTime @default(now())
+
+  eligibilityRule EligibilityRule  @relation(fields: [eligibilityRuleId], references: [id], onDelete: Cascade)
+  subject         SubjectCatalogue @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  @@unique([eligibilityRuleId, subjectId])
+  @@index([subjectId])
+}
+
+// --- Motivational letters ---------------------------------------------------
+
+enum LetterStatus {
+  DRAFT
+  /// The student has marked it finished. It stays editable.
+  READY
+}
+
+/// A motivational letter written for one opportunity.
+///
+/// Letters are kept individually and never overwritten: a student applying to
+/// six bursaries needs six letters, and losing one to a regenerate would lose
+/// work they cannot get back.
+model MotivationalLetter {
+  id                 String  @id @default(cuid())
+  studentProfileId   String
+  fundingProgrammeId String?
+  /// Kept verbatim so the letter still names its bursary if the opportunity is
+  /// later removed from the catalogue.
+  opportunityName    String
+  organisationName   String
+
+  title   String
+  content String
+  status  LetterStatus @default(DRAFT)
+
+  /// The student's own answers, kept so a regenerate does not ask again and so
+  /// the letter can be traced to what they actually said.
+  answers Json?
+
+  /// Which generator produced the current text, so a letter can be reproduced.
+  generator String?
+
+  /// True once the student has edited the text themselves.
+  editedByStudent Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  studentProfile   StudentProfile    @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  fundingProgramme FundingProgramme? @relation(fields: [fundingProgrammeId], references: [id], onDelete: SetNull)
+
+  @@index([studentProfileId, updatedAt])
+}
+
+// --- Information requests ---------------------------------------------------
+
+enum InformationRequestStatus {
+  /// Sent to the student, nothing supplied yet.
+  OPEN
+  /// The student has submitted their response.
+  RESPONDED
+  /// Withdrawn by the funder before it was answered.
+  CANCELLED
+}
+
+/// A funder asking an applicant for something specific.
+///
+/// Stored rather than being a message, so both sides can see exactly what was
+/// asked for, what has been supplied and what is still outstanding.
+model InformationRequest {
+  id             String @id @default(cuid())
+  applicationId  String
+  organisationId String
+  /// The corporate user who sent it.
+  requestedById  String
+
+  message  String?
+  deadline DateTime?
+  status   InformationRequestStatus @default(OPEN)
+
+  createdAt   DateTime  @default(now())
+  respondedAt DateTime?
+  cancelledAt DateTime?
+
+  application  Application              @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  organisation Organisation             @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  requestedBy  User                     @relation("InformationRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  items        InformationRequestItem[]
+
+  @@index([applicationId, createdAt])
+  @@index([organisationId, status])
+}
+
+/// One thing the funder asked for.
+model InformationRequestItem {
+  id        String @id @default(cuid())
+  requestId String
+
+  /// The funder's own words. Preserved exactly: a funder who asks for "a
+  /// certified copy of your latest university academic record" must not have
+  /// it flattened into "Academic record".
+  label        String
+  /// Set when the request maps onto a document type the student already has a
+  /// slot for, so an existing upload can be offered.
+  documentType DocumentType?
+
+  /// The document the student supplied for this item.
+  documentId String?
+
+  createdAt   DateTime  @default(now())
+  fulfilledAt DateTime?
+
+  request  InformationRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  document Document?          @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  @@index([requestId])
+  @@index([documentId])
 }
