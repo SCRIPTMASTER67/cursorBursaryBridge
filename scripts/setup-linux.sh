@@ -35,8 +35,11 @@ fi
 # --- 1. Prerequisites -------------------------------------------------------
 step 'Installing Git, curl and PostgreSQL'
 if   command -v apt-get >/dev/null; then
-    $SUDO apt-get update -qq
-    $SUDO DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
+    $SUDO apt-get update -qq || true
+    # `env` rather than a bare assignment: bash recognises assignments at parse
+    # time, so with $SUDO empty (running as root) the assignment would be read
+    # as the command name and fail with "command not found".
+    $SUDO env DEBIAN_FRONTEND=noninteractive apt-get install -y -qq \
         git curl ca-certificates postgresql postgresql-contrib
 elif command -v dnf >/dev/null; then
     $SUDO dnf install -y git curl postgresql-server postgresql-contrib
