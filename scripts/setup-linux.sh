@@ -120,24 +120,62 @@ sed "s|^AUTH_SECRET=.*|AUTH_SECRET=\"$secret\"|" .env > "$tmp" && mv "$tmp" .env
 # would not be caught downstream. Check it here instead.
 grep -q 'replace-me-with' .env && die 'AUTH_SECRET was not written to .env.'
 
-# --- 5. Schema and demo data ------------------------------------------------
+# --- 5. Schema and data -----------------------------------------------------
 step 'Applying migrations'
 npm run db:deploy
 
-step 'Loading demo data'
-npm run db:seed
+# Demo data is a separate, explicitly-requested step. Every funder and bursary
+# it creates is INVENTED, which is why it refuses to run without being asked by
+# name and refuses outright when NODE_ENV is production. Skip it with
+# SKIP_DEMO_DATA=1 for an empty directory, which is what a real deployment has.
+#
+# It runs BEFORE the production seed because it truncates the database, so
+# running it second would wipe the administrator the production seed creates.
+if [ "${SKIP_DEMO_DATA:-0}" = '1' ]; then
+    step 'Skipping demo data (SKIP_DEMO_DATA=1)'
+else
+    step 'Loading demo data — every bursary it creates is invented'
+    SEED_DEMO_DATA=yes npm run db:seed:demo
+fi
+
+# The production seed creates reference data only: the institution and course
+# catalogue the forms choose from, plus the first administrator. It creates no
+# bursaries, because a seeded bursary is an invented bursary. It upserts, so it
+# is safe to run over the demo data.
+step 'Loading the institution and course catalogue, and the administrator'
+ADMIN_EMAIL=admin@bursarybridge.local ADMIN_PASSWORD='ChangeMe-Locally-1' npm run db:seed
 
 # --- 6. Run -----------------------------------------------------------------
 step 'Starting the dev server'
+if [ "${SKIP_DEMO_DATA:-0}" = '1' ]; then
+cat <<'BANNER'
+
+  http://localhost:3000  will open once the server is ready.
+  admin@bursarybridge.local  /  ChangeMe-Locally-1
+
+  No demo data was loaded, so All Bursaries is empty. That is what a real
+  deployment looks like before anything has been collected. Populate it with:
+    npm run ingest             read the authorised sources (needs network)
+    npm run import:pages -- import   read pages you saved yourself
+
+  Leave this terminal open. Ctrl+C stops the server.
+
+BANNER
+else
 cat <<'BANNER'
 
   http://localhost:3000  will open once the server is ready.
   student@demo.bursarybridge.local   /  Demo1234!
   corporate@demo.bursarybridge.local /  Demo1234!
+  admin@bursarybridge.local          /  ChangeMe-Locally-1
+
+  The bursaries you will see are INVENTED demo data for local evaluation.
+  Remove them at any time with:  npm run purge:mock
 
   Leave this terminal open. Ctrl+C stops the server.
 
 BANNER
+fi
 
 # Open a browser once the port answers. Harmless on a headless machine.
 (
