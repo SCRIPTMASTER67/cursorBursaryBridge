@@ -318,6 +318,68 @@ page. The test now waits for the navigation.
 
 ---
 
+---
+
+## Addendum — 23 September 2026
+
+Egress re-checked: still denied. The setting is **Network access** in this
+session's cloud environment (the environment menu in the title bar → Edit) —
+either a broader access level or `www.zabursaries.co.za` added to the allowed
+domains.
+
+Three things changed since the report above.
+
+**A regression was found and fixed.** Making `openDate`/`closingDate` nullable
+left a funder's own published programme with `availability = UNKNOWN`, so it
+appeared in the directory as "status unknown" rather than open. Availability is
+now derived on create, on publish/close and on edit. For a first-party
+programme the funder _is_ the source, so their stated window is authoritative
+and the local sweep may open one when its opening date arrives — deliberately
+not extended to ingested opportunities, where a funder may have closed early
+somewhere we cannot see.
+
+**The admin portal now has a Data sources page** (`/admin/data-sources`),
+which the earlier bursary brief asked for and the report above did not have.
+It shows every registered source and why each is on or off, the last ten runs,
+and every decision a run made including its rejections. A BLOCKED run is called
+out at the top with its real reason.
+
+**An offline import path exists** (`npm run import:pages`). It runs the
+identical pipeline over pages fetched by hand — same parser, normalisation,
+validation, deduplication and provenance — so real data can be loaded before
+the network is unblocked. A page whose URL cannot be determined is skipped
+rather than given one. It does not consult robots.txt and says so, because it
+fetches nothing.
+
+Demonstrated against saved pages:
+
+```
+$ npm run import:pages -- import --source zabursaries --adapter listing-generic
+Reading 3 saved page(s) as ZA Bursaries (SECONDARY_PUBLICATION),
+using the listing-generic reader.
+Nothing is fetched. robots.txt is not consulted, because you did the fetching.
+
+  skipped import/mystery.html — its URL could not be determined, and one
+          will not be invented.
+
+  OPEN     Kalahari Test Trust Science Bursary
+  CLOSED   Mopane Test Group Accounting Bursary 2026
+  UNKNOWN  Sefako Test Foundation Teaching Bursary
+  REJECTED Example Bursary — Reads as sample content, not a real opportunity.
+  REJECTED ABC Foundation Bursary 2027 — Reads as sample content.
+  REJECTED Apply — Title too short to identify.
+```
+
+**Test totals now:** 22 matching · 39 label · 46 auto-fill field · 32 auto-fill
+service · 68 ingestion · 25 directory journey · 109 end-to-end. All pass.
+
+The end-to-end suite had been failing at the student matching steps. That was
+the test, not the application: it depended on the seeded demo bursaries that
+were removed. It now creates its own published programme, which is a better
+test — it was implicitly coupled to seed data.
+
+---
+
 ## What happens when you unblock egress
 
 ```bash
