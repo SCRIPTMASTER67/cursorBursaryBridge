@@ -7,6 +7,7 @@ import {
   FileText,
   HelpCircle,
   LayoutGrid,
+  Mail,
   Settings,
   Sparkles,
   Target,
@@ -59,6 +60,11 @@ export default async function StudentLayout({ children }: { children: React.Reac
       href: '/student/results',
       label: 'My Results',
       icon: <Award className="h-[18px] w-[18px]" />,
+    },
+    {
+      href: '/student/letters',
+      label: 'Motivational Letters',
+      icon: <Mail className="h-[18px] w-[18px]" />,
     },
     {
       href: '/student/documents',

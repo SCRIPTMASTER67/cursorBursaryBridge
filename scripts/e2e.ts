@@ -117,6 +117,17 @@ function section(title: string) {
 class Session {
   private cookies = new Map<string, string>();
 
+  /**
+   * A distinct client address per session.
+   *
+   * The login limiter buckets by IP as well as by account, and a single run
+   * signs several different people in and out well past the per-IP allowance.
+   * Real users do not share an address, so neither do the sessions here; the
+   * per-account limit, which is the one that stops credential stuffing, still
+   * applies untouched.
+   */
+  private readonly ip = `203.0.113.${Math.floor(Math.random() * 250) + 1}`;
+
   private header(): string {
     return [...this.cookies].map(([k, v]) => `${k}=${v}`).join('; ');
   }
@@ -138,6 +149,7 @@ class Session {
       redirect: 'manual',
       headers: {
         'Content-Type': 'application/json',
+        'x-forwarded-for': this.ip,
         ...(this.cookies.size ? { Cookie: this.header() } : {}),
         ...(init.headers ?? {}),
       },
@@ -150,7 +162,10 @@ class Session {
   async page(path: string): Promise<{ status: number; html: string; location: string | null }> {
     const response = await fetch(`${BASE}${path}`, {
       redirect: 'manual',
-      headers: this.cookies.size ? { Cookie: this.header() } : {},
+      headers: {
+        'x-forwarded-for': this.ip,
+        ...(this.cookies.size ? { Cookie: this.header() } : {}),
+      },
     });
     this.store(response);
     return {
@@ -1095,8 +1110,11 @@ async function main() {
   );
 
   // --- suspend a programme -------------------------------------------------
+  // Scoped to the funder whose session does the republish attempt below. The
+  // run also creates a rival organisation, and picking its programme instead
+  // would test nothing but the ownership check.
   const targetProgramme = await db.fundingProgramme.findFirstOrThrow({
-    where: { organisation: { name: { contains: unique } } },
+    where: { organisation: { name: orgName } },
     select: { id: true, name: true, status: true },
   });
 
@@ -1321,8 +1339,25 @@ async function main() {
   // The token itself is only ever emailed, so the test reads the hash side of
   // it the same way the server does.
   const resetToken = randomBytes(32).toString('base64url');
-  const studentForReset = await db.user.findUniqueOrThrow({
-    where: { email: studentEmail },
+
+  // A student of its own for this section. The account limiter allows six
+  // sign-ins per account in five minutes, and the student above has already
+  // used them getting through the journey; reusing them here would measure the
+  // limiter rather than the reset flow. The limiter itself is deliberately
+  // left alone — a real account being throttled after six attempts in five
+  // minutes is the behaviour we want.
+  const resetEmail = `e2e.reset.${unique}@demo.bursarybridge.local`;
+  const studentForReset = await db.user.create({
+    data: {
+      email: resetEmail,
+      passwordHash: await hash(PASSWORD, 10),
+      role: 'STUDENT',
+      firstName: 'Reset',
+      lastName: 'Tester',
+      emailVerifiedAt: new Date(),
+      acceptedTermsAt: new Date(),
+      studentProfile: { create: { onboardingCompletedAt: new Date() } },
+    },
     select: { id: true },
   });
   await db.passwordResetToken.upsert({
@@ -1408,7 +1443,7 @@ async function main() {
 
   const oldPasswordLogin = await new Session().json('/api/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email: studentEmail, password: PASSWORD }),
+    body: JSON.stringify({ email: resetEmail, password: PASSWORD }),
   });
   check(
     'the old password no longer works',
@@ -1418,7 +1453,7 @@ async function main() {
 
   const newPasswordLogin = await new Session().json('/api/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email: studentEmail, password: NEW_PASSWORD }),
+    body: JSON.stringify({ email: resetEmail, password: NEW_PASSWORD }),
   });
   check(
     'the new password signs the student back in',
@@ -1449,7 +1484,7 @@ async function main() {
   await db.user.update({ where: { id: studentForReset.id }, data: { status: 'SUSPENDED' } });
   const suspendedForgot = await new Session().json('/api/auth/forgot-password', {
     method: 'POST',
-    body: JSON.stringify({ email: studentEmail }),
+    body: JSON.stringify({ email: resetEmail }),
   });
   check(
     'a suspended account still gets the neutral response',

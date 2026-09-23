@@ -12,6 +12,7 @@ import {
   Check,
   FileText,
   GraduationCap,
+  Mail,
   MapPin,
   Users,
   Wallet,
@@ -309,6 +310,18 @@ export function OpportunityDetail({
               </ButtonLink>
             </>
           )}
+          {/* Most bursaries ask for a motivational letter, so the place to
+              write one belongs next to the place you apply. */}
+          <ButtonLink
+            href={`/student/letters/new?opportunity=${programme.id}`}
+            fullWidth
+            variant="ghost"
+            className="mt-2"
+          >
+            <Mail className="h-4 w-4" />
+            Write a motivational letter
+          </ButtonLink>
+
           <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-ink-400">
             <Calendar className="h-3.5 w-3.5" />
             {deadlineLabel(programme.closingDate)}
