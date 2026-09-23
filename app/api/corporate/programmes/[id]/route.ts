@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
+import { firstPartyAvailability } from '@/lib/first-party-availability';
 import { apiCorporate, apiError, apiOk, zodFields } from '@/lib/auth/api';
 import { createProgrammeSchema } from '@/lib/validation/programme';
 import { audit } from '@/services/audit';
@@ -17,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   // Scoped by organisationId: a funder can only touch its own programmes.
   const programme = await prisma.fundingProgramme.findFirst({
     where: { id, organisationId: auth.organisationId },
-    select: { id: true, status: true, name: true, closingDate: true },
+    select: { id: true, status: true, name: true, openDate: true, closingDate: true },
   });
   if (!programme) return apiError('Programme not found.', 404);
 
@@ -46,7 +47,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
   await prisma.fundingProgramme.update({
     where: { id: programme.id },
-    data: { status: parsed.data.status },
+    data: {
+      status: parsed.data.status,
+      // The directory reads availability, not status, so the two must move
+      // together or a closed programme keeps advertising itself as open.
+      availability: firstPartyAvailability({
+        status: parsed.data.status,
+        openDate: programme.openDate,
+        closingDate: programme.closingDate,
+      }),
+    },
   });
 
   await audit({
@@ -101,6 +111,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
         closingDate: new Date(details.closingDate),
         intakeTarget: details.intakeTarget ?? null,
         status: publish ? 'PUBLISHED' : undefined,
+        availability: firstPartyAvailability({
+          status: publish ? 'PUBLISHED' : programme.status,
+          openDate: new Date(details.openDate),
+          closingDate: new Date(details.closingDate),
+        }),
       },
     }),
     prisma.eligibilityRule.upsert({

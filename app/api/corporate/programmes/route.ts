@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { prisma } from '@/lib/db';
+import { firstPartyAvailability } from '@/lib/first-party-availability';
 import { apiCorporate, apiError, apiOk, zodFields } from '@/lib/auth/api';
 import { createProgrammeSchema } from '@/lib/validation/programme';
 import { slugify } from '@/lib/utils';
@@ -56,6 +57,14 @@ export async function POST(request: NextRequest) {
       openDate: new Date(details.openDate),
       closingDate: new Date(details.closingDate),
       status: publish ? 'PUBLISHED' : 'DRAFT',
+      // The funder sets the window here, so the directory's status follows
+      // from it directly. Without this a published programme would sit in the
+      // directory as "status unknown".
+      availability: firstPartyAvailability({
+        status: publish ? 'PUBLISHED' : 'DRAFT',
+        openDate: new Date(details.openDate),
+        closingDate: new Date(details.closingDate),
+      }),
       intakeTarget: details.intakeTarget ?? null,
       eligibility: {
         create: {

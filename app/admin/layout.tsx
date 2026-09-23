@@ -3,6 +3,7 @@ import {
   Award,
   Building,
   FileText,
+  Globe,
   GraduationCap,
   LayoutGrid,
   ShieldCheck,
@@ -41,6 +42,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       href: '/admin/programmes',
       label: 'Programmes',
       icon: <Award className="h-[18px] w-[18px]" />,
+    },
+    {
+      href: '/admin/data-sources',
+      label: 'Data sources',
+      icon: <Globe className="h-[18px] w-[18px]" />,
     },
     {
       href: '/admin/catalogue',

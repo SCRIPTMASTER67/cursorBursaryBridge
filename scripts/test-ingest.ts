@@ -17,6 +17,7 @@ import { validate, mayDisplayAsOpen } from '../lib/ingest/validate';
 import { runSource } from '../lib/ingest/pipeline';
 import { organisationFromTitle } from '../lib/ingest/parse';
 import { SOURCES } from '../lib/ingest/source-registry';
+import { firstPartyAvailability } from '../lib/first-party-availability';
 import { finishRun, persistOutcome, startRun } from '../services/opportunity-ingest';
 import {
   LISTING_PAGE,
@@ -158,6 +159,50 @@ async function main() {
   check(
     'a recent check may be shown as open',
     mayDisplayAsOpen({ availability: 'OPEN', lastVerifiedAt: new Date() }),
+  );
+
+  console.log('\nA funder publishing here sets their own window');
+  const win = { openDate: new Date('2020-01-01'), closingDate: new Date('2099-01-01') };
+  check(
+    'a published programme inside its window is OPEN',
+    firstPartyAvailability({ status: 'PUBLISHED', ...win }) === 'OPEN',
+  );
+  check('a draft is never open', firstPartyAvailability({ status: 'DRAFT', ...win }) === 'CLOSED');
+  check(
+    'a suspended programme is never open',
+    firstPartyAvailability({ status: 'SUSPENDED', ...win }) === 'CLOSED',
+  );
+  check(
+    'a programme closed by its funder is closed',
+    firstPartyAvailability({ status: 'CLOSED', ...win }) === 'CLOSED',
+  );
+  check(
+    'a published programme before its opening date is UPCOMING',
+    firstPartyAvailability({
+      status: 'PUBLISHED',
+      openDate: new Date('2099-01-01'),
+      closingDate: null,
+    }) === 'UPCOMING',
+  );
+  check(
+    'a published programme past its closing date is CLOSED',
+    firstPartyAvailability({
+      status: 'PUBLISHED',
+      openDate: null,
+      closingDate: new Date('2020-01-01'),
+    }) === 'CLOSED',
+  );
+  check(
+    'a closed date beats a future opening date',
+    firstPartyAvailability({
+      status: 'PUBLISHED',
+      openDate: new Date('2099-01-01'),
+      closingDate: new Date('2020-01-01'),
+    }) === 'CLOSED',
+  );
+  check(
+    'a published programme with no dates is OPEN',
+    firstPartyAvailability({ status: 'PUBLISHED', openDate: null, closingDate: null }) === 'OPEN',
   );
 
   console.log('\nSample content never reaches the database');

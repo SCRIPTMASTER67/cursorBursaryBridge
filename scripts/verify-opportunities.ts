@@ -28,6 +28,7 @@ async function main() {
   console.log(`  ${sweep.scanned} opportunities scanned`);
   console.log(`  ${sweep.closedByDeadline} closed because their deadline has passed`);
   console.log(`  ${sweep.markedUpcoming} marked upcoming because they have not opened yet`);
+  console.log(`  ${sweep.openedOnSchedule} opened on the schedule their funder set`);
   console.log(`  ${sweep.markedStale} marked as needing verification`);
 
   if (localOnly) {
@@ -38,7 +39,8 @@ async function main() {
       sourcesFailed: 0,
       opportunitiesFound: sweep.scanned,
       opportunitiesCreated: 0,
-      opportunitiesUpdated: sweep.closedByDeadline + sweep.markedUpcoming + sweep.markedStale,
+      opportunitiesUpdated:
+        sweep.closedByDeadline + sweep.markedUpcoming + sweep.openedOnSchedule + sweep.markedStale,
       duplicatesMerged: 0,
       rejected: 0,
       notes: 'Local sweep only. No source was contacted.',

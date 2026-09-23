@@ -21,6 +21,52 @@ const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
  */
 const db = new PrismaClient();
 
+/**
+ * A published programme the seeded student profile will match.
+ *
+ * Deliberately broad: no course, institution or academic restrictions, so it
+ * matches any onboarded student and the test measures the matching pipeline
+ * rather than the eligibility rules, which have their own checks.
+ */
+async function createMatchableProgramme(runId: string) {
+  const organisation = await db.organisation.create({
+    data: {
+      name: `E2E Test Funder ${runId}`,
+      type: 'CORPORATION',
+      industry: 'OTHER',
+      origin: 'REGISTERED',
+    },
+    select: { id: true },
+  });
+
+  const openDate = new Date(Date.now() - 7 * 86_400_000);
+  const closingDate = new Date(Date.now() + 60 * 86_400_000);
+
+  await db.fundingProgramme.create({
+    data: {
+      organisationId: organisation.id,
+      name: `E2E Matchable Bursary ${runId}`,
+      slug: `e2e-matchable-bursary-${runId}`,
+      shortDescription: 'Created by the end-to-end checks. Removed when they finish.',
+      fullDescription: 'Created by the end-to-end checks. Removed when they finish.',
+      fundingType: 'BURSARY',
+      coverage: ['TUITION_FEES'],
+      openDate,
+      closingDate,
+      status: 'PUBLISHED',
+      origin: 'FIRST_PARTY',
+      availability: 'OPEN',
+      officialSource: true,
+      sourceName: 'Bursary-Bridge (published by the funder)',
+      sourceType: 'OFFICIAL_ORGANISATION',
+      verificationStatus: 'VERIFIED',
+      lastVerifiedAt: new Date(),
+      lastCheckedAt: new Date(),
+      eligibility: { create: { requiresFinancialNeed: false } },
+    },
+  });
+}
+
 async function questionIdsFor(fundingProgrammeId: string): Promise<string[]> {
   const questions = await db.applicationQuestion.findMany({
     where: { fundingProgrammeId },
@@ -397,6 +443,14 @@ async function main() {
     review.status === 200 && review.body.redirectTo === '/student/dashboard',
     `status ${review.status}`,
   );
+
+  // A programme for this student to match against.
+  //
+  // The database holds no seeded bursaries -- opportunities come from a funder
+  // publishing one or from the ingestion pipeline, never from a seed -- so the
+  // student journey creates its own rather than depending on data that may or
+  // may not be there. Everything it creates is removed by cleanUp().
+  await createMatchableProgramme(unique);
 
   // 10. Matches
   const dashboard = await student.page('/student/dashboard');

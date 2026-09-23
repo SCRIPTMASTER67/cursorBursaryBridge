@@ -25,6 +25,8 @@ import { logEvent } from '@/services/opportunity-ingest';
 export type LocalSweepResult = {
   closedByDeadline: number;
   markedUpcoming: number;
+  /** First-party programmes whose stated opening date has arrived. */
+  openedOnSchedule: number;
   markedStale: number;
   scanned: number;
 };
@@ -59,6 +61,21 @@ export async function sweepLocalStatus(now = new Date()): Promise<LocalSweepResu
     data: { availability: 'UPCOMING' },
   });
 
+  // A programme published here by its own funder is a different case: they set
+  // the window in this application, so when the opening date arrives it really
+  // is open. That reasoning does not extend to an ingested opportunity, where
+  // the funder may have closed early somewhere we cannot see.
+  const opened = await prisma.fundingProgramme.updateMany({
+    where: {
+      origin: 'FIRST_PARTY',
+      status: 'PUBLISHED',
+      availability: { in: ['UPCOMING', 'UNKNOWN'] },
+      OR: [{ openDate: null }, { openDate: { lte: now } }],
+      AND: [{ OR: [{ closingDate: null }, { closingDate: { gte: now } }] }],
+    },
+    data: { availability: 'OPEN' },
+  });
+
   // Anything not confirmed recently stops counting as verified. Nothing is
   // deleted and nothing is hidden — it is simply no longer advertised as open.
   const marked = await prisma.fundingProgramme.updateMany({
@@ -75,6 +92,7 @@ export async function sweepLocalStatus(now = new Date()): Promise<LocalSweepResu
   return {
     closedByDeadline: closed.count,
     markedUpcoming: upcoming.count,
+    openedOnSchedule: opened.count,
     markedStale: marked.count,
     scanned,
   };
