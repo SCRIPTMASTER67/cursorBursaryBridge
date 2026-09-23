@@ -96,10 +96,34 @@ if [ "$("${PG[@]}" psql -tAc "SELECT 1 FROM pg_database WHERE datname='bursarybr
 fi
 
 # --- 3. Source --------------------------------------------------------------
-step 'Fetching the source'
-[ -d cursorBursaryBridge ] || \
-    git clone https://github.com/SCRIPTMASTER67/cursorBursaryBridge.git
-cd cursorBursaryBridge
+# The work lives on a branch, not on the default one, so the branch is named
+# explicitly. Cloning without it silently produces a different application:
+# older migrations, an older seed, and errors that look like configuration
+# problems rather than the wrong code.
+REPO=${REPO:-https://github.com/SCRIPTMASTER67/cursorBursaryBridge.git}
+BRANCH=${BRANCH:-claude/bursary-bridge-prototype-vhhs5t}
+
+step "Fetching the source ($BRANCH)"
+if [ -d cursorBursaryBridge/.git ]; then
+    # An existing clone may be on another branch or out of date. Bring it to
+    # the right one rather than building on whatever happens to be there.
+    cd cursorBursaryBridge
+    git fetch origin "$BRANCH" --depth=1 || die "Could not fetch $BRANCH."
+    git checkout -B "$BRANCH" "origin/$BRANCH" || die "Could not switch to $BRANCH."
+else
+    git clone --branch "$BRANCH" "$REPO" || die "Could not clone $BRANCH from $REPO."
+    cd cursorBursaryBridge
+fi
+
+on=$(git rev-parse --abbrev-ref HEAD)
+[ "$on" = "$BRANCH" ] || die "Expected to be on $BRANCH but am on $on."
+echo "On $on at $(git rev-parse --short HEAD)"
+
+# A quick sanity check on what actually arrived. If these are missing the
+# clone is not the branch this script was written for, and every later step
+# would fail in a way that points at the wrong thing.
+[ -f prisma/seed-demo.ts ] || die 'This clone does not contain prisma/seed-demo.ts. Wrong branch?'
+[ -f lib/ingest/pipeline.ts ] || die 'This clone does not contain lib/ingest. Wrong branch?'
 
 step 'Installing packages (this takes a couple of minutes)'
 npm install
