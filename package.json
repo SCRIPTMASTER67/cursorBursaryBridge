@@ -31,6 +31,7 @@
     "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:ingest && npm run test:e2e",
     "screenshots": "tsx scripts/screenshots.ts",
     "ingest": "tsx --conditions=react-server scripts/ingest.ts",
+    "make:test-forms": "tsx scripts/make-test-forms.ts",
     "import:pages": "tsx --conditions=react-server scripts/import-pages.ts",
     "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts"
   },
