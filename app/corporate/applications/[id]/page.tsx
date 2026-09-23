@@ -4,6 +4,7 @@ import { PageBody } from '@/components/layout/app-shell';
 import { ApplicantProfile } from '@/components/corporate/applicant-profile';
 import { requireCorporate } from '@/lib/auth/guards';
 import { getApplicantDetail, getApplicantNeighbours } from '@/services/applicants';
+import { requestsForApplication } from '@/services/information-requests';
 
 export const metadata: Metadata = { title: 'Applicant' };
 
@@ -16,15 +17,28 @@ export default async function ApplicantPage({ params }: { params: Promise<{ id: 
   if (!result) notFound();
 
   const { application, eligibility } = result;
-  const neighbours = await getApplicantNeighbours(
-    organisationId,
-    application.id,
-    application.fundingProgrammeId,
-  );
+  const [neighbours, informationRequests] = await Promise.all([
+    getApplicantNeighbours(organisationId, application.id, application.fundingProgrammeId),
+    requestsForApplication(application.id),
+  ]);
 
   return (
     <PageBody>
       <ApplicantProfile
+        informationRequests={informationRequests.map((request) => ({
+          id: request.id,
+          message: request.message,
+          deadline: request.deadline?.toISOString() ?? null,
+          status: request.status,
+          createdAt: request.createdAt.toISOString(),
+          items: request.items.map((item) => ({
+            id: item.id,
+            label: item.label,
+            document: item.document
+              ? { fileName: item.document.fileName, storageKey: item.document.storageKey }
+              : null,
+          })),
+        }))}
         application={{
           id: application.id,
           status: application.status,

@@ -17,11 +17,12 @@ import type {
   TriState,
 } from '@prisma/client';
 import { CriterionRow } from '@/components/student/match-explanation';
-import { ApplicationStatusBadge, EligibilityBadge, MatchBadge } from '@/components/ui/badge';
+import { ApplicationStatusBadge, Badge, EligibilityBadge, MatchBadge } from '@/components/ui/badge';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
+import { RequestInformationDialog } from '@/components/corporate/request-information-dialog';
 import { Modal } from '@/components/ui/modal';
 import { Tabs } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
@@ -84,6 +85,7 @@ export function ApplicantProfile({
   application,
   student,
   documents,
+  informationRequests,
   eligibility,
   neighbours,
 }: {
@@ -101,6 +103,19 @@ export function ApplicantProfile({
   };
   student: StudentView;
   documents: { id: string; type: DocumentType; fileName: string; url: string }[];
+  /** What has been asked of this applicant, and what they supplied. */
+  informationRequests: {
+    id: string;
+    message: string | null;
+    deadline: string | null;
+    status: 'OPEN' | 'RESPONDED' | 'CANCELLED';
+    createdAt: string;
+    items: {
+      id: string;
+      label: string;
+      document: { fileName: string; storageKey: string } | null;
+    }[];
+  }[];
   eligibility: EligibilityResult;
   neighbours: { previousId: string | null; nextId: string | null };
 }) {
@@ -236,6 +251,11 @@ export function ApplicantProfile({
                 { key: 'overview', label: 'Overview' },
                 { key: 'eligibility', label: 'Eligibility' },
                 { key: 'documents', label: 'Documents', count: documents.length },
+                {
+                  key: 'requests',
+                  label: 'Requests',
+                  count: informationRequests.length || undefined,
+                },
                 { key: 'answers', label: 'Answers' },
               ]}
             />
@@ -407,6 +427,91 @@ export function ApplicantProfile({
                       <CriterionRow key={`${criterion.key}-${index}`} criterion={criterion} />
                     ))}
                   </ul>
+                </section>
+              )}
+
+              {tab === 'requests' && (
+                <section>
+                  <h2 className="text-[15px] font-semibold text-ink">Information requests</h2>
+                  {informationRequests.length === 0 ? (
+                    <p className="mt-2 text-[13px] text-ink-500">
+                      Nothing has been requested from this applicant yet.
+                    </p>
+                  ) : (
+                    <ul className="mt-3 space-y-4">
+                      {informationRequests.map((request) => (
+                        <li
+                          key={request.id}
+                          className="rounded-card border border-line bg-surface-muted p-4"
+                        >
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-[13px] font-semibold text-ink">
+                              Requested {formatDate(request.createdAt)}
+                            </span>
+                            <Badge
+                              tone={
+                                request.status === 'RESPONDED'
+                                  ? 'success'
+                                  : request.status === 'CANCELLED'
+                                    ? 'neutral'
+                                    : 'warning'
+                              }
+                            >
+                              {request.status === 'RESPONDED'
+                                ? 'Responded'
+                                : request.status === 'CANCELLED'
+                                  ? 'Withdrawn'
+                                  : 'Awaiting response'}
+                            </Badge>
+                            {request.deadline && (
+                              <span className="text-[13px] text-ink-500">
+                                Due {formatDate(request.deadline)}
+                              </span>
+                            )}
+                          </div>
+
+                          {request.message && (
+                            <p className="mt-2 text-[13px] text-ink-600">{request.message}</p>
+                          )}
+
+                          <ul className="mt-2.5 space-y-1.5">
+                            {request.items.map((item) => (
+                              <li key={item.id} className="flex items-start gap-2 text-[13px]">
+                                <span
+                                  className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                                    item.document
+                                      ? 'bg-success-50 text-success-600'
+                                      : 'bg-warning-50 text-warning-600'
+                                  }`}
+                                >
+                                  {item.document ? (
+                                    <Check className="h-3.5 w-3.5" strokeWidth={2.8} />
+                                  ) : (
+                                    <AlertTriangle className="h-3.5 w-3.5" />
+                                  )}
+                                </span>
+                                <span className="min-w-0 flex-1">
+                                  <span className="text-ink-700">{item.label}</span>
+                                  {item.document ? (
+                                    <Link
+                                      href={`/api/documents/file/${encodeURIComponent(item.document.storageKey)}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="ml-2 font-medium text-brand-600 underline"
+                                    >
+                                      {item.document.fileName}
+                                    </Link>
+                                  ) : (
+                                    <span className="ml-2 text-warning-600">not supplied</span>
+                                  )}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </section>
               )}
 
@@ -616,35 +721,12 @@ export function ApplicantProfile({
         </Field>
       </Modal>
 
-      <Modal
+      <RequestInformationDialog
+        applicationId={application.id}
+        applicantName={`${student.firstName} ${student.lastName}`}
         open={dialog === 'REQUEST_INFO'}
         onClose={() => setDialog(null)}
-        title="Request more information"
-        description="The applicant's status becomes “Documents Required” and they are emailed your message."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setDialog(null)} disabled={busy}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => decide('DOCUMENTS_REQUIRED', note)}
-              loading={busy}
-              disabled={!note.trim()}
-            >
-              Send request
-            </Button>
-          </>
-        }
-      >
-        <Field label="What do you need from this applicant?" required>
-          <Textarea
-            rows={3}
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            placeholder="e.g. Please upload your most recent academic transcript."
-          />
-        </Field>
-      </Modal>
+      />
     </div>
   );
 }

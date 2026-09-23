@@ -15,6 +15,8 @@ import { documentTypeLabels } from '@/lib/labels';
 import type { CriterionResult } from '@/lib/matching';
 import { formatDate } from '@/lib/utils';
 import { buildStudentSummary } from '@/services/student-summary';
+import { InformationRequestPanel } from '@/components/student/information-request-panel';
+import { requestsForApplication } from '@/services/information-requests';
 
 export const metadata: Metadata = { title: 'Application' };
 
@@ -73,6 +75,17 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
     },
   ];
 
+  // What the funder has asked for, and the student's own documents to answer
+  // it with.
+  const [requests, documents] = await Promise.all([
+    requestsForApplication(application.id),
+    prisma.document.findMany({
+      where: { studentProfileId },
+      orderBy: { uploadedAt: 'desc' },
+      select: { id: true, fileName: true, type: true },
+    }),
+  ]);
+
   return (
     <PageBody>
       <Link
@@ -82,6 +95,42 @@ export default async function ApplicationDetailPage({ params, searchParams }: Pa
         <ArrowLeft className="h-4 w-4" />
         Back to my applications
       </Link>
+
+      {/* Anything the funder is waiting on comes first: it is the only thing on
+          this page the student can act on. */}
+      {requests.length > 0 && (
+        <div className="mb-5 grid gap-4">
+          {requests.map((request) => (
+            <InformationRequestPanel
+              key={request.id}
+              documents={documents}
+              request={{
+                id: request.id,
+                message: request.message,
+                deadline: request.deadline?.toISOString() ?? null,
+                status: request.status,
+                createdAt: request.createdAt.toISOString(),
+                respondedAt: request.respondedAt?.toISOString() ?? null,
+                organisationName: request.organisation.name,
+                programmeName: request.application.fundingProgramme.name,
+                items: request.items.map((item) => ({
+                  id: item.id,
+                  label: item.label,
+                  documentType: item.documentType,
+                  fulfilledAt: item.fulfilledAt?.toISOString() ?? null,
+                  document: item.document
+                    ? {
+                        id: item.document.id,
+                        fileName: item.document.fileName,
+                        type: item.document.type,
+                      }
+                    : null,
+                })),
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {submitted === '1' && (
         <Alert tone="success" title="Application submitted" className="mb-5">
