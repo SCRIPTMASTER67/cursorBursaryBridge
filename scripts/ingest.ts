@@ -4,6 +4,8 @@
  * Usage:
  *   npm run ingest              read the enabled sources and store what they carry
  *   npm run ingest -- --dry-run read and report, write nothing
+ *   npm run ingest -- --max-detail=8
+ *                               follow only the first 8 detail pages
  *
  * Every run is recorded, including one that achieved nothing. A run that could
  * not reach its sources is marked BLOCKED, not SUCCEEDED with zero results:
@@ -18,6 +20,22 @@ import { finishRun, logEvent, persistOutcome, startRun } from '../services/oppor
 
 const db = new PrismaClient();
 const dryRun = process.argv.includes('--dry-run');
+
+/**
+ * How many detail pages to follow per source.
+ *
+ * Worth being able to set, because a host asking for a 30-second crawl delay
+ * turns a 25-page read into a thirteen-minute one. A smaller number is how you
+ * look at a handful of mapped opportunities before committing to the full run.
+ */
+const maxDetailArgument = process.argv.find((argument) => argument.startsWith('--max-detail='));
+const maxDetailPages = maxDetailArgument
+  ? Number.parseInt(maxDetailArgument.split('=')[1], 10)
+  : undefined;
+if (maxDetailArgument && (!Number.isFinite(maxDetailPages) || (maxDetailPages ?? 0) < 1)) {
+  console.error('--max-detail= must be a positive whole number.');
+  process.exit(1);
+}
 
 async function main() {
   const sources = enabledSources();
@@ -59,7 +77,7 @@ async function main() {
     totals.sourcesAttempted += 1;
     console.log(`${source.name} (${source.type})`);
 
-    const outcome = await runSource(source);
+    const outcome = await runSource(source, { maxDetailPages });
     totals.opportunitiesFound += outcome.candidates.length;
     totals.rejected += outcome.rejections.length;
 

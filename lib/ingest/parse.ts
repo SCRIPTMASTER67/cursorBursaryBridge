@@ -82,24 +82,157 @@ function parseGenericListing(html: string, pageUrl: string, source: RegisteredSo
  * requirements written as labelled lines. The adapter reads those labels; it
  * does not copy the page.
  */
+/**
+ * ZA Bursaries.
+ *
+ * The site is organised in three layers: a homepage of categories, a category
+ * page per field of study listing individual bursaries, and a page per
+ * bursary. Only the third layer is an opportunity, and telling the layers
+ * apart is most of this adapter's job — an earlier version treated any page
+ * with a heading as a bursary, which turned "How to Apply for a Bursary:
+ * Step-by-Step Guide" into a funding opportunity offered by an organisation
+ * called "How to Apply for a". A student cannot apply to an article.
+ *
+ * A bursary page carries a recognisable set of questions as its section
+ * headings ("WHAT IS THE CLOSING DATE FOR THE … BURSARY?", "HOW CAN I APPLY
+ * …?"). Those headings are what the fields are read from, because this site
+ * does not use "Closing date: …" anywhere — it answers a question under a
+ * heading, and a label-matching parser finds nothing.
+ */
+
+/** A URL of the shape /<field>-bursaries-south-africa/<bursary-slug>/. */
+function isDetailUrl(url: string): boolean {
+  try {
+    const { hostname, pathname } = new URL(url);
+    if (!/zabursaries\.co\.za$/i.test(hostname.replace(/^www\./, ''))) return false;
+    const segments = pathname.split('/').filter(Boolean);
+    return segments.length === 2 && /-(bursaries|scholarships)-south-africa$/i.test(segments[0]);
+  } catch {
+    return false;
+  }
+}
+
+/** The text under one of the page's question headings. */
+function sectionText($: cheerio.CheerioAPI, heading: RegExp): string | undefined {
+  let found: string | undefined;
+  $('h2, h3').each((_, element) => {
+    if (found) return;
+    const $heading = $(element);
+    if (!heading.test($heading.text())) return;
+
+    const parts: string[] = [];
+    let node = $heading.next();
+    // Everything up to the next heading belongs to this question.
+    while (node.length > 0 && !/^h[23]$/i.test(node.prop('tagName') ?? '')) {
+      parts.push(node.text());
+      node = node.next();
+    }
+    const text = tidy(parts.join(' '));
+    if (text) found = text;
+  });
+  return found;
+}
+
+/** The first off-site link under a heading: where the student actually applies. */
+function sectionLink($: cheerio.CheerioAPI, heading: RegExp, pageUrl: string): string | undefined {
+  let found: string | undefined;
+  $('h2, h3').each((_, element) => {
+    if (found) return;
+    const $heading = $(element);
+    if (!heading.test($heading.text())) return;
+
+    let node = $heading.next();
+    while (node.length > 0 && !/^h[23]$/i.test(node.prop('tagName') ?? '')) {
+      const links = node.is('a') ? node : node.find('a[href]');
+      links.each((_index, anchor) => {
+        if (found) return;
+        const href = safeUrl(absolute($(anchor).attr('href'), pageUrl));
+        // The publication links back to itself constantly; the funder's own
+        // application page is the one that leaves the site.
+        if (href && hostOf(href) !== hostOf(pageUrl)) found = href;
+      });
+      node = node.next();
+    }
+  });
+  return found;
+}
+
+/**
+ * The first sentence of an answer.
+ *
+ * The closing-date section answers with the date and then a warning about
+ * late applications. Only the first sentence is the deadline; keeping the rest
+ * would put a paragraph where the card shows a date.
+ */
+function firstSentence(text: string | undefined): string | undefined {
+  if (!text) return undefined;
+  const match = /^[\s\S]{3,160}?[.!?](?=\s|$|\()/.exec(text.trim());
+  return tidy(match ? match[0] : text.slice(0, 160)) || undefined;
+}
+
+const CLOSING_DATE = /closing date|when (?:is|does).*close|deadline/i;
+const ELIGIBILITY = /eligibility|requirements|who (?:can|qualifies)|minimum (?:entry )?criteria/i;
+const HOW_TO_APPLY = /how (?:can i|do i|to) apply|application process/i;
+const DOCUMENTS = /documents?/i;
+const FIELDS_OF_STUDY = /fields? of study|what (?:courses|fields)|which fields/i;
+const ABOUT = /what does .* do\?/i;
+
 function parseZaBursaries(html: string, pageUrl: string, source: RegisteredSource): ParseResult {
   const $ = cheerio.load(html);
   const readAt = new Date();
 
-  const title = tidy($('h1').first().text() || $('title').first().text());
+  // Only links to individual bursary pages are worth following. Category and
+  // advice pages are where those links come from, not opportunities.
+  //
+  // Read from the article where there is one: every page on this site carries
+  // a menu linking to all ~980 bursaries, so taking links document-wide would
+  // mean a category page about accounting handed back the whole site in menu
+  // order, and the first pages followed would have nothing to do with the
+  // list the reader is actually on.
+  const article = $('article').first();
+  const anchors = article.length > 0 ? article.find('a[href]') : $('a[href]');
   const detailLinks = unique(
-    $('a[href]')
+    anchors
       .map((_, a) => safeUrl(absolute($(a).attr('href'), pageUrl)))
       .get()
       .filter((href): href is string => Boolean(href))
-      .filter((href) => /bursar|scholarship|grant/i.test(href)),
+      .filter(isDetailUrl),
   );
 
-  // A page with no heading is a listing or an index, not an opportunity.
+  const title = tidy($('h1').first().text() || $('title').first().text());
   if (!title) return { opportunities: [], detailLinks };
 
   const bodyText = tidy($('article').text() || $('main').text() || $('body').text());
-  const summary = tidy($('article p, main p, .entry-content p').first().text());
+
+  // Two page shapes answer to this adapter. The publication writes a bursary
+  // as answers under question headings; a funder's own page, reached from one
+  // of those bursaries, usually writes "Closing date: …" inline. Each field
+  // is taken from whichever of the two the page actually uses, and is left
+  // unset when neither does.
+  const closingDateText =
+    firstSentence(sectionText($, CLOSING_DATE)) ??
+    findLabelled(bodyText, /closing date|applications close|deadline/i);
+  const requirementsText =
+    sectionText($, ELIGIBILITY) ??
+    findLabelled(bodyText, /requirements?|eligibility|who can apply/i);
+  const howToApply = sectionText($, HOW_TO_APPLY);
+
+  // On the publication's own site, what makes a page an opportunity rather
+  // than a page about opportunities: it sits at a bursary URL, and it answers
+  // at least two of the three questions a bursary page answers. A category
+  // page listing forty bursaries answers none of them about itself, and
+  // "How to Apply for a Bursary: Step-by-Step Guide" is an article.
+  //
+  // Elsewhere the URL says nothing, so the page is taken on its content, as
+  // any other source's would be.
+  const onPublication = /zabursaries\.co\.za$/i.test(hostOf(pageUrl));
+  if (onPublication) {
+    const answers = [closingDateText, requirementsText, howToApply].filter(Boolean).length;
+    if (!isDetailUrl(pageUrl) || answers < 2) return { opportunities: [], detailLinks };
+  }
+
+  const about = sectionText($, ABOUT);
+  const summary = about ?? tidy($('article p, main p, .entry-content p').first().text());
 
   const opportunity: RawOpportunity = {
     title,
@@ -109,15 +242,21 @@ function parseZaBursaries(html: string, pageUrl: string, source: RegisteredSourc
     sourceType: source.type,
     official: source.official,
     description: summary ? summary.slice(0, SUMMARY_LIMIT) : undefined,
-    closingDateText: findLabelled(bodyText, /closing date|applications close|deadline/i),
+    closingDateText,
     openDateText: findLabelled(bodyText, /opening date|applications open/i),
     statusText: findStatusWording(bodyText),
-    fieldsOfStudyText: findLabelled(bodyText, /fields? of study|courses? covered|study fields?/i),
-    institutionsText: findLabelled(bodyText, /institutions?|universit/i),
-    requirementsText: findLabelled(bodyText, /requirements?|eligibility|who can apply/i),
-    documentsText: findLabelled(bodyText, /documents? required|supporting documents?/i),
-    minAverageText: findLabelled(bodyText, /minimum average|academic average|aggregate/i),
-    applicationUrl: findOfficialLink($, pageUrl, source.official),
+    fieldsOfStudyText:
+      sectionText($, FIELDS_OF_STUDY) ??
+      findLabelled(bodyText, /fields? of study|courses? covered|study fields?/i),
+    requirementsText,
+    documentsText:
+      sectionText($, DOCUMENTS) ??
+      findLabelled(bodyText, /documents? required|supporting documents?/i),
+    // Stated inside the eligibility answer ("a minimum overall average of
+    // 65%"), never guessed from a number elsewhere on the page.
+    minAverageText: requirementsText,
+    applicationUrl:
+      sectionLink($, HOW_TO_APPLY, pageUrl) ?? findOfficialLink($, pageUrl, source.official),
     applicationFormUrl: findFormLink($, pageUrl),
     contentHash: contentHash([title, summary, bodyText.slice(0, 2000)]),
     readAt,

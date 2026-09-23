@@ -41,7 +41,26 @@ export const SOURCES: RegisteredSource[] = [
     type: 'SECONDARY_PUBLICATION',
     official: false,
     homepage: 'https://www.zabursaries.co.za',
-    listingUrls: ['https://www.zabursaries.co.za/'],
+    // The homepage is a hub of categories, not a list of bursaries: its own
+    // content links to nothing individual. The category pages are the real
+    // listings, and /bursary-news/ is the publication's list of what is open
+    // right now, which is what a student is looking for first.
+    listingUrls: [
+      'https://www.zabursaries.co.za/bursary-news/',
+      'https://www.zabursaries.co.za/accounting-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/commerce-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/construction-and-built-environment-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/education-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/engineering-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/general-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/government-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/law-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/medical-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/music-and-performing-arts-bursaries-south-africa/',
+      'https://www.zabursaries.co.za/science-bursaries-south-africa/',
+    ],
     adapter: 'zabursaries',
     enabled: true,
     note: 'Authorised by the operator. A listing publication, so level 3: anything it carries should be confirmed against the funder’s own site before it is treated as official.',
