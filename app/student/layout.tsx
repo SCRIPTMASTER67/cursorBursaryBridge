@@ -1,5 +1,6 @@
 import { AppShell } from '@/components/layout/app-shell';
 import {
+  Award,
   Bell,
   Bookmark,
   ClipboardList,
@@ -54,6 +55,11 @@ export default async function StudentLayout({ children }: { children: React.Reac
       badge: unread,
     },
     { href: '/student/profile', label: 'My Profile', icon: <User className="h-[18px] w-[18px]" /> },
+    {
+      href: '/student/results',
+      label: 'My Results',
+      icon: <Award className="h-[18px] w-[18px]" />,
+    },
     {
       href: '/student/documents',
       label: 'Documents',

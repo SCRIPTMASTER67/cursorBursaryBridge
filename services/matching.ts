@@ -16,7 +16,16 @@ import type { MatchResult, MatchableProgramme, MatchableStudent } from '@/lib/ma
 
 const programmeInclude = {
   organisation: { select: { id: true, name: true, logoUrl: true, industry: true } },
-  eligibility: true,
+  eligibility: {
+    // The subject's name comes with the requirement, so the engine can say
+    // "your Mathematics result" rather than referring to an id.
+    include: {
+      subjectRequirements: {
+        include: { subject: { select: { name: true } } },
+        orderBy: { subject: { name: 'asc' } },
+      },
+    },
+  },
   supportedProgrammes: { include: { programme: { select: { id: true, name: true } } } },
   supportedInstitutions: {
     include: { institution: { select: { id: true, name: true, shortName: true } } },
@@ -50,6 +59,17 @@ export async function loadMatchableStudent(
       studyPreferences: {
         select: { preferenceNumber: true, programmeId: true, institutionId: true },
         orderBy: { preferenceNumber: 'asc' },
+      },
+      // Individual subject and module results, so a funder's per-subject
+      // minimum can be checked against what the student actually achieved.
+      subjectResults: {
+        select: {
+          subjectId: true,
+          percentage: true,
+          year: true,
+          subject: { select: { name: true } },
+        },
+        orderBy: { year: 'desc' },
       },
     },
   });

@@ -1019,6 +1019,9 @@ async function seedStudents({
       householdIncome: profile.householdIncome,
       citizenship: profile.citizenship,
       yearOfStudy: profile.yearOfStudy,
+      // Demo students carry no subject results, so subject requirements
+      // evaluate as unknown rather than as failures.
+      subjectResults: [],
     };
 
     // Students apply to their better matches, but not only to perfect ones —

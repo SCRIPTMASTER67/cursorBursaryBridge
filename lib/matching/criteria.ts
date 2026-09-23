@@ -8,6 +8,7 @@ import type {
   MatchablePreference,
   MatchableProgramme,
   MatchableStudent,
+  MatchableSubjectResult,
 } from './types';
 
 function build(key: CriterionKey, status: CriterionStatus, reason: string): CriterionResult {
@@ -201,4 +202,68 @@ export function evaluateFinancial(
 
   // requiresFinancialNeed with no explicit band — any declared band qualifies.
   return build('financial', 'MET', 'Financial requirement met');
+}
+
+/**
+ * Per-subject requirements, e.g. Mathematics at 70% or above.
+ *
+ * The rule that shapes this: a statement is only made when both numbers are
+ * actually known. A student who has not entered Mathematics, or has entered it
+ * without a mark, produces "add your Mathematics result" — never a pass and
+ * never a failure. Telling somebody they do not qualify on the strength of a
+ * mark nobody has is the failure this guards against.
+ */
+export function evaluateSubjects(
+  student: MatchableStudent,
+  eligibility: MatchableEligibility | null,
+): CriterionResult {
+  const requirements = eligibility?.subjectRequirements ?? [];
+  if (requirements.length === 0) {
+    return build('subjects', 'MET', 'No subject requirements');
+  }
+
+  // The most recent year a student has for a subject is the one that counts:
+  // a re-sit or a later module supersedes an earlier attempt.
+  const latest = new Map<string, MatchableSubjectResult>();
+  for (const result of student.subjectResults) {
+    const held = latest.get(result.subjectId);
+    if (!held || result.year > held.year) latest.set(result.subjectId, result);
+  }
+
+  const met: string[] = [];
+  const notMet: string[] = [];
+  const unknown: string[] = [];
+
+  for (const requirement of requirements) {
+    const result = latest.get(requirement.subjectId);
+    if (!result || result.percentage === null) {
+      unknown.push(requirement.subjectName);
+      continue;
+    }
+    if (result.percentage >= requirement.minimumPercentage) {
+      met.push(
+        `Your ${requirement.subjectName} result of ${result.percentage}% meets the bursary's minimum ${requirement.subjectName} requirement of ${requirement.minimumPercentage}%`,
+      );
+    } else {
+      notMet.push(
+        `Your ${requirement.subjectName} result of ${result.percentage}% is below the required ${requirement.minimumPercentage}%`,
+      );
+    }
+  }
+
+  // A requirement definitely not met is decisive, whatever else passed.
+  if (notMet.length > 0) {
+    return build('subjects', 'NOT_MET', notMet.join('. '));
+  }
+  if (unknown.length > 0) {
+    const names = unknown.join(', ');
+    return build(
+      'subjects',
+      'UNKNOWN',
+      met.length > 0
+        ? `${met.join('. ')}. Add your ${names} result to confirm the rest`
+        : `Add your ${names} result to check this requirement`,
+    );
+  }
+  return build('subjects', 'MET', met.join('. '));
 }

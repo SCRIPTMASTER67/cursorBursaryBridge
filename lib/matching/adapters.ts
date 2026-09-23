@@ -14,7 +14,15 @@ export function toMatchableProgramme(programme: {
   id: string;
   supportedProgrammes: { programmeId: string }[];
   supportedInstitutions: { institutionId: string }[];
-  eligibility: EligibilityRow | null;
+  eligibility:
+    | (Omit<EligibilityRow, 'subjectRequirements'> & {
+        subjectRequirements?: {
+          subjectId: string;
+          minimumPercentage: number;
+          subject?: { name: string } | null;
+        }[];
+      })
+    | null;
 }): MatchableProgramme {
   return {
     id: programme.id,
@@ -29,6 +37,16 @@ export function toMatchableProgramme(programme: {
           maxHouseholdIncome: programme.eligibility.maxHouseholdIncome,
           requiresFinancialNeed: programme.eligibility.requiresFinancialNeed,
           provinces: programme.eligibility.provinces,
+          // A requirement whose subject row was not loaded is dropped rather
+          // than named "Unknown subject": a requirement we cannot describe
+          // cannot be explained to a student either.
+          subjectRequirements: (programme.eligibility.subjectRequirements ?? [])
+            .filter((r) => Boolean(r.subject?.name))
+            .map((r) => ({
+              subjectId: r.subjectId,
+              subjectName: r.subject!.name,
+              minimumPercentage: r.minimumPercentage,
+            })),
         }
       : null,
   };
@@ -44,6 +62,12 @@ export function toMatchableStudent(profile: {
   citizenship: MatchableStudent['citizenship'];
   yearOfStudy: number | null;
   studyPreferences: { preferenceNumber: number; programmeId: string; institutionId: string }[];
+  subjectResults?: {
+    subjectId: string;
+    percentage: number | null;
+    year: number;
+    subject?: { name: string } | null;
+  }[];
 }): MatchableStudent {
   return {
     studyPreferences: profile.studyPreferences,
@@ -55,5 +79,13 @@ export function toMatchableStudent(profile: {
     householdIncome: profile.householdIncome,
     citizenship: profile.citizenship,
     yearOfStudy: profile.yearOfStudy,
+    subjectResults: (profile.subjectResults ?? [])
+      .filter((r) => Boolean(r.subject?.name))
+      .map((r) => ({
+        subjectId: r.subjectId,
+        subjectName: r.subject!.name,
+        percentage: r.percentage,
+        year: r.year,
+      })),
   };
 }

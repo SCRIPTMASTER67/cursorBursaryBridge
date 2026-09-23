@@ -19,6 +19,7 @@ import '../lib/load-env';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { institutions, programmes } from './seed-data';
+import { subjects } from './subject-data';
 import { canonicalise } from '../lib/catalogue';
 
 const prisma = new PrismaClient();
@@ -69,8 +70,34 @@ async function main() {
     }
   }
 
+  // The National Senior Certificate subject list. Real subjects, so a bursary
+  // requiring "Mathematics" finds a student's Mathematics mark rather than a
+  // differently-spelled row. No tertiary modules are seeded: module names
+  // differ at every institution and there is no national list to draw on, so
+  // students type their own and those become custom catalogue entries.
+  let subjectsAdded = 0;
+  for (const subject of subjects) {
+    const canonicalName = canonicalise(subject.name);
+    const existing = await prisma.subjectCatalogue.findUnique({
+      where: { canonicalName },
+      select: { id: true },
+    });
+    if (existing) {
+      await prisma.subjectCatalogue.update({
+        where: { id: existing.id },
+        data: { name: subject.name, level: subject.level, custom: false },
+      });
+    } else {
+      await prisma.subjectCatalogue.create({
+        data: { name: subject.name, canonicalName, level: subject.level, custom: false },
+      });
+      subjectsAdded += 1;
+    }
+  }
+
   console.log(`  institutions: ${institutions.length} in catalogue (${institutionsAdded} new)`);
   console.log(`  courses:      ${programmes.length} in catalogue (${coursesAdded} new)`);
+  console.log(`  subjects:     ${subjects.length} in catalogue (${subjectsAdded} new)`);
 
   // There is no public sign-up for the ADMIN role, so the first administrator
   // has to be created here. A password must be supplied: a default one would

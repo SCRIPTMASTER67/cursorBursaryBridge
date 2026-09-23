@@ -6,11 +6,12 @@ import type {
   QualificationLevel,
 } from '@prisma/client';
 
-/** The six weighted criteria the prototype engine evaluates. */
+/** The seven weighted criteria the engine evaluates. */
 export type CriterionKey =
   | 'course'
   | 'institution'
   | 'academic'
+  | 'subjects'
   | 'qualification'
   | 'location'
   | 'financial';
@@ -39,6 +40,27 @@ export type MatchResult = {
   needsMoreInformation: boolean;
 };
 
+/**
+ * One subject or module result, reduced to what the engine compares.
+ *
+ * `percentage` is nullable because a student may have entered the subject
+ * without the mark. That is a real state and not the same as a zero, so a
+ * requirement measured against it is UNKNOWN rather than failed.
+ */
+export type MatchableSubjectResult = {
+  subjectId: string;
+  subjectName: string;
+  percentage: number | null;
+  year: number;
+};
+
+/** A subject mark a funder requires, e.g. Mathematics at 70%. */
+export type MatchableSubjectRequirement = {
+  subjectId: string;
+  subjectName: string;
+  minimumPercentage: number;
+};
+
 /** A student's study preference reduced to the ids the engine compares. */
 export type MatchablePreference = {
   preferenceNumber: number;
@@ -61,6 +83,8 @@ export type MatchableStudent = {
   householdIncome: IncomeBand | null;
   citizenship: Citizenship | null;
   yearOfStudy: number | null;
+  /** Individual subject and module results the student has entered. */
+  subjectResults: MatchableSubjectResult[];
 };
 
 export type MatchableEligibility = {
@@ -71,6 +95,8 @@ export type MatchableEligibility = {
   maxHouseholdIncome: IncomeBand | null;
   requiresFinancialNeed: boolean;
   provinces: Province[];
+  /** Per-subject minimums, where the funder states any. */
+  subjectRequirements: MatchableSubjectRequirement[];
 };
 
 export type MatchableProgramme = {

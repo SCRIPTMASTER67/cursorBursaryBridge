@@ -7,12 +7,17 @@ import type { CriterionKey } from './types';
  * a future rules engine — without touching evaluation logic or the UI.
  */
 export const CRITERION_WEIGHTS: Record<CriterionKey, number> = {
-  course: 30,
-  institution: 25,
-  academic: 20,
-  qualification: 10,
-  location: 10,
-  financial: 5,
+  course: 28,
+  institution: 22,
+  academic: 18,
+  // Subject requirements are specific and verifiable, so they carry real
+  // weight: a bursary asking for Mathematics at 70% is making a harder claim
+  // than one asking for a 70% average, and a student who meets it should be
+  // scored for it.
+  subjects: 12,
+  qualification: 8,
+  location: 8,
+  financial: 4,
 };
 
 export const TOTAL_WEIGHT = Object.values(CRITERION_WEIGHTS).reduce((sum, w) => sum + w, 0);
@@ -21,6 +26,7 @@ export const CRITERION_LABELS: Record<CriterionKey, string> = {
   course: 'Course',
   institution: 'Institution',
   academic: 'Academic requirement',
+  subjects: 'Subject requirements',
   qualification: 'Qualification level',
   location: 'Location requirement',
   financial: 'Financial requirement',

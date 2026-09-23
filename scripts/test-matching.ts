@@ -8,6 +8,7 @@
 import { MatchingService } from '../lib/matching/engine';
 import { EligibilityService } from '../lib/matching/eligibility';
 import type { MatchableProgramme, MatchableStudent } from '../lib/matching/types';
+import { CRITERION_WEIGHTS, UNKNOWN_CREDIT_RATIO } from '../lib/matching/config';
 
 let passed = 0;
 let failed = 0;
@@ -40,6 +41,7 @@ const baseProgramme: MatchableProgramme = {
     maxHouseholdIncome: 'R350K_500K',
     requiresFinancialNeed: true,
     provinces: ['GAUTENG'],
+    subjectRequirements: [],
   },
 };
 
@@ -53,6 +55,7 @@ const perfectStudent: MatchableStudent = {
   householdIncome: 'R100K_200K',
   citizenship: 'SA_CITIZEN',
   yearOfStudy: 2,
+  subjectResults: [],
 };
 
 console.log('\nMatchingService');
@@ -69,9 +72,11 @@ console.log('\nMatchingService');
     result.classification === 'STRONG_MATCH',
     result.classification,
   );
+  // One affirmative reason per criterion. Asserted against the criteria list
+  // rather than a literal, so adding a criterion does not break this.
   check(
-    '...with six affirmative reasons',
-    result.reasons.length === 6,
+    '...with an affirmative reason for every criterion',
+    result.reasons.length === Object.keys(CRITERION_WEIGHTS).length,
     `got ${result.reasons.length}`,
   );
   check(
@@ -108,9 +113,9 @@ console.log('\nMatchingService');
   const academic = result.criteria.find((c) => c.key === 'academic')!;
   check('an average below the minimum fails the academic criterion', academic.status === 'NOT_MET');
   check(
-    '...costing exactly the 20-point academic weight',
-    result.matchScore === 80,
-    `got ${result.matchScore}`,
+    '...costing exactly the academic weight',
+    result.matchScore === 100 - CRITERION_WEIGHTS.academic,
+    `got ${result.matchScore}, expected ${100 - CRITERION_WEIGHTS.academic}`,
   );
   check(
     '...and dropping to POTENTIAL_MATCH',
@@ -124,7 +129,11 @@ console.log('\nMatchingService');
   const result = MatchingService.score(unknownAverage, baseProgramme);
   const academic = result.criteria.find((c) => c.key === 'academic')!;
   check('a missing average is UNKNOWN, not a failure', academic.status === 'UNKNOWN');
-  check('...earning half credit', academic.awarded === 10, `got ${academic.awarded}`);
+  check(
+    '...earning half credit',
+    academic.awarded === CRITERION_WEIGHTS.academic * UNKNOWN_CREDIT_RATIO,
+    `got ${academic.awarded}`,
+  );
   check(
     '...and surfacing a verification message',
     academic.reason.includes('verification'),
@@ -143,6 +152,7 @@ console.log('\nMatchingService');
     householdIncome: null,
     citizenship: null,
     yearOfStudy: null,
+    subjectResults: [],
   };
   const result = MatchingService.score(emptyProfile, baseProgramme);
   check(
@@ -166,6 +176,7 @@ console.log('\nMatchingService');
       maxHouseholdIncome: null,
       requiresFinancialNeed: false,
       provinces: [],
+      subjectRequirements: [],
     },
   };
   const result = MatchingService.score(perfectStudent, openProgramme);
@@ -243,6 +254,148 @@ console.log('\nEligibilityService');
     'a citizenship mismatch is NOT_ELIGIBLE',
     result.outcome === 'NOT_ELIGIBLE',
     result.outcome,
+  );
+}
+
+// --- subject requirements ---------------------------------------------------
+{
+  console.log('\nSubject requirements');
+
+  const MATHS = 'subject-maths';
+  const SCIENCE = 'subject-science';
+
+  const withRequirements: MatchableProgramme = {
+    ...baseProgramme,
+    eligibility: {
+      ...baseProgramme.eligibility!,
+      subjectRequirements: [
+        { subjectId: MATHS, subjectName: 'Mathematics', minimumPercentage: 70 },
+      ],
+    },
+  };
+
+  const meets: MatchableStudent = {
+    ...perfectStudent,
+    subjectResults: [{ subjectId: MATHS, subjectName: 'Mathematics', percentage: 78, year: 2026 }],
+  };
+  const metResult = MatchingService.score(meets, withRequirements);
+  const met = metResult.criteria.find((c) => c.key === 'subjects')!;
+  check('a mark above the minimum meets the requirement', met.status === 'MET');
+  check(
+    '...and the explanation states both numbers',
+    met.reason ===
+      "Your Mathematics result of 78% meets the bursary's minimum Mathematics requirement of 70%",
+    met.reason,
+  );
+
+  const below: MatchableStudent = {
+    ...perfectStudent,
+    subjectResults: [{ subjectId: MATHS, subjectName: 'Mathematics', percentage: 61, year: 2026 }],
+  };
+  const belowResult = MatchingService.score(below, withRequirements);
+  const notMet = belowResult.criteria.find((c) => c.key === 'subjects')!;
+  check('a mark below the minimum does not meet it', notMet.status === 'NOT_MET');
+  check('...and says so with both numbers', /61%.*70%/.test(notMet.reason), notMet.reason);
+  check(
+    '...costing exactly the subjects weight',
+    belowResult.matchScore === 100 - CRITERION_WEIGHTS.subjects,
+    `got ${belowResult.matchScore}`,
+  );
+
+  // The rule that matters most: nothing is claimed about a mark nobody has.
+  const missing = MatchingService.score(
+    { ...perfectStudent, subjectResults: [] },
+    withRequirements,
+  );
+  const unknown = missing.criteria.find((c) => c.key === 'subjects')!;
+  check(
+    'a subject the student has not entered is UNKNOWN, not a failure',
+    unknown.status === 'UNKNOWN',
+  );
+  check(
+    '...and asks for the result rather than judging it',
+    /add your mathematics result/i.test(unknown.reason),
+    unknown.reason,
+  );
+
+  const noMark = MatchingService.score(
+    {
+      ...perfectStudent,
+      subjectResults: [
+        { subjectId: MATHS, subjectName: 'Mathematics', percentage: null, year: 2026 },
+      ],
+    },
+    withRequirements,
+  );
+  check(
+    'a subject entered without a mark is UNKNOWN, not a zero',
+    noMark.criteria.find((c) => c.key === 'subjects')!.status === 'UNKNOWN',
+  );
+
+  // The most recent year wins, so a re-sit supersedes the earlier attempt.
+  const resat = MatchingService.score(
+    {
+      ...perfectStudent,
+      subjectResults: [
+        { subjectId: MATHS, subjectName: 'Mathematics', percentage: 55, year: 2025 },
+        { subjectId: MATHS, subjectName: 'Mathematics', percentage: 74, year: 2026 },
+      ],
+    },
+    withRequirements,
+  );
+  check(
+    'the most recent year supersedes an earlier attempt',
+    resat.criteria.find((c) => c.key === 'subjects')!.status === 'MET',
+  );
+
+  // A definite failure is decisive even when another requirement passed.
+  const twoRequirements: MatchableProgramme = {
+    ...baseProgramme,
+    eligibility: {
+      ...baseProgramme.eligibility!,
+      subjectRequirements: [
+        { subjectId: MATHS, subjectName: 'Mathematics', minimumPercentage: 70 },
+        { subjectId: SCIENCE, subjectName: 'Physical Sciences', minimumPercentage: 65 },
+      ],
+    },
+  };
+  const mixed = MatchingService.score(
+    {
+      ...perfectStudent,
+      subjectResults: [
+        { subjectId: MATHS, subjectName: 'Mathematics', percentage: 78, year: 2026 },
+        { subjectId: SCIENCE, subjectName: 'Physical Sciences', percentage: 50, year: 2026 },
+      ],
+    },
+    twoRequirements,
+  );
+  check(
+    'one failed requirement is decisive',
+    mixed.criteria.find((c) => c.key === 'subjects')!.status === 'NOT_MET',
+  );
+
+  const partial = MatchingService.score(
+    {
+      ...perfectStudent,
+      subjectResults: [
+        { subjectId: MATHS, subjectName: 'Mathematics', percentage: 78, year: 2026 },
+      ],
+    },
+    twoRequirements,
+  );
+  const partialSubjects = partial.criteria.find((c) => c.key === 'subjects')!;
+  check('a partially-known set is UNKNOWN', partialSubjects.status === 'UNKNOWN');
+  check(
+    '...and still credits what was met',
+    /meets the bursary/.test(partialSubjects.reason) &&
+      /Physical Sciences/.test(partialSubjects.reason),
+    partialSubjects.reason,
+  );
+
+  const none = MatchingService.score(perfectStudent, baseProgramme);
+  check(
+    'a bursary with no subject requirements passes the criterion',
+    none.criteria.find((c) => c.key === 'subjects')!.status === 'MET',
   );
 }
 

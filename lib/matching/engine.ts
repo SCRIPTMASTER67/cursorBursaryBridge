@@ -12,6 +12,7 @@ import {
   evaluateInstitution,
   evaluateLocation,
   evaluateQualification,
+  evaluateSubjects,
   selectBestPreference,
 } from './criteria';
 import type { MatchResult, MatchableProgramme, MatchableStudent } from './types';
@@ -38,6 +39,7 @@ export const MatchingService = {
       evaluateCourse(preferenceMatch),
       evaluateInstitution(preferenceMatch),
       evaluateAcademic(student, eligibility),
+      evaluateSubjects(student, eligibility),
       evaluateQualification(student, eligibility),
       evaluateLocation(student, eligibility),
       evaluateFinancial(student, eligibility),

@@ -27,6 +27,7 @@
     "test:pdf:labels": "tsx scripts/test-matching-labels.ts",
     "test:autofill": "tsx --conditions=react-server scripts/test-auto-fill-service.ts",
     "test:catalogue": "tsx scripts/test-catalogue.ts && tsx --conditions=react-server scripts/test-catalogue-service.ts",
+    "test:results": "tsx --conditions=react-server scripts/test-results-service.ts",
     "test:ingest": "tsx --conditions=react-server scripts/test-ingest.ts",
     "test:directory": "tsx --conditions=react-server scripts/test-directory-e2e.ts",
     "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:ingest && npm run test:e2e",
