@@ -22,6 +22,7 @@ import {
 import bcrypt from 'bcryptjs';
 import { institutions, programmes } from './seed-data';
 import { canonicalise } from '../lib/catalogue';
+import { firstPartyAvailability } from '../lib/first-party-availability';
 
 const prisma = new PrismaClient();
 
@@ -598,6 +599,20 @@ async function main() {
         openDate: daysFromNow(seed.openDays),
         closingDate: daysFromNow(seed.closeDays),
         status: seed.status,
+        // The directory reads availability, not status. Without this a
+        // published demo programme would sit in the directory as "status
+        // unknown", which is not what a funder publishing here would see.
+        availability: firstPartyAvailability({
+          status: seed.status ?? 'PUBLISHED',
+          openDate: daysFromNow(seed.openDays),
+          closingDate: daysFromNow(seed.closeDays),
+        }),
+        officialSource: true,
+        sourceName: 'Bursary-Bridge (published by the funder)',
+        sourceType: 'OFFICIAL_ORGANISATION',
+        verificationStatus: 'VERIFIED',
+        lastVerifiedAt: new Date(),
+        lastCheckedAt: new Date(),
         intakeTarget: seed.intakeTarget,
         eligibility: { create: seed.eligibility },
         supportedInstitutions: {

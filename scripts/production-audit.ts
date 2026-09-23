@@ -65,8 +65,11 @@ function categorise(file: string, rawLine: string, term: string): Category {
   const line = rawLine.trim();
   // A comment cannot be rendered.
   if (/^(\/\/|\*|\/\*)/.test(line)) return 'code';
-  // Neither can a property name, a script name or a regular expression.
+  // Neither can a property name, a JSX attribute name, a script name or a
+  // regular expression. An attribute is named `placeholder=`, and the value
+  // beside it is what a person reads -- the name itself never is.
   if (new RegExp(`\\b${escape(term)}\\??\\s*:`, 'i').test(line)) return 'code';
+  if (new RegExp(`\\b${escape(term)}\\s*=`, 'i').test(line)) return 'code';
   if (/^"[a-z:]+":/.test(line)) return 'code';
   if (line.includes('RegExp') || /=\s*\//.test(line)) return 'code';
 
