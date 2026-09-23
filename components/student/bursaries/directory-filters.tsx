@@ -104,7 +104,7 @@ export function DirectoryFilters({ facets, counts }: { facets: Facets; counts: S
             label={STATUS_COPY[value].label}
             count={counts[value]}
             active={status === value}
-            emphasise={value === 'OPEN'}
+            emphasise={value === 'OPEN' || value === 'CLOSING_SOON'}
             onClick={() => apply({ status: value })}
           />
         ))}

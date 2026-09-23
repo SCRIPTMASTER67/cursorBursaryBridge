@@ -11,13 +11,29 @@ import { FRESHNESS_DAYS } from '@/lib/ingest/validate';
  * bursary that closed last week is the failure this guards against.
  */
 
-export type DisplayStatus = 'OPEN' | 'UPCOMING' | 'CLOSED' | 'NEEDS_VERIFICATION' | 'UNKNOWN';
+export type DisplayStatus =
+  | 'OPEN'
+  | 'CLOSING_SOON'
+  | 'UPCOMING'
+  | 'CLOSED'
+  | 'NEEDS_VERIFICATION'
+  | 'UNKNOWN';
+
+/**
+ * How near a deadline has to be before it is called out.
+ *
+ * Two weeks: long enough to gather documents and write a motivation, short
+ * enough that saying "closing soon" still means something.
+ */
+export const CLOSING_SOON_DAYS = 14;
 
 export type StatusInput = {
   availability: Availability;
   verificationStatus: VerificationStatus;
   lastVerifiedAt: Date | null;
   origin: OpportunityOrigin;
+  /** Null for a rolling opportunity, or one whose source states no date. */
+  closingDate?: Date | null;
 };
 
 export function displayStatus(input: StatusInput, now = new Date()): DisplayStatus {
@@ -29,14 +45,30 @@ export function displayStatus(input: StatusInput, now = new Date()): DisplayStat
 
   // A funder maintaining their own programme here is the source, so there is
   // nothing external to re-check.
-  if (input.origin === 'FIRST_PARTY') return 'OPEN';
+  if (input.origin === 'FIRST_PARTY') return openOrClosingSoon(input.closingDate ?? null, now);
 
   if (input.verificationStatus === 'SOURCE_GONE') return 'UNKNOWN';
   if (input.verificationStatus !== 'VERIFIED') return 'NEEDS_VERIFICATION';
   if (!input.lastVerifiedAt) return 'NEEDS_VERIFICATION';
 
   const ageDays = (now.getTime() - input.lastVerifiedAt.getTime()) / 86_400_000;
-  return ageDays <= FRESHNESS_DAYS ? 'OPEN' : 'NEEDS_VERIFICATION';
+  return ageDays <= FRESHNESS_DAYS
+    ? openOrClosingSoon(input.closingDate ?? null, now)
+    : 'NEEDS_VERIFICATION';
+}
+
+/**
+ * Open, or open and about to close.
+ *
+ * Only a real date can make something "closing soon". A rolling opportunity,
+ * or one whose source states no deadline, stays simply open — inventing
+ * urgency would be as dishonest as inventing the date it came from.
+ */
+function openOrClosingSoon(closingDate: Date | null, now: Date): DisplayStatus {
+  if (!closingDate) return 'OPEN';
+  const days = (closingDate.getTime() - now.getTime()) / 86_400_000;
+  if (days < 0) return 'CLOSED';
+  return days <= CLOSING_SOON_DAYS ? 'CLOSING_SOON' : 'OPEN';
 }
 
 /** How each status reads to a student, and what it means for them. */
@@ -48,6 +80,11 @@ export const STATUS_COPY: Record<
     label: 'Open',
     meaning: 'Applications are open.',
     tone: 'success',
+  },
+  CLOSING_SOON: {
+    label: 'Closing soon',
+    meaning: 'Applications are open, but the deadline is close. Apply now.',
+    tone: 'warning',
   },
   UPCOMING: {
     label: 'Opening soon',
@@ -80,6 +117,8 @@ export const STATUS_COPY: Record<
  * last.
  */
 export const STATUS_ORDER: DisplayStatus[] = [
+  // Closing soon leads, because it is the one a student can lose by waiting.
+  'CLOSING_SOON',
   'OPEN',
   'UPCOMING',
   'NEEDS_VERIFICATION',
@@ -89,5 +128,10 @@ export const STATUS_ORDER: DisplayStatus[] = [
 
 /** Whether a student may apply through Bursary-Bridge. Only ever true for OPEN. */
 export function canApplyHere(status: DisplayStatus, origin: OpportunityOrigin): boolean {
-  return status === 'OPEN' && origin === 'FIRST_PARTY';
+  return (status === 'OPEN' || status === 'CLOSING_SOON') && origin === 'FIRST_PARTY';
+}
+
+/** Whether a student can still act on this, for anything that gates on "open". */
+export function isOpenNow(status: DisplayStatus): boolean {
+  return status === 'OPEN' || status === 'CLOSING_SOON';
 }

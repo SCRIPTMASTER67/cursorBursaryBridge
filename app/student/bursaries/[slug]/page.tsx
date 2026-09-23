@@ -12,7 +12,7 @@ import { OrgAvatar } from '@/components/ui/avatar';
 import { ArrowLeft, Calendar, ExternalLink, ShieldCheck } from '@/components/icons';
 import { requireOnboardedStudent } from '@/lib/auth/guards';
 import { getDirectoryEntry } from '@/services/bursary-directory';
-import { STATUS_COPY, canApplyHere } from '@/lib/bursary-status';
+import { STATUS_COPY, canApplyHere, isOpenNow } from '@/lib/bursary-status';
 import {
   citizenshipLabels,
   documentTypeLabels,
@@ -79,7 +79,7 @@ export default async function BursaryDetailPage({ params }: { params: Promise<{ 
           missed and cannot be mistaken for something else. */}
       <Alert
         tone={
-          entry.status === 'OPEN'
+          isOpenNow(entry.status)
             ? 'success'
             : entry.status === 'NEEDS_VERIFICATION'
               ? 'warning'
@@ -275,7 +275,7 @@ export default async function BursaryDetailPage({ params }: { params: Promise<{ 
               ) : (
                 <>
                   <p className="text-sm text-ink-600">
-                    {entry.status === 'OPEN'
+                    {isOpenNow(entry.status)
                       ? 'This opportunity is applied for on the funder’s own site.'
                       : 'Check the source for how and when to apply.'}
                   </p>
@@ -283,7 +283,7 @@ export default async function BursaryDetailPage({ params }: { params: Promise<{ 
                     <ButtonLink
                       href={entry.applicationUrl ?? entry.sourceUrl!}
                       external
-                      variant={entry.status === 'OPEN' ? 'primary' : 'outline'}
+                      variant={isOpenNow(entry.status) ? 'primary' : 'outline'}
                       trailingIcon={<ExternalLink className="h-4 w-4" />}
                     >
                       {entry.applicationUrl ? 'Apply on the funder’s site' : 'Visit source'}

@@ -13,6 +13,9 @@ import { cn } from '@/lib/utils';
 
 const styles: Record<DisplayStatus, string> = {
   OPEN: 'bg-success-600 text-white ring-success-600',
+  // Closing soon is the loudest badge on the page: it is the one a student
+  // loses by not reading.
+  CLOSING_SOON: 'bg-warning-600 text-white ring-warning-600',
   UPCOMING: 'bg-info-50 text-info-700 ring-info-100',
   NEEDS_VERIFICATION: 'bg-warning-50 text-warning-700 ring-warning-100',
   UNKNOWN: 'bg-surface-subtle text-ink-600 ring-line',
@@ -21,6 +24,7 @@ const styles: Record<DisplayStatus, string> = {
 
 const dots: Record<DisplayStatus, string> = {
   OPEN: 'bg-white',
+  CLOSING_SOON: 'bg-white',
   UPCOMING: 'bg-info-600',
   NEEDS_VERIFICATION: 'bg-warning-600',
   UNKNOWN: 'bg-ink-400',

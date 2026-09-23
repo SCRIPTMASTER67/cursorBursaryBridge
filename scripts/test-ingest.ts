@@ -18,6 +18,7 @@ import { runSource } from '../lib/ingest/pipeline';
 import { organisationFromTitle } from '../lib/ingest/parse';
 import { SOURCES } from '../lib/ingest/source-registry';
 import { firstPartyAvailability } from '../lib/first-party-availability';
+import { STATUS_ORDER, displayStatus, isOpenNow } from '../lib/bursary-status';
 import { finishRun, persistOutcome, startRun } from '../services/opportunity-ingest';
 import {
   LISTING_PAGE,
@@ -204,6 +205,57 @@ async function main() {
     'a published programme with no dates is OPEN',
     firstPartyAvailability({ status: 'PUBLISHED', openDate: null, closingDate: null }) === 'OPEN',
   );
+
+  console.log('\nClosing soon is open, and only a real date can cause it');
+  const soon = new Date(Date.now() + 5 * 86_400_000);
+  const later = new Date(Date.now() + 120 * 86_400_000);
+  const openVerified = {
+    availability: 'OPEN' as const,
+    verificationStatus: 'VERIFIED' as const,
+    lastVerifiedAt: new Date(),
+    origin: 'EXTERNAL' as const,
+  };
+  check(
+    'a deadline inside the window is CLOSING_SOON',
+    displayStatus({ ...openVerified, closingDate: soon }) === 'CLOSING_SOON',
+  );
+  check(
+    'a distant deadline is just OPEN',
+    displayStatus({ ...openVerified, closingDate: later }) === 'OPEN',
+  );
+  check(
+    'no deadline is OPEN, never urgent',
+    displayStatus({ ...openVerified, closingDate: null }) === 'OPEN',
+  );
+  check(
+    'a passed deadline is CLOSED even if availability says open',
+    displayStatus({ ...openVerified, closingDate: new Date(Date.now() - 86_400_000) }) === 'CLOSED',
+  );
+  check(
+    'an unverified opportunity is never CLOSING_SOON',
+    displayStatus({ ...openVerified, lastVerifiedAt: null, closingDate: soon }) ===
+      'NEEDS_VERIFICATION',
+  );
+  check(
+    'a first-party programme closing soon is CLOSING_SOON',
+    displayStatus({
+      ...openVerified,
+      origin: 'FIRST_PARTY',
+      verificationStatus: 'UNVERIFIED',
+      lastVerifiedAt: null,
+      closingDate: soon,
+    }) === 'CLOSING_SOON',
+  );
+  check(
+    'closing soon still counts as open to apply',
+    isOpenNow('CLOSING_SOON') && isOpenNow('OPEN'),
+  );
+  check('closed does not', !isOpenNow('CLOSED') && !isOpenNow('NEEDS_VERIFICATION'));
+  check(
+    'closing soon is listed before open',
+    STATUS_ORDER.indexOf('CLOSING_SOON') < STATUS_ORDER.indexOf('OPEN'),
+  );
+  check('closed is listed last', STATUS_ORDER[STATUS_ORDER.length - 1] === 'CLOSED');
 
   console.log('\nSample content never reaches the database');
   const base = {

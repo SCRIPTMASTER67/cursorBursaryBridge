@@ -7,6 +7,7 @@ import { Card, CardBody, CardHeader, StatCard } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Table as TableWrap, Td, Th, Tr } from '@/components/ui/table-exports';
 import { ChevronRight, Globe, ShieldCheck } from '@/components/icons';
+import { SyncButton } from '@/components/admin/sync-button';
 import { requireAdmin } from '@/lib/auth/guards';
 import { ingestionOverview } from '@/services/admin-ingestion';
 import { formatDate } from '@/lib/utils';
@@ -36,8 +37,9 @@ export default async function DataSourcesPage() {
   return (
     <PageBody>
       <PageHeader
-        title="Data sources"
+        title="Bursary sources"
         description="Where bursary opportunities come from, what each collection run did, and what needs attention."
+        actions={<SyncButton label="Sync all sources" size="md" />}
       />
 
       {latest?.status === 'BLOCKED' && (
@@ -106,7 +108,10 @@ export default async function DataSourcesPage() {
                 <Th>Source</Th>
                 <Th>Level</Th>
                 <Th>State</Th>
+                <Th>Last sync</Th>
+                <Th>Imported</Th>
                 <Th>Why</Th>
+                <Th />
               </Tr>
             </thead>
             <tbody>
@@ -143,7 +148,32 @@ export default async function DataSourcesPage() {
                       <Badge tone="warning">No pages configured</Badge>
                     )}
                   </Td>
-                  <Td className="max-w-[420px] text-[13px] text-ink-600">{source.note}</Td>
+                  <Td className="whitespace-nowrap text-[13px] text-ink-600">
+                    {source.stats.lastSuccess ? (
+                      formatDate(source.stats.lastSuccess)
+                    ) : source.stats.lastAttempt ? (
+                      <span className="text-warning-700">
+                        attempted {formatDate(source.stats.lastAttempt)}
+                      </span>
+                    ) : (
+                      <span className="text-ink-400">never</span>
+                    )}
+                  </Td>
+                  <Td className="text-[13px] tabular-nums text-ink-600">
+                    {source.stats.imported === 0 ? (
+                      <span className="text-ink-400">—</span>
+                    ) : (
+                      source.stats.imported
+                    )}
+                  </Td>
+                  <Td className="max-w-[360px] text-[13px] text-ink-600">{source.note}</Td>
+                  <Td>
+                    {source.enabled && source.configured && (
+                      <div className="flex justify-end">
+                        <SyncButton sourceId={source.id} />
+                      </div>
+                    )}
+                  </Td>
                 </Tr>
               ))}
             </tbody>

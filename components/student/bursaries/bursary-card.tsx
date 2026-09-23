@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ButtonLink } from '@/components/ui/button';
 import { OrgAvatar } from '@/components/ui/avatar';
 import { ArrowRight, Calendar, FileText, ShieldCheck } from '@/components/icons';
-import { STATUS_COPY } from '@/lib/bursary-status';
+import { STATUS_COPY, isOpenNow } from '@/lib/bursary-status';
 import { fundingCoverageLabels, fundingTypeLabels } from '@/lib/labels';
 import { deadlineLabel, formatDate } from '@/lib/utils';
 
@@ -101,7 +101,7 @@ export function BursaryCard({ row }: { row: DirectoryRow }) {
         {/* Never "Apply now" on something that is not open. */}
         <ButtonLink
           href={`/student/bursaries/${row.slug}`}
-          variant={row.status === 'OPEN' ? 'primary' : 'outline'}
+          variant={isOpenNow(row.status) ? 'primary' : 'outline'}
           size="sm"
           trailingIcon={<ArrowRight className="h-4 w-4" />}
         >

@@ -59,6 +59,39 @@ export async function ingestionOverview() {
     byStatus.set(shown, (byStatus.get(shown) ?? 0) + 1);
   }
 
+  // Per-source statistics, so the table answers "when did this last work, and
+  // what did it bring in" without opening a run.
+  const perSource = new Map<
+    string,
+    {
+      lastSuccess: Date | null;
+      lastAttempt: Date | null;
+      imported: number;
+      updated: number;
+      failed: number;
+    }
+  >();
+  for (const source of SOURCES) {
+    const events = await prisma.ingestionEvent.findMany({
+      where: { sourceName: source.name },
+      orderBy: { createdAt: 'desc' },
+      take: 1,
+      select: { createdAt: true, level: true },
+    });
+    const opportunities = await prisma.fundingProgramme.aggregate({
+      where: { sourceName: source.name },
+      _count: { _all: true },
+      _max: { lastVerifiedAt: true, lastCheckedAt: true },
+    });
+    perSource.set(source.id, {
+      lastSuccess: opportunities._max.lastVerifiedAt,
+      lastAttempt: opportunities._max.lastCheckedAt ?? events[0]?.createdAt ?? null,
+      imported: opportunities._count._all,
+      updated: 0,
+      failed: events[0]?.level === 'ERROR' ? 1 : 0,
+    });
+  }
+
   return {
     runs,
     sources: SOURCES.map((source) => ({
@@ -70,6 +103,13 @@ export async function ingestionOverview() {
       enabled: source.enabled,
       configured: source.listingUrls.length > 0,
       note: source.note,
+      stats: perSource.get(source.id) ?? {
+        lastSuccess: null,
+        lastAttempt: null,
+        imported: 0,
+        updated: 0,
+        failed: 0,
+      },
     })),
     totals: {
       opportunities: opportunities.length,

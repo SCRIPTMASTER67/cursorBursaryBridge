@@ -171,6 +171,7 @@ function countByStatus(rows: DirectoryRow[]): StatusCounts {
   const counts: StatusCounts = {
     ALL: rows.length,
     OPEN: 0,
+    CLOSING_SOON: 0,
     UPCOMING: 0,
     NEEDS_VERIFICATION: 0,
     UNKNOWN: 0,
@@ -291,6 +292,8 @@ export async function directoryTotals() {
       verificationStatus: true,
       lastVerifiedAt: true,
       origin: true,
+      // Needed to tell "open" from "closing soon".
+      closingDate: true,
     },
   });
   const now = new Date();
