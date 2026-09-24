@@ -55,10 +55,10 @@ show.
 Every factual claim is either read off the implemented system in this
 repository or attributed to one of the nine references, each of which was
 retrieved and checked rather than recalled. Where the proposal needs a fact
-about the team that nothing in the project records — who leads it, what prior
-experience each member brings, which calendar month the semester starts in —
-the text carries a bracketed placeholder instead of an invention. There are six
-such placeholders and they are the only ones in the document.
+The six bracketed placeholders this document carried have been filled from the
+team's own answers: the leader is Asanda Nsibande, the level of knowledge is
+recorded as high for all four members, and the semester runs July to October
+2026. No placeholder remains.
 
 No survey or interview result is reported, because none was conducted: Section
 4 states that requirements are derived from documentary analysis of published

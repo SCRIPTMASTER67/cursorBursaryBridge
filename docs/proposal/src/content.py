@@ -802,26 +802,27 @@ TEAM = [
      "Requirements engineering and the Software Requirements Specification; "
      "the student-facing profile, matching and opportunity screens; "
      "coordination of the sprint reviews with the supervisor.",
-     "[INSERT LEVEL OF KNOWLEDGE AND RELEVANT EXPERIENCE]"),
+     "High."),
     ("A Nsibande",
      "Data model and database migrations; the matching and eligibility domain "
      "modules; the ingestion pipeline and the provenance of imported "
      "opportunities.",
-     "[INSERT LEVEL OF KNOWLEDGE AND RELEVANT EXPERIENCE]"),
+     "High."),
     ("KN Bikile",
      "The organisation-facing portal: funding programme publication, "
      "applicant review, shortlisting and selection; bulk application intake and "
      "duplicate detection.",
-     "[INSERT LEVEL OF KNOWLEDGE AND RELEVANT EXPERIENCE]"),
+     "High."),
     ("SP Tshazi",
      "Document processing, including extraction from submitted PDF forms and "
      "assisted form completion; the test suites at unit, integration and "
      "end-to-end level; the Test Plan.",
-     "[INSERT LEVEL OF KNOWLEDGE AND RELEVANT EXPERIENCE]"),
+     "High."),
 ]
 
 TEAM_NOTE = [
-    "The team leader is [INSERT NAME OF TEAM LEADER]. The team leader is "
+    "The team leader is Asanda Nsibande, listed on the cover page as A "
+    "Nsibande. The team leader is "
     "responsible for the product backlog, for scheduling and chairing the "
     "sprint events, and for the delivery of each document to the supervisor. "
     "All four members contribute to design decisions, to code review and to the "
@@ -833,8 +834,10 @@ WORKPLAN_INTRO = [
     "The project runs over a single semester of four months. The plan below "
     "organises it into ten tasks across the sixteen weeks of that semester; "
     "weeks rather than months are used because at four columns a chart cannot "
-    "show which tasks overlap, and the overlap is the point. Week 1 is the "
-    "first week of the semester, beginning in [INSERT PROJECT START MONTH].",
+    "show which tasks overlap, and the overlap is the point. The semester "
+    "runs from July 2026 to October 2026: week 1 is the first week of July "
+    "and week 16 falls in October, the month in which the project is "
+    "presented.",
 
     "Tasks overlap deliberately. Development begins before the whole "
     "specification is settled and testing begins before development ends, "

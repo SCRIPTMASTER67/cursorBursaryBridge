@@ -61,9 +61,9 @@ SECTIONS = [
         ("blank", None),
         ("p", "The automated interface checks run in Chromium through "
               "Playwright at a desktop width of 1440 pixels, a tablet width of "
-              "834 pixels and a mobile width of 390 pixels. The browsers used "
-              "for manual cross-browser checks are "
-              "[BROWSERS TO BE CONFIRMED]."),
+              "834 pixels and a mobile width of 390 pixels. Manual checks use "
+              "Chromium as well, so one browser engine is exercised and only "
+              "one."),
     ]),
 
     ("Features To Be Tested", [
@@ -135,6 +135,12 @@ SECTIONS = [
               "of prose by a language model will not be tested, because the "
               "motivational letter composer assembles text deterministically "
               "from stated facts and reaches no model."),
+        ("blank", None),
+        ("p", "Behaviour in browsers other than Chromium will not be tested. "
+              "Both the automated suites and the manual checks use Chromium, so "
+              "a defect specific to the Gecko or WebKit engine would not be "
+              "found by this plan. This is a known limitation of the plan "
+              "rather than a claim about the system."),
         ("blank", None),
         ("p", "Load, stress and performance testing are outside the scope of "
               "this plan. The system is tested for correctness, not for "
@@ -212,9 +218,11 @@ SECTIONS = [
               "demonstration or submission."),
         ("blank", None),
         ("p", "Manual exploratory testing covers what the automated suites do "
-              "not reach, in particular cross-browser rendering and the "
+              "not reach, in particular the rendering of each screen at the three "
+              "widths and the "
               "usability of the onboarding steps. Defects found by any layer "
-              "are recorded in [ISSUE TRACKER] with the steps needed to "
+              "are recorded as GitHub issues against the project "
+              "repository, with the steps needed to "
               "reproduce them."),
     ]),
 
@@ -284,7 +292,7 @@ SECTIONS = [
         (1, "Automated suites run and their output recorded."),
         (1, "Accuracy harness run and its figures recorded."),
         (1, "Production audit run and its report recorded."),
-        (1, "Manual exploratory and cross-browser testing performed on what the "
+        (1, "Manual exploratory testing performed on what the "
             "automated suites do not reach."),
         (1, "Defects recorded and assigned."),
         (1, "Defects fixed and the affected checks re-run."),
@@ -316,7 +324,7 @@ SECTIONS = [
     ]),
 
     ("Responsibilities", [
-        ("p", "The Test Manager, [TEST MANAGER], is responsible for "
+        ("p", "The Test Manager, Salma, is responsible for "
               "facilitating the testing project, preparing the test "
               "environment, coordinating the availability of the testers, "
               "reviewing the results of each test run and reporting back to the "
@@ -352,12 +360,24 @@ SECTIONS = [
     ]),
 
     ("Schedule", [
-        ("p", "Testing takes place between [TESTING START DATE] and "
-              "[TESTING END DATE], before the submission date of "
-              "[SUBMISSION DATE]. The first round of testing should be "
-              "completed within [DURATION OF FIRST ROUND], leaving time for "
-              "defects to be fixed and the affected checks to be re-run before "
-              "the final round."),
+        ("p", "Testing takes place between 21 and 24 September 2026. The "
+              "submission date is 24 September 2026, which is the last day of "
+              "that window."),
+        ("blank", None),
+        ("p", "One week is allowed for the first round of testing. That is "
+              "longer than the window, so the round does not sit inside it. "
+              "The automated part of the first round begins before 21 "
+              "September and needs no scheduled window of its own, because the "
+              "full sequence runs in minutes and is run on every change in any "
+              "case. The four days from 21 to 24 September are reserved for "
+              "the manual checks, which need a person rather "
+              "than a command."),
+        ("blank", None),
+        ("p", "Because the submission date is the last day of the window, "
+              "there is no time after it. Any defect found between 21 and 24 "
+              "September must be fixed and its checks re-run within those four "
+              "days, or accepted as an open defect and recorded as such in the "
+              "test summary report."),
         ("blank", None),
         ("p", "The static check and the unit suites are quick enough to be run "
               "on every change. The integration and browser suites are run "
@@ -400,15 +420,19 @@ SECTIONS = [
               "handling of an unevaluable criterion may be reported as a "
               "defect. The training described above reduces this risk."),
         ("blank", None),
-        ("p", "If the first round of testing is not completed on schedule, it "
-              "could delay defect fixes and the final round. The contingency is "
-              "to prioritise the checks that cover access control, the matching "
-              "engine and the provenance of imported data, because a defect in "
-              "any of the three is the most serious kind this system can have."),
+        ("p", "If the first round of testing is not completed on schedule, there "
+              "is no slack to absorb it: the submission date of 24 September "
+              "2026 is the last day of the testing window, so a round that runs "
+              "late does not delay the final round, it removes it. The "
+              "contingency is to prioritise the checks that cover access "
+              "control, the matching engine and the provenance of imported "
+              "data, because a defect in any of the three is the most serious "
+              "kind this system can have, and to record anything left unchecked "
+              "in the test summary report rather than leaving it unstated."),
     ]),
 
     ("Approvals", [
-        ("p", "The Test Manager, [TEST MANAGER], and the Project Supervisor, "
+        ("p", "The Test Manager, Salma, and the Project Supervisor, "
               "Ms Zulu, must both agree that the testing project is complete "
               "and determine when the system is ready for submission."),
     ]),

@@ -46,10 +46,22 @@ counted suites, all passing, with no errors from `npm run typecheck`; and 46
 fields across 6 forms in the accuracy harness, 46 correct, 20 populated and 26
 correctly left for the student because the source form did not answer them.
 
-Where the project has not fixed a fact — who is test manager, which dates
-apply, which issue tracker is used, which browsers are used for manual checks —
-the document carries a bracketed placeholder rather than an invented value.
-There are seven.
+The seven bracketed placeholders this document carried have been filled from the
+team's own answers: Salma is test manager, defects are recorded as GitHub
+issues, testing runs 21 to 24 September 2026, submission is 24 September 2026,
+and one week is allowed for the first round. No placeholder remains.
+
+Two of those answers did not fit together, and the document says so rather than
+papering over it. A one-week first round does not fit a four-day window, so the
+Schedule section states that the automated part of the round runs before the
+window opens and the four days are reserved for the manual checks. And the
+submission date is the last day of the window, so there is no slack after it;
+the Risks section says that a round which runs late does not delay the final
+round, it removes it.
+
+Only Chromium is used, for the manual checks as well as the automated ones, so
+cross-browser testing is now listed under Features Not To Be Tested as a
+limitation of the plan rather than being claimed as coverage.
 
 The Risks section describes two failures that actually happened during this
 round of testing rather than hypothetical ones: two suites that deleted every
