@@ -206,18 +206,18 @@ grammatical but clumsy; it now reads _"I am studying towards a …"_.
 
 ## 9. Remaining limitations
 
-**The scraper still cannot reach the internet.** Every outbound request from
-this environment is refused at the proxy (`connect_rejected`), including
-`www.zabursaries.co.za`, `www.nsfas.org.za` and `example.com`. The pipeline,
-the parsers, the deduplication, the provenance recording and the status
-handling are all built and tested against supplied pages via
-`npm run import:pages`, and `npm run ingest` will work unchanged the moment
-the host is reachable — but **no live bursary has been imported, and the
-directory is empty by design rather than populated with invented data**. To
-change this, open the cloud environment menu in the session title bar, choose
-Edit, and either raise the network access level or add the host to the allowed
-domains; the levels are described at
-https://code.claude.com/docs/en/claude-code-on-the-web.
+**The directory is now populated from a live crawl.** This limitation has been
+lifted: network access was raised for this environment and `npm run ingest` was
+run against `www.zabursaries.co.za`, whose `robots.txt` and terms were checked
+first and permit it. **189 real bursaries were imported**, each with the source
+URL it came from, and a sample was reviewed before the full run. That is fewer
+than the roughly 325 the site's category pages suggest, because entries that
+could not be mapped to a funder, a closing date and a source page were rejected
+rather than guessed at.
+
+The one thing that has not changed is what happens when a page cannot be parsed:
+it is recorded as rejected with a reason rather than being filled in. The
+directory therefore holds what the source actually published and nothing else.
 
 **The letter generator is not a language model.** No model endpoint is
 reachable, so the built-in `ComposedLetter` provider assembles the letter
@@ -249,7 +249,7 @@ To go further, three things would need credentials:
 
 | Purpose                | What is needed                                       | What it unlocks                                 |
 | ---------------------- | ---------------------------------------------------- | ----------------------------------------------- |
-| Live bursary ingestion | No key — **network egress to the source hosts**      | `npm run ingest` against real sources           |
+| Further bursary sources | No key — network egress to each new source host     | `npm run ingest` against sources beyond the one crawled |
 | Model-backed letters   | An LLM API key and a `LetterProvider` implementation | Prose written rather than composed              |
 | Email delivery         | SMTP or a transactional email provider               | Verification, reset links, funder notifications |
 

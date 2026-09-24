@@ -8,7 +8,7 @@ stands in the repository.
 """
 
 PROJECT = "Bursary-Bridge"
-SUPERVISOR = "Mr Isiah Adebayo"
+SUPERVISOR = "Ms Zulu"
 SUBMIT_DATE = "September 2026"
 STUDENTS = [
     ("1.  CPP Mchunu", "202242486"),
@@ -360,6 +360,337 @@ ARCHITECTURE = [
                     "The status is set to PUBLISHED and the change is written to "
                     "the audit log.",
                     "The programme enters the pool the Matching Engine scores.",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Administration Portal",
+        "type": "Set of web pages",
+        "description": [
+            "The Administration Portal is the set of screens presented to a user "
+            "holding the ADMIN role. It comprises the catalogue of institutions and "
+            "courses, the user register, the organisation and funding programme "
+            "registers, the bursary data sources and their run history, and the "
+            "audit trail.",
+            "The portal maintains the platform rather than any one Organisation's "
+            "funding. It holds no application data of its own: every screen acts on "
+            "records owned elsewhere in the system, and every action it takes is "
+            "written to the audit log with the acting administrator and a stated "
+            "reason.",
+            "Every page under /admin calls requireAdmin() before it reads anything. "
+            "The guard is applied in the layout, so a page added later inherits it "
+            "rather than having to remember it.",
+        ],
+        "attributes": [
+            "Route prefix: /admin",
+            "Rendering: server components, with client components for forms",
+            "Guard: requireAdmin(), apiAdmin()",
+        ],
+        "resources": [
+            "Service layer: admin-catalogue, admin-users, admin-organisations, "
+            "admin-programmes, admin-ingestion, admin-audit",
+            "Authentication and Session Module",
+        ],
+        "operations": [
+            {
+                "name": "setCatalogueEntryStatus()",
+                "arguments": "Entry identifier, target status, entry kind",
+                "returns": "The updated entry",
+                "pre": "The administrator holds a valid session",
+                "post": "The entry is active or retired; records already pointing "
+                        "at it are unaffected",
+                "exceptions": "Unknown entry: the request is refused and nothing is "
+                              "written",
+                "flow": [
+                    "The administrator retires or restores an institution or "
+                    "course.",
+                    "The service counts the student profiles and funding programmes "
+                    "that point at the entry.",
+                    "The status is changed rather than the row deleted, so those "
+                    "records keep the institution or course they name.",
+                    "The count is returned to the administrator with the result.",
+                ],
+            },
+            {
+                "name": "runIngestion()",
+                "arguments": "None",
+                "returns": "The identifier and outcome of the run",
+                "pre": "The administrator holds a valid session and at least one "
+                       "source is authorised",
+                "post": "A run is recorded, with the opportunities it created, "
+                        "updated, merged and rejected",
+                "exceptions": "A source whose robots file disallows collection is "
+                              "recorded as not read; a source that cannot be reached "
+                              "makes the run BLOCKED rather than SUCCEEDED",
+                "flow": [
+                    "The administrator starts a run.",
+                    "The Bursary Ingestion Pipeline reads each authorised source's "
+                    "robots file and honours it.",
+                    "Each listing and detail page is fetched at the rate the source "
+                    "asks for.",
+                    "Each candidate is validated, deduplicated and stored with the "
+                    "address it was read from.",
+                    "The run is closed with its counts and any note.",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Bursary Ingestion Pipeline",
+        "type": "Server-side module",
+        "description": [
+            "The Bursary Ingestion Pipeline collects funding opportunities from "
+            "published external sources. It is the only part of the system that "
+            "creates an opportunity nobody has entered by hand, and it is "
+            "constrained accordingly: a source is read only after an administrator "
+            "has authorised it by name, its robots file is read first and honoured, "
+            "and the rate it asks for is observed.",
+            "Extraction is deliberately literal. Each field is either found on the "
+            "page or left unset; nothing is inferred from a neighbouring value. A "
+            "candidate that cannot be shown to describe a real opportunity is "
+            "rejected rather than stored with gaps, and every stored opportunity "
+            "carries the address it was read from and the date it was last "
+            "confirmed.",
+            "The module is written against a fetcher interface rather than the "
+            "network directly, so the same pipeline runs over pages supplied "
+            "offline. That is what allows it to be tested without reading a live "
+            "site.",
+        ],
+        "attributes": [
+            "Location: lib/ingest, services/opportunity-ingest",
+            "Authorised sources: declared in the source registry, disabled by "
+            "default",
+            "Provenance: source address, source name, source type and verification "
+            "dates on every opportunity",
+        ],
+        "resources": [
+            "Bursary-Bridge Database",
+            "The published pages of the authorised sources, over HTTP",
+        ],
+        "operations": [
+            {
+                "name": "runSource()",
+                "arguments": "A registered source, and optionally a page limit",
+                "returns": "The candidates found and the rejections, with a status",
+                "pre": "The source is authorised and has listing pages configured",
+                "post": "Nothing is written; the outcome is returned for the caller "
+                        "to persist",
+                "exceptions": "Disallowed by robots: the source is reported as not "
+                              "read. Unreachable: the source is reported as blocked, "
+                              "which is distinct from having found nothing",
+                "flow": [
+                    "The robots file for the source's host is read and parsed.",
+                    "Each listing page permitted by that file is fetched.",
+                    "The listing is parsed into candidates and links to detail "
+                    "pages.",
+                    "Each detail page is fetched and parsed, waiting between "
+                    "requests for as long as the source asks.",
+                    "Each candidate is validated, and those describing the same "
+                    "opportunity are merged.",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Document Extraction Engine",
+        "type": "Server-side module",
+        "description": [
+            "The Document Extraction Engine reads a completed application form and "
+            "returns the values on it as canonical fields, each with the confidence "
+            "of the reading and the label it was read from. It serves two features: "
+            "the Student's auto-fill of blank forms, and the Organisation's import "
+            "of applications received elsewhere.",
+            "Values are taken from a form's own field definitions where it has them "
+            "and from the page text where it does not, and the two are not treated "
+            "as equally reliable: a value read from a real form field is exact, "
+            "while one recovered from the text layer was inferred from position and "
+            "is trusted less.",
+            "A form that is encrypted, or that carries no readable text because it "
+            "is a scan, is refused with a reason rather than guessed at. The engine "
+            "never invents a value; a field it cannot establish is left unset and "
+            "reported as needing attention.",
+        ],
+        "attributes": [
+            "Location: lib/pdf",
+            "Canonical fields: thirty-three, covering personal, contact, education "
+            "and funding information",
+            "Confidence: HIGH, MEDIUM or LOW, recorded per field",
+        ],
+        "resources": [
+            "Document Storage Service",
+            "pdf-lib for writing forms, pdfjs-dist for reading them",
+        ],
+        "operations": [
+            {
+                "name": "readSourceForm()",
+                "arguments": "The bytes of a completed form, and its name",
+                "returns": "The canonical values, or a refusal with a reason",
+                "pre": "The document is a PDF",
+                "post": "Nothing is written; the values are returned to the caller",
+                "exceptions": "Encrypted, damaged, or a scan with no text layer: "
+                              "the form is refused and the reason is returned in "
+                              "words the user can act on",
+                "flow": [
+                    "The document is opened and its fields and text are analysed.",
+                    "Each field label is matched against the canonical field names "
+                    "and their recognised aliases.",
+                    "Each matched value is normalised and recorded with its "
+                    "confidence and the label it came from.",
+                    "Labels that matched nothing are returned separately rather "
+                    "than discarded.",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Application Import Pipeline",
+        "type": "Server-side module",
+        "description": [
+            "The Application Import Pipeline turns application forms an Organisation "
+            "received outside the platform into scored, reviewable applicant "
+            "records. It expands an upload, reads each form through the Document "
+            "Extraction Engine, looks for an existing Student account, scores the "
+            "applicant against the programme's own criteria, counts the supporting "
+            "documents supplied and flags duplicates.",
+            "The pipeline creates nothing on its own. Extraction produces a batch "
+            "for a person to review; the applications are created only when a "
+            "Corporate User confirms it. Duplicates are flagged and never merged "
+            "automatically, and a file that cannot be read is kept with the reason "
+            "rather than discarded.",
+            "Duplicate detection runs as a single ordered pass after every file in "
+            "the batch has been read. Deciding during extraction would be a race: "
+            "two copies processed in the same window would each examine the other "
+            "before either had been recorded, and both would pass.",
+        ],
+        "attributes": [
+            "Location: lib/import, services/application-import",
+            "Concurrency: four files at a time",
+            "Identity: matched on verified identifiers only, never on a name",
+        ],
+        "resources": [
+            "Document Extraction Engine",
+            "Matching Engine and Eligibility Service",
+            "Document Storage Service",
+            "Bursary-Bridge Database",
+        ],
+        "operations": [
+            {
+                "name": "createBatch()",
+                "arguments": "Organisation, funding programme, acting user, the "
+                             "uploaded files",
+                "returns": "The batch identifier and its reference",
+                "pre": "The funding programme belongs to the acting Organisation",
+                "post": "Every uploaded file is stored and recorded against the "
+                        "batch before any of it is read",
+                "exceptions": "A file that is not a PDF, or an archive that cannot "
+                              "be opened, is recorded as failed with the reason",
+                "flow": [
+                    "The upload is expanded, each folder in an archive treated as "
+                    "one applicant.",
+                    "Every file is written to Document Storage.",
+                    "A row is created for each, so the batch survives an "
+                    "interruption.",
+                    "Files that could not be used are recorded as failures rather "
+                    "than dropped, so the totals account for everything sent.",
+                ],
+            },
+            {
+                "name": "processBatch()",
+                "arguments": "Batch identifier",
+                "returns": "Completion, with the counts held on the batch",
+                "pre": "The batch exists and holds files awaiting processing",
+                "post": "Every file has reached a conclusion and the batch is ready "
+                        "for review",
+                "exceptions": "A file that cannot be processed is marked failed with "
+                              "its reason; the remainder of the batch continues",
+                "flow": [
+                    "Each pending file is read through the Document Extraction "
+                    "Engine.",
+                    "The applicant is projected from the extracted values and "
+                    "matched against the catalogue.",
+                    "An existing Student is looked for on verified identifiers.",
+                    "The Matching Engine and the Eligibility Service score the "
+                    "applicant against this programme.",
+                    "The supporting documents supplied are counted against those "
+                    "the programme requires.",
+                    "Once every file has been read, one ordered pass flags "
+                    "duplicates within the batch and against the applications the "
+                    "programme already holds.",
+                ],
+            },
+            {
+                "name": "confirmImport()",
+                "arguments": "Batch identifier, Organisation, acting user, the "
+                             "reviewer's decisions",
+                "returns": "The number imported and the number left out",
+                "pre": "The batch belongs to the acting Organisation and has been "
+                       "processed",
+                "post": "An application exists for each file marked for import, "
+                        "carrying its score, its eligibility verdict and a link to "
+                        "the document it came from",
+                "exceptions": "A file whose application cannot be created is "
+                              "reported and left for review; the rest are still "
+                              "created",
+                "flow": [
+                    "Each file marked for import is taken in turn.",
+                    "Where a Student was identified, the application is attached to "
+                    "that profile; where none was, an external applicant record is "
+                    "created.",
+                    "The application is created with the source recorded as "
+                    "EXTERNAL, so it is never mistaken for one submitted here.",
+                    "The file is marked imported and linked to the application, so "
+                    "confirming twice cannot create it again.",
+                ],
+            },
+        ],
+    },
+    {
+        "name": "Motivational Letter Composer",
+        "type": "Pure domain module",
+        "description": [
+            "The Motivational Letter Composer assembles a draft letter from facts "
+            "already held on a Student's profile and from sentences the Student "
+            "wrote in answer to the questions put to them. There is no third "
+            "source.",
+            "Where there is no material for a paragraph, the paragraph is omitted "
+            "and the Student is told what to add, rather than a plausible "
+            "substitute being written. The letter is sent under the Student's name "
+            "to somebody deciding whether to fund them, and a sentence about an "
+            "achievement they never mentioned would be a claim they never made.",
+            "The composer is deterministic and is reached through a provider "
+            "interface, so a different writer can be substituted without the "
+            "service, the interface or the stored letters changing.",
+        ],
+        "attributes": [
+            "Location: lib/letters",
+            "Questions: seven, all optional",
+            "Interface: LetterProvider",
+        ],
+        "resources": [
+            "The Student's profile, subject results and study preferences",
+            "The funding programme's stated requirements, where the letter names a "
+            "programme the system holds",
+        ],
+        "operations": [
+            {
+                "name": "compose()",
+                "arguments": "The profile facts, the opportunity and the Student's "
+                             "answers",
+                "returns": "The letter, and the answers it used",
+                "pre": "The Student holds a profile",
+                "post": "Nothing is written; the text is returned to the service to "
+                        "store",
+                "exceptions": "None: a letter composed from nothing is short rather "
+                              "than an error",
+                "flow": [
+                    "The salutation is addressed to the funder where one is named.",
+                    "Each paragraph is assembled only where there is material for "
+                    "it.",
+                    "A subject requirement the Student demonstrably meets is cited "
+                    "against the minimum the funder states.",
+                    "The Student's own sentences are carried through unaltered "
+                    "rather than paraphrased.",
                 ],
             },
         ],
@@ -858,7 +1189,7 @@ DATA_FIELDS = [
     ("Attribute Name", "Attribute Type", "Attribute Size"),
     ("User.email*", "Text", "254"),
     ("User.passwordHash*", "Text", "60 (bcrypt)"),
-    ("User.role*", "Enumerated", "STUDENT, CORPORATE"),
+    ("User.role*", "Enumerated", "STUDENT, CORPORATE, ADMIN"),
     ("User.firstName*", "Text", "60"),
     ("User.lastName*", "Text", "60"),
     ("User.mobile", "Text", "20"),
@@ -894,6 +1225,40 @@ DATA_FIELDS = [
     ("Application.eligibilityOutcome", "Enumerated", "ELIGIBLE, NOT_ELIGIBLE, PENDING_VERIFICATION"),
     ("Document.mimeType*", "Text", "PDF, JPEG, PNG, WebP"),
     ("Document.sizeBytes*", "Integer", "Maximum 5 242 880"),
+    ("StudentSubjectResult.subjectId*", "Reference", "SubjectCatalogue"),
+    ("StudentSubjectResult.percentage", "Integer", "0 to 100; null when not yet known"),
+    ("StudentSubjectResult.year*", "Integer", "4"),
+    ("StudentSubjectResult.level*", "Enumerated", "SCHOOL, TERTIARY"),
+    ("MotivationalLetter.opportunityName*", "Text", "200"),
+    ("MotivationalLetter.content*", "Text", "Unbounded"),
+    ("MotivationalLetter.answers", "Structured", "The Student's own answers, as supplied"),
+    ("MotivationalLetter.status*", "Enumerated", "DRAFT, READY"),
+    ("MotivationalLetter.editedByStudent*", "Boolean", "1"),
+    ("InformationRequest.message", "Text", "Unbounded; the Funder's own wording"),
+    ("InformationRequest.deadline", "Date", "Null when the Funder set none"),
+    ("InformationRequest.status*", "Enumerated", "OPEN, RESPONDED, CANCELLED"),
+    ("ApplicationImportBatch.reference*", "Text", "40"),
+    ("ApplicationImportBatch.status*", "Enumerated", "See schema; UPLOADING to COMPLETED"),
+    ("ApplicationImportBatch.totalFiles*", "Integer", "Recomputed from the files"),
+    ("ApplicationImportFile.fileName*", "Text", "255"),
+    ("ApplicationImportFile.storageKey*", "Text", "255, unique"),
+    ("ApplicationImportFile.status*", "Enumerated", "See schema; PENDING to IMPORTED"),
+    ("ApplicationImportFile.failureReason", "Text", "Unbounded; null when the file was read"),
+    ("ApplicationImportFile.matchScore", "Integer", "0 to 100; null when not eligible"),
+    ("ApplicationImportFile.duplicateReason", "Text", "Unbounded; why it was flagged"),
+    ("ImportExtractedField.canonicalKey*", "Text", "60"),
+    ("ImportExtractedField.value*", "Text", "Unbounded"),
+    ("ImportExtractedField.confidence*", "Enumerated", "HIGH, MEDIUM, LOW"),
+    ("ImportExtractedField.correctedValue", "Text", "Unbounded; the extracted value is kept"),
+    ("ExternalApplicant.fullName*", "Text", "200"),
+    ("ExternalApplicant.idNumber", "Text", "20"),
+    ("ExternalApplicant.academicAverage", "Integer", "0 to 100"),
+    ("Institution.canonicalName*", "Text", "200, unique"),
+    ("Programme.canonicalName*", "Text", "200, unique"),
+    ("OpportunitySource.url*", "Text", "2048"),
+    ("OpportunitySource.lastVerifiedAt", "Date", "When the opportunity was last confirmed"),
+    ("ProgrammeCriterionWeight.criterion*", "Text", "40"),
+    ("ProgrammeCriterionWeight.weight*", "Integer", "Relative, not a percentage"),
 ]
 
 DATA_NOTES = [
@@ -908,6 +1273,14 @@ DATA_NOTES = [
     "institution, so the same pairing cannot be entered twice under different "
     "numbers. An Application is unique on the profile and the funding programme, "
     "so a Student cannot apply twice to the same programme.",
+    "Two columns are deliberately nullable where a stricter schema might not "
+    "allow it. An Application holds a student profile only when one exists: an "
+    "application an Organisation imported stands behind an external applicant "
+    "record instead, and requiring a profile would have meant creating an empty "
+    "account for somebody who never asked for one. A subject result holds no "
+    "percentage until the Student has the mark, because knowing which subject is "
+    "being taken without yet knowing the result is a real state, and recording it "
+    "as a zero would tell a Funder something false.",
 ]
 
 # ---------------------------------------------------------------------------
@@ -961,7 +1334,7 @@ REALIZATIONS = [
      "omitted.",
      "uc_apply.png", "Apply for Funding Sequence Diagram"),
 
-    ("Use Case: Create Funding Programme", "3.2.17",
+    ("Use Case: Create Funding Programme", "3.2.22",
      "The Corporate User describes a programme and states its eligibility "
      "criteria through ordinary form controls. The criteria are written to the "
      "Eligibility Rule as typed columns, not as prose, which is what allows the "
@@ -970,7 +1343,55 @@ REALIZATIONS = [
      "Students until it is published.",
      "uc_create.png", "Create Funding Programme Sequence Diagram"),
 
-    ("Use Case: Review Applicant", "3.2.21",
+    ("Use Case: Browse All Bursaries", "3.2.16",
+     "The Student opens the directory of every published opportunity the system "
+     "holds. The service reads the published programmes, derives a display "
+     "status for each from its dates and its recorded availability, and orders "
+     "the list so that those accepting applications come first. The directory is "
+     "never narrowed to the Student's own profile: it answers what exists, where "
+     "the matched list answers what fits. A closed opportunity stays listed and "
+     "is marked closed, so a Student can see who funds what and when to return.",
+     "uc_directory.png", "Browse All Bursaries Sequence Diagram"),
+    ("Use Case: Auto-Fill Application Forms", "3.2.18",
+     "The Student supplies one completed form and a number of blank ones. The "
+     "Document Extraction Engine reads the completed form into canonical values, "
+     "each carrying the confidence of the reading, then identifies the fields on "
+     "each blank form and writes the values it can match. A field it cannot "
+     "establish is left empty and flagged, because a blank a Student can complete "
+     "is better than a populated field that is wrong. A form that cannot be read "
+     "fails on its own without stopping the others.",
+     "uc_autofill.png", "Auto-Fill Application Forms Sequence Diagram"),
+    ("Use Case: Generate Motivational Letter", "3.2.17",
+     "The Student chooses a programme and answers as many of the seven questions "
+     "as they wish. The service gathers the facts held on their profile, the "
+     "requirements the funder states, and the answers, and the Motivational "
+     "Letter Composer assembles the draft from those alone. The letter is stored "
+     "with the answers it was built from, so it can be traced to what the Student "
+     "actually said and rewritten if they change it.",
+     "uc_letter.png", "Generate Motivational Letter Sequence Diagram"),
+    ("Use Case: Import Applications", "3.2.25",
+     "The Corporate User uploads application forms the Organisation received "
+     "elsewhere. Every file is stored before any of it is read, so the batch "
+     "survives an interruption. Each form is read through the Document Extraction "
+     "Engine, the applicant is looked for among existing Students on verified "
+     "identifiers, the Matching Engine and the Eligibility Service score them "
+     "against that programme's own criteria, and the supporting documents are "
+     "counted against those the programme requires. Once every file has been "
+     "read, one ordered pass flags duplicates. Nothing becomes an application "
+     "until a Corporate User confirms the batch.",
+     "uc_import.png", "Import Applications Sequence Diagram"),
+    ("Use Case: Review Imported Applications", "3.2.26",
+     "The Corporate User examines a processed batch. Each application is shown "
+     "beside the document it was read from, with every extracted field, its "
+     "confidence and the label it came from. A correction is stored alongside "
+     "the extracted value rather than replacing it, so the record keeps both "
+     "what the form said and what a person decided it meant. On confirmation an "
+     "application is created for each file marked for import, attached to the "
+     "identified Student where there was one and to a new external applicant "
+     "record where there was not. The file is linked to the application it "
+     "produced, so confirming twice cannot create it again.",
+     "uc_confirm.png", "Review Imported Applications Sequence Diagram"),
+    ("Use Case: Review Applicant", "3.2.28",
      "The Corporate User opens an application belonging to their Organisation. "
      "The guard returns the organisation identifier and it forms part of the "
      "query, so an application belonging to another Organisation is not found "
@@ -979,7 +1400,7 @@ REALIZATIONS = [
      "the reason for each condition.",
      "uc_review.png", "Review Applicant Sequence Diagram"),
 
-    ("Use Case: Shortlist Applicant", "3.2.22",
+    ("Use Case: Shortlist Applicant", "3.2.29",
      "The Corporate User adds an applicant to the shortlist for a programme. The "
      "application's status is advanced, a shortlist entry is created, the "
      "applicant is notified and the change is appended to the audit log. The "
@@ -990,6 +1411,10 @@ REALIZATIONS = [
 # ---------------------------------------------------------------------------
 # 6.0 Interface design
 # ---------------------------------------------------------------------------
+# Presented in the order the SRS states them, so the two documents read in
+# step rather than each in its own sequence.
+REALIZATIONS.sort(key=lambda r: [int(part) for part in r[1].split(".")])
+
 INTERFACE_INTRO = [
     "The interface follows the approved reference designs, which are the visual "
     "source of truth for the system. It is laid out on a single palette and type "
@@ -1011,6 +1436,18 @@ INTERFACE_INTRO = [
 
     "The screens reproduced below are captured from the running system rather "
     "than drawn, so they show the interface as implemented.",
+
+    "The Student-facing screens are captured against the real directory, whose "
+    "bursaries were imported from published sources, so the programmes, funders "
+    "and closing dates on them are the ones the system actually holds. The "
+    "Organisation-facing screens are different: they show applications, "
+    "shortlists and beneficiaries, and none of those exists until an "
+    "Organisation has published a programme through the system and Students "
+    "have applied to it, which has not yet happened. Those screens are "
+    "therefore captured against a demonstration Organisation and demonstration "
+    "Applicants created for the purpose, and the names, averages and figures on "
+    "them are not real people or real awards. That data was removed from the "
+    "database once the captures were taken.",
 ]
 
 # filename, caption. Written by make_figures.py from the capture run, so the
@@ -1036,3 +1473,23 @@ HELP_SYSTEM = [
     "the privacy notice, which states what is collected and why. No indexed help "
     "system, guided tour or offline documentation is planned for this release.",
 ]
+
+
+# ---------------------------------------------------------------------------
+# 8.0 Index
+#
+# The terms the index covers. Each is looked up in the rendered document and
+# listed against the pages it actually appears on, so an entry that finds no
+# page is left out rather than being given one.
+# ---------------------------------------------------------------------------
+INDEX_TERMS = sorted({
+    # The actors and the roles they hold
+    "Student", "Corporate User", "Administrator", "Organisation", "Applicant",
+    # The design entities of Section 3
+    *(entity["name"] for entity in ARCHITECTURE),
+    # The domain vocabulary of the glossary
+    *(term for term, _ in GLOSSARY),
+    # The parts of the design that are referred to throughout
+    "ApplicationImportBatch", "Audit Trail", "Edge Middleware", "Next.js",
+    "PostgreSQL", "Service Layer", "Shortlist",
+})

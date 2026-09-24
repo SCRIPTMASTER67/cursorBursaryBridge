@@ -1,0 +1,10 @@
+# The faculty template and its unpacked form are supplied, not ours to publish.
+template.docx
+unpacked/
+
+# Raw captures. figures/ holds the cropped versions the document actually uses.
+shots/
+
+# Build output. The delivered copy lives at docs/sdd/Bursary-Bridge_SDD.docx.
+Bursary-Bridge_SDD.docx
+__pycache__/

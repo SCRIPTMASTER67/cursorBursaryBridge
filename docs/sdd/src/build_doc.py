@@ -28,7 +28,8 @@ from content import (ARCHITECTURE, DATA_FIELDS, DEPLOYMENT, GLOSSARY,
                      INTERFACE_SHOTS, OVERVIEW, PROJECT, REALIZATIONS,
                      REFERENCES, SCOPE, PURPOSE, HELP_SYSTEM, DATA_INTRO,
                      SYSTEM_SEQUENCE_NOTE, INTERFACE_INTRO,
-                     DATA_NOTES, ARCH_INTRO, SUPERVISOR, STUDENTS, SUBMIT_DATE)
+                     DATA_NOTES, ARCH_INTRO, SUPERVISOR, STUDENTS, SUBMIT_DATE,
+                     INDEX_TERMS)
 
 SRC = "unpacked"
 BUILD = "build"
@@ -39,8 +40,12 @@ TEXT_WIDTH_TWIPS = 8640
 EMU_PER_INCH = 914400
 
 # Paragraph fragments taken verbatim from the template.
-BODY_RPR = '<w:rPr><w:sz w:val="24"/></w:rPr>'
-BODY_SPACING = '<w:spacing w:line="276" w:lineRule="auto"/>'
+# Body text at eleven points, one and a half spaced, as the brief requires.
+# The supplied sample is set twelve on 1.15; where the two disagree the stated
+# requirement wins, and it is the only place this document departs from the
+# sample's typography.
+BODY_RPR = '<w:rPr><w:sz w:val="22"/></w:rPr>'
+BODY_SPACING = '<w:spacing w:line="360" w:lineRule="auto"/>'
 BODY_IND = '<w:ind w:firstLine="389"/>'
 
 images = []          # (relationship id, filename)
@@ -201,6 +206,38 @@ def page_map(pdf, needles, offset):
             cursor = found
             result.append(max(1, found + 1 - offset))
     return result
+def page_hits(pdf, terms, offset, skip_pages=0, stop_page=None):
+    """
+    Every printed page on which each index term appears.
+
+    The contents and the table of figures repeat many of these words, so the
+    first `skip_pages` of the render are ignored; an index that pointed a
+    reader back at the contents page would be worse than no index. The index
+    itself is excluded the same way through `stop_page`, or every entry would
+    cite the page it is printed on. Matching is on a word boundary and ignores
+    case, because "Session" should be found in "the Session record" but not
+    inside "Sessions" of some other sense.
+    """
+    n = int(subprocess.run(["pdfinfo", pdf], capture_output=True, text=True)
+            .stdout.split("Pages:")[1].split()[0])
+    text = []
+    for i in range(1, n + 1):
+        out = subprocess.run(
+            ["pdftotext", "-f", str(i), "-l", str(i), "-layout", pdf, "-"],
+            capture_output=True, text=True).stdout
+        text.append(" ".join(out.split()))
+
+    hits = {}
+    for term in terms:
+        pattern = re.compile(r"\b" + re.escape(term) + r"\b", re.IGNORECASE)
+        last = n if stop_page is None else min(n, stop_page)
+        pages = [i + 1 - offset for i in range(skip_pages, last)
+                 if pattern.search(text[i])]
+        if pages:
+            hits[term] = sorted({p for p in pages if p >= 1})
+    return hits
+
+
 def picture(path, max_width_in=TEXT_WIDTH_IN, doc_id=[1]):
     w_px, h_px = Image.open(path).size
     width_in = min(max_width_in, w_px / 96)
@@ -639,23 +676,47 @@ def help_section():
     return x
 
 
-def index_section():
+def index_section(index_hits=None):
     """
-    The template's contents page lists an index at Section 8 but its own body
-    heading is empty, so the heading is written here and an INDEX field placed
-    under it for Word to populate.
+    Section 8, an alphabetical index of the terms the document defines and uses.
+
+    The template leaves this section empty for Word to fill from an INDEX field,
+    which only populates once the reader presses F9 and shows nothing at all in
+    a viewer that does not implement the field. The pages are therefore read off
+    the laid-out document in the same pass that numbers the contents, and the
+    entries are written as ordinary text, so the index is there when the file is
+    opened, whatever it is opened in.
     """
     x = heading(1, "8.0. Index")
-    x += ('<w:p><w:pPr>' + BODY_SPACING + BODY_RPR + '</w:pPr>'
-          '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
-          '<w:r><w:instrText xml:space="preserve"> INDEX \\e "' + "\t" + '" \\c "1" \\z "1033" </w:instrText></w:r>'
-          '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
-          '<w:r><w:t xml:space="preserve"> </w:t></w:r>'
-          '<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p>')
+
+    if not index_hits:
+        return x + blank()
+
+    for term in sorted(index_hits, key=str.lower):
+        pages = index_hits[term]
+        # Consecutive pages read as a range, which is how an index is written
+        # and is considerably shorter for a term used throughout a section.
+        runs, run = [], [pages[0]]
+        for page in pages[1:]:
+            if page == run[-1] + 1:
+                run.append(page)
+            else:
+                runs.append(run)
+                run = [page]
+        runs.append(run)
+        printed = ", ".join(str(r[0]) if len(r) == 1
+                            else f"{r[0]}\u2013{r[-1]}" for r in runs)
+        x += ('<w:p><w:pPr>'
+              '<w:tabs><w:tab w:val="right" w:leader="dot" w:pos="8640"/></w:tabs>'
+              + BODY_SPACING + BODY_RPR + '</w:pPr>'
+              f'<w:r>{BODY_RPR}<w:t xml:space="preserve">{escape(term)}</w:t></w:r>'
+              f'<w:r>{BODY_RPR}<w:tab/></w:r>'
+              f'<w:r>{BODY_RPR}<w:t xml:space="preserve">{escape(printed)}</w:t></w:r>'
+              '</w:p>')
     return x
 
 
-def assemble(toc_entries=None, fig_entries=None):
+def assemble(toc_entries=None, fig_entries=None, index_hits=None):
     HEADINGS.clear()
     FIGURES.clear()
     images.clear()
@@ -669,7 +730,7 @@ def assemble(toc_entries=None, fig_entries=None):
         + realizations_section()
         + interface_section()
         + help_section()
-        + index_section()
+        + index_section(index_hits)
     )
     prefix = (
         '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
@@ -700,29 +761,62 @@ def assemble(toc_entries=None, fig_entries=None):
 
 def build():
     """
-    Two passes: the first lays the document out so the page numbers can be read
-    off it, the second rebuilds with those numbers cached into the contents and
-    the table of figures, so both are filled in when the file is opened.
+    Lay the document out, read the page numbers off the render, rebuild with
+    those numbers cached into the contents and the table of figures, and repeat
+    until the numbers stop moving.
+
+    Repeating is the point. An unfilled contents field occupies one line; the
+    filled one occupies four pages, and that difference pushes every heading
+    after it further down the document. A single second pass would therefore
+    write page numbers that were true of a document two pages shorter than the
+    one being shipped. Each rebuild feeds the previous layout back in, and the
+    numbers settle once a rebuild no longer changes where anything sits.
     """
-    package(assemble(), "pass1.docx")
+    assemble()                       # collects HEADINGS and FIGURES
     headings = list(HEADINGS)
     figures = list(FIGURES)
-    render("pass1.docx", "pass1.pdf")
 
-    offset = body_offset("pass1.pdf")
-    h_pages = page_map("pass1.pdf", [t for _, t in headings], offset)
-    f_pages = page_map("pass1.pdf", figures, offset)
+    toc_entries = [(lvl, txt, 1) for lvl, txt in headings]
+    fig_entries = [(1, txt, 1) for txt in figures]
+    index_hits = {}
+    missing = 0
+    settled = False
 
-    toc_entries = [(lvl, txt, pg if pg else 1)
-                   for (lvl, txt), pg in zip(headings, h_pages)]
-    fig_entries = [(1, txt, pg if pg else 1)
-                   for txt, pg in zip(figures, f_pages)]
-    missing = sum(1 for p in h_pages + f_pages if p is None)
+    for _ in range(6):
+        package(assemble(toc_entries, fig_entries, index_hits), "pass1.docx")
+        render("pass1.docx", "pass1.pdf")
 
-    package(assemble(toc_entries, fig_entries), OUT)
+        offset = body_offset("pass1.pdf")
+        h_pages = page_map("pass1.pdf", [t for _, t in headings], offset)
+        f_pages = page_map("pass1.pdf", figures, offset)
+
+        next_toc = [(lvl, txt, pg if pg else 1)
+                    for (lvl, txt), pg in zip(headings, h_pages)]
+        next_fig = [(1, txt, pg if pg else 1)
+                    for txt, pg in zip(figures, f_pages)]
+        # The front matter repeats most of these words; skipping it keeps the
+        # index pointing at the body rather than back at the contents.
+        front = next((pg for (_, txt, pg) in next_toc
+                      if txt.startswith("1.0.")), 1) + offset - 1
+        index_at = next((pg for (_, txt, pg) in next_toc
+                         if txt.startswith("8.0.")), None)
+        next_index = page_hits("pass1.pdf", INDEX_TERMS, offset,
+                               skip_pages=front,
+                               stop_page=(index_at + offset - 1) if index_at else None)
+        missing = sum(1 for p in h_pages + f_pages if p is None)
+
+        if (next_toc == toc_entries and next_fig == fig_entries
+                and next_index == index_hits):
+            settled = True
+            break
+        toc_entries, fig_entries, index_hits = next_toc, next_fig, next_index
+
+    package(assemble(toc_entries, fig_entries, index_hits), OUT)
     size = os.path.getsize(OUT)
     print(f"wrote {OUT}  ({size/1024:.0f} KB, {len(images)} figures, "
-          f"{len(toc_entries)} contents entries, {len(fig_entries)} figure entries"
+          f"{len(toc_entries)} contents entries, {len(fig_entries)} figure entries, "
+          f"{len(index_hits)} index entries"
+          + ("" if settled else ", PAGE NUMBERS DID NOT SETTLE")
           + (f", {missing} page numbers not resolved" if missing else "") + ")")
     for f in ("pass1.docx", "pass1.pdf"):
         if os.path.exists(f):

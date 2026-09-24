@@ -764,7 +764,7 @@ def requirements_specification():
     x += heading(3, "3.3.1\tLogical Structure of the Data")
     x += para("The logical structure of the data stored by Bursary-Bridge is "
               "given below.")
-    x += figure("figures/fig7_data.png", "Logical Structure of the Bursary-Bridge Data")
+    x += figure("figures/fig8_data.png", "Logical Structure of the Bursary-Bridge Data")
     x += para("The data descriptions of each of these data entities is as follows:")
     for name, rows in DATA_ENTITIES:
         x += para([(f"{name} Data Entity", True, False)])
