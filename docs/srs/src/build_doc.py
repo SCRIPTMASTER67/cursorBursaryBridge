@@ -28,8 +28,12 @@ TEXT_WIDTH_TWIPS = 8640
 
 # Body runs in the template carry these directly; reproducing them keeps the
 # generated text identical to the sample rather than merely similar.
-BODY_RPR = '<w:rPr><w:spacing w:val="-3"/><w:sz w:val="24"/></w:rPr>'
-BODY_SPACING = '<w:spacing w:line="276" w:lineRule="auto"/>'
+# Body text at eleven points, one and a half spaced, as the brief requires.
+# The supplied sample is set twelve on 1.15; where the two disagree the stated
+# requirement wins, and it is the only place this document departs from the
+# sample's typography.
+BODY_RPR = '<w:rPr><w:spacing w:val="-3"/><w:sz w:val="22"/></w:rPr>'
+BODY_SPACING = '<w:spacing w:line="360" w:lineRule="auto"/>'
 
 images = []          # (relationship id, filename)
 _next_rid = [100]
@@ -375,7 +379,27 @@ SECT_BODY = ('<w:sectPr><w:headerReference w:type="default" r:id="rId9"/>'
              '<w:pgSz w:w="12240" w:h="15840" w:code="1"/>'
              '<w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" '
              'w:header="720" w:footer="720" w:gutter="0"/>'
-             '<w:pgNumType w:start="1"/><w:cols w:space="720"/></w:sectPr>')
+             '<w:cols w:space="720"/></w:sectPr>')
+
+
+# The complete use case diagram carries 37 use cases. On a portrait page its
+# labels fall below six points; turned sideways it has half as much again to
+# work with. The page keeps the template's own header, footer and margins.
+SECT_LANDSCAPE = ('<w:sectPr><w:headerReference w:type="default" r:id="rId9"/>'
+                  '<w:footerReference w:type="default" r:id="rId10"/>'
+                  '<w:type w:val="nextPage"/>'
+                  '<w:pgSz w:w="15840" w:h="12240" w:orient="landscape" w:code="1"/>'
+                  '<w:pgMar w:top="1080" w:right="720" w:bottom="1080" w:left="720" '
+                  'w:header="720" w:footer="720" w:gutter="0"/>'
+                  '<w:cols w:space="720"/></w:sectPr>')
+
+SECT_BODY_RESUME = ('<w:sectPr><w:headerReference w:type="default" r:id="rId9"/>'
+                    '<w:footerReference w:type="default" r:id="rId10"/>'
+                    '<w:type w:val="nextPage"/>'
+                    '<w:pgSz w:w="12240" w:h="15840" w:code="1"/>'
+                    '<w:pgMar w:top="1440" w:right="1800" w:bottom="1440" w:left="1800" '
+                    'w:header="720" w:footer="720" w:gutter="0"/>'
+                    '<w:pgNumType w:start="1"/><w:cols w:space="720"/></w:sectPr>')
 
 
 def section_break(sect):
@@ -409,7 +433,7 @@ def title_page():
         + centred(SUBTITLE, size=24)
         + blank() * 2
         + centred("Supervisor", size=20)
-        + centred("Mr Isiah Adebayo", size=20)
+        + centred("Ms Zulu", size=20)
         + blank()
         + para("Submitted by", jc="left", spacing=False)
         + table(students, [4320, 4320], header_bold=False)
@@ -439,18 +463,25 @@ def front_matter(toc_entries=None, fig_entries=None):
 
 GROUPS = [
     ("common", "2.2.1", "Common Use Cases", "User",
-     "fig3_common.png", "Common Use Cases",
+     ["fig3_common.png"], "Common Use Cases",
      "Both kinds of user share a small number of use cases. They are described "
      "once here and are not repeated under each actor."),
     ("student", "2.2.2", "Student Use Cases", "Student",
-     "fig4_student.png", "Student Use Cases",
+     ["fig4_studenta.png", "fig4_studentb.png", "fig4_studentc.png"],
+     "Student Use Cases",
      "The Student is the actor the system exists to serve. The use cases below "
      "carry the Student from registration through to tracking a submitted "
      "application."),
     ("corporate", "2.2.3", "Corporate User Use Cases", "Corporate User",
-     "fig5_corporate.png", "Corporate User Use Cases",
+     ["fig5_corporatea.png", "fig5_corporateb.png", "fig5_corporatec.png"],
+     "Corporate User Use Cases",
      "The Corporate User administers an Organisation's funding programmes and "
      "decides who receives funding."),
+    ("admin", "2.2.4", "Administrator Use Cases", "Administrator",
+     ["fig6_admin.png"], "Administrator Use Cases",
+     "The Administrator maintains the platform itself rather than any one "
+     "Organisation's funding. The Administrator does not apply for funding and "
+     "does not decide who receives it."),
 ]
 
 
@@ -587,21 +618,44 @@ def overall_description():
         "shortlisted applicant is either selected as a beneficiary or, ultimately, "
         "unsuccessful.")
 
-    for group, number, title, actor, fig, figtitle, blurb in GROUPS:
+    for group, number, title, actor, figs, figtitle, blurb in GROUPS:
         x += heading(3, f"{number}\t{title}")
         x += para(blurb)
-        x += figure(f"figures/{fig}", figtitle)
+        if len(figs) > 1:
+            x += para(
+                f"This actor has more than one diagram. A fan of use cases grows "
+                f"wider with every use case on it, and every figure is set in the "
+                f"same text column, so beyond about five the labels become too "
+                f"small to read. The {len(figs)} diagrams below therefore divide "
+                f"this actor's use cases between them; together they show the "
+                f"complete set, and each use case also appears on its own diagram "
+                f"with its description.")
+        for i, fig in enumerate(figs, start=1):
+            part = figtitle if len(figs) == 1 else f"{figtitle} ({i} of {len(figs)})"
+            x += figure(f"figures/{fig}", part)
         for uc in [u for u in USE_CASES if u["group"] == group]:
             x += use_case_section(uc)
 
-    # The complete picture, at the end of the section, as required.
-    x += page_break() + heading(3, "2.2.4\tComplete Use Case Diagram")
+    # The complete picture, at the end of the section, as required. It is set
+    # sideways on a page of its own: thirty-seven use cases do not fit across a
+    # portrait column at a legible size, and an overview nobody can read is not
+    # an overview.
+    x += heading(3, "2.2.5\tComplete Use Case Diagram")
     x += para(
         "The diagram below brings together every actor and every use case "
-        "described in this section. The Student and the Corporate User are both "
-        "specialisations of a User, which is why the four use cases they share "
-        "are attached once to the User actor rather than drawn twice.")
-    x += figure("figures/fig6_complete.png", "Complete Use Case Diagram")
+        "described in this section. The Student, the Corporate User and the "
+        "Administrator are all specialisations of a User, which is why the four "
+        "use cases they share are attached once to the User actor rather than "
+        "drawn three times. The diagram is set sideways on the page overleaf "
+        "because it carries thirty-seven use cases; each of them is also shown, "
+        "at a larger size, on the per-actor diagrams above and on its own diagram "
+        "beside its description.")
+    # The heading and the paragraph stay on the portrait page; the sideways page
+    # that follows carries nothing but the diagram and its caption.
+    x += section_break(SECT_BODY_RESUME)
+    x += figure("figures/fig7_complete.png", "Complete Use Case Diagram",
+                max_width_in=10.0)
+    x += section_break(SECT_LANDSCAPE)
 
     x += heading(2, "2.3\tUser Characteristics")
     x += para(
@@ -620,8 +674,16 @@ def overall_description():
         "eligibility criteria are captured through ordinary form controls rather "
         "than through any rule language.")
     x += para(
-        "Neither actor is expected to receive training. The detailed appearance of "
-        "the screens is discussed in Section 3.1 below.")
+        "The Administrator is a member of the Bursary-Bridge operating team and is "
+        "expected to understand the platform itself: the standardised catalogue of "
+        "institutions and courses, the sources from which funding opportunities are "
+        "collected, and the circumstances in which an account or a published "
+        "programme should be withdrawn. The Administrator is not assumed to be a "
+        "developer, and every administrative action is carried out through the "
+        "interface rather than against the database.")
+    x += para(
+        "No actor is expected to receive training. The detailed appearance of the "
+        "screens is discussed in Section 3.1 below.")
 
     x += heading(2, "2.4\tNon-Functional Requirements")
     for name, text in NON_FUNCTIONAL:
@@ -657,26 +719,41 @@ def requirements_specification():
 
     x += heading(2, "3.1\tExternal Interface Requirements")
     x += para(
-        "The only link to an external system is the link to the Email Service, "
-        "which delivers address verification messages and status notifications. "
-        "The system passes a recipient address, a subject and a body, and treats "
-        "delivery as advisory: no decision anywhere in the system depends on a "
-        "message having been delivered, and every journey can be completed "
-        "through the interface alone.")
+        "The system depends on two external systems. The first is the Email "
+        "Service, which delivers address verification messages and status "
+        "notifications. The system passes a recipient address, a subject and a "
+        "body, and treats delivery as advisory: no decision anywhere in the "
+        "system depends on a message having been delivered, and every journey can "
+        "be completed through the interface alone.")
+    x += para(
+        "The second is the set of published bursary sources from which funding "
+        "opportunities are collected, described in Section 2.2.4, Manage Bursary "
+        "Data Sources. The system reads pages published by those sources over "
+        "HTTP and passes nothing to them beyond the request itself and an "
+        "identifying user agent. It reads each source's robots file first and "
+        "does not fetch any page that file disallows, and it waits between "
+        "requests for as long as the source asks. What it takes from a page is "
+        "the description of the opportunity and the address the page was read "
+        "from; that address is stored against the opportunity and shown to "
+        "Students, so that any statement the system makes about a bursary can be "
+        "checked against its source.")
+    x += para(
+        "Documents are written to Document Storage through an interface that "
+        "names only a folder, a file name, a content type and the bytes. The "
+        "prototype writes to the local file system; an object storage service may "
+        "be substituted without any change to the code that calls it.")
     x += para(
         "The user interface is delivered as web pages. The Student portal "
-        "presents a dashboard, a searchable list of opportunities, the detail of "
-        "a single opportunity, an application form, an application tracker, a "
-        "profile and a document library. The Corporate portal presents a "
-        "dashboard, a programme builder, an applicant list, an applicant detail "
-        "screen, a shortlist, a beneficiary register and a report. Both portals "
-        "share a navigation sidebar which collapses behind a menu on a narrow "
-        "screen.")
-    x += para(
-        "Uploaded documents are written to Document Storage through an interface "
-        "that names only a folder, a file name, a content type and the bytes, so "
-        "that local disk may be exchanged for object storage without any change "
-        "to the code that calls it.")
+        "presents a dashboard, the matched opportunities, the complete bursary "
+        "directory, the detail of a single opportunity, an application form, an "
+        "application tracker, a profile, a results page, a motivational letter "
+        "editor, an auto-fill workspace and a document library. The Corporate "
+        "portal presents a dashboard, a programme builder, an application import "
+        "workspace, an applicant list, an applicant detail screen, a shortlist, a "
+        "beneficiary register and a report. The Administration portal presents "
+        "the catalogue, the user register, the organisation and programme "
+        "registers, the data sources and the audit trail. All three portals share "
+        "a navigation sidebar which collapses behind a menu on a narrow screen.")
 
     x += heading(2, "3.2\tFunctional Requirements")
     x += para("The Logical Structure of the Data is contained in Section 3.3.1.")
@@ -727,7 +804,7 @@ def requirement_table(uc):
 
     basic = "".join(numbered(i, s) for i, s in enumerate(uc["basic_path"], 1))
     group_number = {"common": "2.2.1", "student": "2.2.2",
-                    "corporate": "2.2.3"}[uc["group"]]
+                    "corporate": "2.2.3", "admin": "2.2.4"}[uc["group"]]
 
     rows = [
         ("Use Case Name", uc["name"]),

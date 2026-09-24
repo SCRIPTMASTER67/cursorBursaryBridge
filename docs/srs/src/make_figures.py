@@ -42,15 +42,18 @@ def system_environment():
         nodes=[
             ("Student Portal", 250, 110),
             ("Corporate Portal", 250, 420),
-            ("Bursary-Bridge Application", 560, 265),
-            ("Matching Engine", 880, 40),
-            ("Bursary-Bridge Database", 880, 190),
-            ("Document Storage", 880, 340),
-            ("Email Service", 880, 490),
+            ("Administration Portal", 250, 700),
+            ("Bursary-Bridge Application", 560, 400),
+            ("Matching Engine", 880, 60),
+            ("Bursary-Bridge Database", 880, 220),
+            ("Document Storage", 880, 380),
+            ("Email Service", 880, 540),
+            ("Published Bursary Sources", 880, 700),
         ],
-        edges=[(0, 2), (1, 2), (2, 3), (2, 4), (2, 5), (2, 6)],
-        actors=[("Student", 40, 70), ("Corporate User", 40, 380)],
-        actor_edges=[(0, 0), (1, 1)],
+        edges=[(0, 3), (1, 3), (2, 3), (3, 4), (3, 5), (3, 6), (3, 7), (3, 8)],
+        actors=[("Student", 40, 70), ("Corporate User", 40, 380),
+                ("Administrator", 40, 660)],
+        actor_edges=[(0, 0), (1, 1), (2, 2)],
         box_w=200, box_h=86, font_px=17, actor_scale=1.7,
     )
     report("fig1_environment.png", 17)
@@ -89,8 +92,9 @@ def lifecycle():
 # neighbouring ellipses stay clear of each other all the way round the arc.
 # ---------------------------------------------------------------------------
 def group_summary(group, actor_label, filename, uc_w, uc_h, spread, font_px,
-                  actor_scale=1.5):
-    names = [uc["name"] for uc in USE_CASES if uc["group"] == group]
+                  actor_scale=1.5, names=None):
+    if names is None:
+        names = [uc["name"] for uc in USE_CASES if uc["group"] == group]
     radius = uc_h * len(names) / (2 * spread * 3.14159 / 180)
     ucs = D.arc_layout(0, 0, radius, names, -spread, spread,
                        rx_bias=uc_w / uc_h)
@@ -100,6 +104,30 @@ def group_summary(group, actor_label, filename, uc_w, uc_h, spread, font_px,
     D.render(f"{OUT}/{filename}", actors=actors, usecases=ucs, links=links,
              uc_w=uc_w, uc_h=uc_h, font_px=font_px, actor_scale=actor_scale)
     report(filename, font_px)
+
+
+def group_summaries(group, actor_label, stem, uc_w, uc_h, spread, font_px,
+                    per_diagram=8, actor_scale=1.5):
+    """
+    An actor's use cases, across as many diagrams as legibility requires.
+
+    A fan's width grows with the number of use cases on it, and every figure is
+    placed in the same six-inch column, so a fan of fifteen prints its labels at
+    five points. Splitting the fan is what keeps the type readable; the
+    alternative is a diagram that is complete and cannot be read, which serves
+    nobody. Each part carries the same actor, so the actor's full set is still
+    shown — just not all in one arc.
+    """
+    names = [uc["name"] for uc in USE_CASES if uc["group"] == group]
+    parts = [names[i:i + per_diagram] for i in range(0, len(names), per_diagram)]
+    written = []
+    for i, part in enumerate(parts, start=1):
+        suffix = "" if len(parts) == 1 else chr(ord("a") + i - 1)
+        filename = f"{stem}{suffix}.png"
+        group_summary(group, actor_label, filename, uc_w, uc_h, spread, font_px,
+                      actor_scale=actor_scale, names=part)
+        written.append((filename, len(parts), i))
+    return written
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +144,7 @@ def per_use_case():
 
 
 # ---------------------------------------------------------------------------
-# Figure 6 - every use case on one diagram
+# Figure 7 - every use case on one diagram
 # ---------------------------------------------------------------------------
 def complete_diagram():
     """
@@ -133,15 +161,21 @@ def complete_diagram():
     """
     student = [uc["name"] for uc in USE_CASES if uc["group"] == "student"]
     corporate = [uc["name"] for uc in USE_CASES if uc["group"] == "corporate"]
+    admin = [uc["name"] for uc in USE_CASES if uc["group"] == "admin"]
     common = [uc["name"] for uc in USE_CASES if uc["group"] == "common"]
 
-    uc_w, uc_h, font_px, spread = 240, 196, 30, 88
+    uc_w, uc_h, font_px, spread = 156, 118, 22, 156
     bias = uc_w / uc_h
     rad = spread * math.pi / 180
 
-    s_ax, s_ay = 70, 900
-    c_ax, c_ay = 2200, 900
-    u_ax, u_ay = 1120, 2280
+    # Student and Corporate User face each other across the page, the
+    # Administrator sits above with its fan opening upward, and the User sits
+    # below with the shared use cases beneath it. That leaves the centre of the
+    # page empty, which is the corridor the three generalisation lines run down.
+    s_ax, s_ay = 60, 820
+    c_ax, c_ay = 1500, 820
+    a_ax, a_ay = 780, 430
+    u_ax, u_ay = 780, 1320
 
     def fan(ax, ay, names, first_deg, last_deg):
         """Lay the names on an arc, leaving the slot nearest the User empty."""
@@ -158,71 +192,98 @@ def complete_diagram():
 
     ucs = fan(s_ax, s_ay, student, -spread, spread)
     ucs += fan(c_ax, c_ay, corporate, 180 - spread, 180 + spread)
-    ucs += D.arc_layout(u_ax, u_ay, uc_h * len(common) / (2 * 1.08),
-                        common, 28, 152, rx_bias=1.8)
+    ucs += D.arc_layout(a_ax, a_ay, uc_h * len(admin) / (2 * 1.0),
+                        admin, -180 + 26, -26, rx_bias=1.75)
+    ucs += D.arc_layout(u_ax, u_ay, uc_h * len(common) / (2 * 0.95),
+                        common, 24, 156, rx_bias=1.7)
 
     actors = [("Student", s_ax, s_ay - 30),
               ("Corporate User", c_ax, c_ay - 30),
+              ("Administrator", a_ax, a_ay - 30),
               ("User", u_ax, u_ay - 30)]
-    n_s, n_c, n_k = len(student), len(corporate), len(common)
+    n_s, n_c, n_a, n_k = len(student), len(corporate), len(admin), len(common)
     links = [(0, i) for i in range(n_s)]
     links += [(1, n_s + i) for i in range(n_c)]
-    links += [(2, n_s + n_c + i) for i in range(n_k)]
+    links += [(2, n_s + n_c + i) for i in range(n_a)]
+    links += [(3, n_s + n_c + n_a + i) for i in range(n_k)]
+    gens = [(0, 3), (1, 3), (2, 3)]
 
-    check_geom.check(ucs, links, actors, uc_w, uc_h, [(0, 2), (1, 2)],
-                     "fig6_complete.png")
-    D.render(f"{OUT}/fig6_complete.png",
+    check_geom.check(ucs, links, actors, uc_w, uc_h, gens, "fig7_complete.png")
+    D.render(f"{OUT}/fig7_complete.png",
              actors=actors, usecases=ucs, links=links,
              uc_w=uc_w, uc_h=uc_h, font_px=font_px, pad=60,
-             actor_scale=2.6, generalisations=[(0, 2), (1, 2)])
-    report("fig6_complete.png", font_px)
+             actor_scale=2.6, generalisations=gens)
+    report("fig7_complete.png", font_px)
 
 
 # ---------------------------------------------------------------------------
-# Figure 7 - logical structure of the data
+# Figure 8 - logical structure of the data
 # ---------------------------------------------------------------------------
 def data_structure():
     """
-    The logical structure of the stored data, arranged as a tree from the User
-    outwards so that no relationship line has to cross an entity box.
+    The logical structure of the stored data.
+
+    Laid out strictly in rows, parents above children, because a line from a box
+    on one row to a box on the row below cannot pass through a third box on that
+    lower row: it is still above the row until it arrives. That property is what
+    keeps the diagram readable without hand-routing a single connector.
     """
     D.boxes(
-        f"{OUT}/fig7_data.png",
+        f"{OUT}/fig8_data.png",
         nodes=[
-            ("User", 640, 60),
-            ("Student Profile", 230, 275),
-            ("Corporate Profile", 1050, 275),
-            ("Study Preference", 120, 490),
-            ("Document", 390, 490),
-            ("Institution", 120, 705),
-            ("Course", 390, 705),
-            ("Application", 640, 490),
-            ("Shortlist", 640, 705),
-            ("Organisation", 1050, 490),
-            ("Funding Programme", 1050, 705),
-            ("Eligibility Rule", 800, 900),
+            # row 1
+            ("User", 640, 40),
+            # row 2
+            ("Student Profile", 200, 250),
+            ("External Applicant", 940, 250),
+            ("Corporate Profile", 1340, 250),
+            # row 3
+            ("Study Preference", 20, 460),
+            ("Subject Result", 260, 460),
+            ("Document", 500, 460),
+            ("Motivational Letter", 740, 460),
+            ("Application", 980, 460),
+            ("Organisation", 1340, 460),
+            ("Import Batch", 1640, 460),
+            # row 4
+            ("Institution", 20, 670),
+            ("Course", 260, 670),
+            ("Shortlist", 740, 670),
+            ("Information Request", 980, 670),
+            ("Funding Programme", 1340, 670),
+            ("Import File", 1640, 670),
+            # row 5
+            ("Eligibility Rule", 1220, 880),
+            ("Opportunity Source", 1460, 880),
         ],
         edges=[
-            (0, 1, "has"), (0, 2, "has"),
-            (1, 3, "holds"), (1, 4, "owns"), (1, 7, "submits"),
-            (3, 5, "names"), (3, 6, "names"),
-            (7, 8, "may reach"), (7, 10, "applies to"),
-            (2, 9, "acts for"), (9, 10, "offers"), (10, 11, "governed by"),
+            (0, 1, "has"), (0, 3, "has"),
+            (1, 4, "holds"), (1, 5, "records"), (1, 6, "owns"),
+            (1, 7, "writes"), (1, 8, "submits"),
+            (2, 8, "stands behind"),
+            (3, 9, "acts for"),
+            (4, 11, "names"), (4, 12, "names"),
+            (8, 13, "may reach"), (8, 14, "may receive"), (8, 15, "applies to"),
+            (9, 15, "offers"), (9, 10, "runs"),
+            (10, 16, "contains"),
+            (15, 17, "governed by"), (15, 18, "read from"),
         ],
-        box_w=196, box_h=80, font_px=17,
+        box_w=210, box_h=78, font_px=16,
     )
-    report("fig7_data.png", 17)
+    report("fig8_data.png", 16)
 
 
 if __name__ == "__main__":
     system_environment()
     lifecycle()
-    group_summary("common", "User", "fig3_common.png",
-                  uc_w=210, uc_h=100, spread=70, font_px=14)
-    group_summary("student", "Student", "fig4_student.png",
-                  uc_w=205, uc_h=106, spread=86, font_px=14)
-    group_summary("corporate", "Corporate User", "fig5_corporate.png",
-                  uc_w=205, uc_h=106, spread=86, font_px=14)
+    group_summaries("common", "User", "fig3_common",
+                    uc_w=210, uc_h=100, spread=70, font_px=14)
+    group_summaries("student", "Student", "fig4_student",
+                    uc_w=210, uc_h=100, spread=74, font_px=14, per_diagram=5)
+    group_summaries("corporate", "Corporate User", "fig5_corporate",
+                    uc_w=210, uc_h=100, spread=74, font_px=14, per_diagram=5)
+    group_summaries("admin", "Administrator", "fig6_admin",
+                    uc_w=210, uc_h=100, spread=74, font_px=14, per_diagram=5)
     per_use_case()
     complete_diagram()
     data_structure()
