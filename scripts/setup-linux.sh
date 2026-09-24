@@ -187,6 +187,18 @@ else
     SEED_DEMO_DATA=yes npm run db:seed:demo
 fi
 
+# Real opportunities, collected by the ingestion pipeline and exported as a
+# snapshot. Each one carries the URL it was read from and the date it was last
+# confirmed, so it stays checkable — unlike the demo data above, none of this
+# was written by hand. Skip it with SKIP_REAL_DATA=1 for a genuinely empty
+# directory.
+if [ "${SKIP_REAL_DATA:-0}" = '1' ]; then
+    step 'Skipping the bursary snapshot (SKIP_REAL_DATA=1)'
+elif [ -f prisma/opportunities-snapshot.json ]; then
+    step 'Loading real bursaries collected from published sources'
+    npm run import:snapshot
+fi
+
 # The production seed creates reference data only: the institution and course
 # catalogue the forms choose from, plus the first administrator. It creates no
 # bursaries, because a seeded bursary is an invented bursary. It upserts, so it
@@ -202,10 +214,11 @@ cat <<'BANNER'
   http://localhost:3000  will open once the server is ready.
   admin@bursarybridge.local  /  ChangeMe-Locally-1
 
-  No demo data was loaded, so All Bursaries is empty. That is what a real
-  deployment looks like before anything has been collected. Populate it with:
-    npm run ingest             read the authorised sources (needs network)
-    npm run import:pages -- import   read pages you saved yourself
+  All Bursaries holds real bursaries collected from published sources. Every
+  one shows the page it was read from and the date it was last confirmed.
+  To refresh them against the live sources (slow: the sources ask for a
+  30-second gap between requests, and we honour it):
+    npm run ingest
 
   Leave this terminal open. Ctrl+C stops the server.
 

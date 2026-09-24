@@ -40,7 +40,9 @@
     "ingest": "tsx --conditions=react-server scripts/ingest.ts",
     "make:test-forms": "tsx scripts/make-test-forms.ts",
     "import:pages": "tsx --conditions=react-server scripts/import-pages.ts",
-    "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts"
+    "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts",
+    "export:opportunities": "tsx scripts/export-opportunities.ts",
+    "import:snapshot": "tsx scripts/import-snapshot.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
