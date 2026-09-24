@@ -131,6 +131,16 @@ echo "On $on at $(git rev-parse --short HEAD)"
 step 'Installing packages (this takes a couple of minutes)'
 npm install
 
+# Generate the Prisma client explicitly rather than relying on the install to
+# do it. On a re-run over an existing clone npm has nothing to install, so it
+# runs no lifecycle scripts, and the client left over from the previous run
+# still describes the previous schema. The failure that causes is a long way
+# from its cause: the migrations apply cleanly, and then the seed dies on
+# "Unknown argument `canonicalName`" because the client has never heard of a
+# column the database now has.
+step 'Generating the database client'
+npx --yes prisma generate
+
 # --- 4. Environment ---------------------------------------------------------
 # .env is gitignored, so it never arrives with the clone. Write it here in
 # full: the DATABASE_URL in .env.example already matches the role and database
