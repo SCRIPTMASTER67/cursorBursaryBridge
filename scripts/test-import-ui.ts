@@ -24,6 +24,19 @@ import { buildSourceForm } from './fixtures/bursary-forms';
 
 const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000';
 const CHROME = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium';
+/**
+ * A distinct client address for this run.
+ *
+ * The login limiter buckets by address as well as by account. Every browser
+ * suite drives a real Chromium against localhost, so they all arrive from the
+ * same address and a full run -- or a second run inside the window -- trips
+ * the per-address allowance and fails at the sign-in step, which looks like a
+ * broken login and is not. Real users do not share an address, so neither do
+ * these runs; the per-account limit, the one that stops credential stuffing,
+ * still applies untouched.
+ */
+const CLIENT_IP = `203.0.113.${Math.floor(Math.random() * 250) + 1}`;
+
 const db = new PrismaClient();
 
 let passed = 0;
@@ -141,7 +154,10 @@ async function main() {
     writeFileSync(join(dir, 'not-a-form.pdf'), 'this is not a pdf at all');
 
     browser = await chromium.launch({ executablePath: CHROME });
-    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+    const page = await browser.newPage({
+      viewport: { width: 1440, height: 1000 },
+      extraHTTPHeaders: { 'x-forwarded-for': CLIENT_IP },
+    });
     await login(page, `import.${tag}@example.test`, password);
 
     console.log('\nImports starts empty and explains itself');
