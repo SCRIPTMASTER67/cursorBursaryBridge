@@ -17,12 +17,14 @@ import { AlertTriangle, ChevronDown, ExternalLink, FileText, Users } from '@/com
 import type { ImportFileStatus } from '@prisma/client';
 
 export type ReviewField = {
+  id: string;
   canonicalKey: string;
   label: string;
   value: string;
   raw: string;
   confidence: 'HIGH' | 'MEDIUM' | 'LOW';
   sourceFieldLabel: string;
+  corrected: boolean;
 };
 
 export type ReviewRow = {
@@ -64,6 +66,93 @@ function display(value: string): string {
   if (value === 'true') return 'Yes';
   if (value === 'false') return 'No';
   return value;
+}
+
+/**
+ * One field, correctable in place.
+ *
+ * The extracted value is never overwritten on the server; a correction is
+ * stored beside it. Clearing the box removes the correction and restores what
+ * the form actually said.
+ */
+function FieldRow({
+  batchId,
+  field,
+  readOnly,
+}: {
+  batchId: string;
+  field: ReviewField;
+  readOnly: boolean;
+}) {
+  const toast = useToast();
+  const [value, setValue] = useState(field.value);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [corrected, setCorrected] = useState(field.corrected);
+
+  async function save() {
+    setSaving(true);
+    const response = await fetch(`/api/corporate/imports/${batchId}/fields/${field.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value }),
+    });
+    const payload = await response.json().catch(() => ({}));
+    setSaving(false);
+    if (!response.ok) {
+      toast.push('error', payload.error ?? 'That correction could not be saved.');
+      return;
+    }
+    setCorrected(Boolean(payload.field?.correctedValue));
+    setValue(payload.field?.correctedValue ?? payload.field?.value ?? '');
+    setEditing(false);
+    toast.push('success', `${field.label} updated.`);
+  }
+
+  return (
+    <div className="flex items-baseline justify-between gap-3 border-b border-line/60 pb-1.5">
+      <dt className="shrink-0 text-xs text-muted">{field.label}</dt>
+      <dd className="flex min-w-0 items-center gap-2 text-right">
+        {editing ? (
+          <>
+            <input
+              value={value}
+              autoFocus
+              onChange={(event) => setValue(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') void save();
+                if (event.key === 'Escape') setEditing(false);
+              }}
+              className="w-44 rounded-md border border-line bg-surface px-2 py-1 text-sm text-ink"
+              aria-label={`Correct ${field.label}`}
+            />
+            <Button size="sm" disabled={saving} onClick={() => void save()}>
+              {saving ? 'Saving…' : 'Save'}
+            </Button>
+          </>
+        ) : (
+          <>
+            <span className="truncate text-sm text-ink">{display(value) || '—'}</span>
+            {corrected && <Badge tone="info">Corrected</Badge>}
+            {!corrected && field.confidence !== 'HIGH' && (
+              <Badge tone={CONFIDENCE_TONE[field.confidence]}>
+                {field.confidence === 'LOW' ? 'Low' : 'Medium'}
+              </Badge>
+            )}
+            {!readOnly && (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                Edit
+              </button>
+            )}
+          </>
+        )}
+      </dd>
+    </div>
+  );
 }
 
 const CONFIDENCE_TONE = {
@@ -365,20 +454,12 @@ export function ImportReview({
                         </p>
                         <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
                           {row.fields.map((field) => (
-                            <div
-                              key={field.canonicalKey}
-                              className="flex items-baseline justify-between gap-3 border-b border-line/60 pb-1.5"
-                            >
-                              <dt className="text-xs text-muted">{field.label}</dt>
-                              <dd className="flex items-center gap-2 text-right">
-                                <span className="text-sm text-ink">{display(field.value) || '—'}</span>
-                                {field.confidence !== 'HIGH' && (
-                                  <Badge tone={CONFIDENCE_TONE[field.confidence]}>
-                                    {field.confidence === 'LOW' ? 'Low' : 'Medium'}
-                                  </Badge>
-                                )}
-                              </dd>
-                            </div>
+                            <FieldRow
+                              key={field.id}
+                              batchId={batchId}
+                              field={field}
+                              readOnly={alreadyImported}
+                            />
                           ))}
                         </dl>
                       </>

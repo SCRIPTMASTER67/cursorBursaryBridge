@@ -33,7 +33,17 @@ export const metadata: Metadata = {
  * enough for a figure that moves when a deadline passes, and keeps the landing
  * page a cached render rather than a query per visitor.
  */
-export const revalidate = 3600;
+/**
+ * Rendered on demand, not at build time.
+ *
+ * The page prints how many bursaries the directory holds, which is a live
+ * figure read from the database. Prerendering it made the build itself depend
+ * on a reachable database -- a build in CI, or a container image built before
+ * the database exists, failed at "Generating static pages" with a connection
+ * error -- and froze the count for an hour at a time. One query per request on
+ * a landing page costs nothing against that.
+ */
+export const dynamic = 'force-dynamic';
 
 const audiences = [
   {

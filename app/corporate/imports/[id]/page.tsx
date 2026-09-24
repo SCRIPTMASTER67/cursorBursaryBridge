@@ -51,6 +51,8 @@ export default async function ImportBatchPage({ params }: { params: Promise<{ id
     duplicateReason: file.duplicateReason,
     applicantName: nameOf(file.fields),
     fields: file.fields.map((field) => ({
+      id: field.id,
+      corrected: field.correctedValue !== null,
       canonicalKey: field.canonicalKey,
       label: CANONICAL_LABELS[field.canonicalKey as CanonicalKey] ?? field.canonicalKey,
       value: field.correctedValue ?? field.value,

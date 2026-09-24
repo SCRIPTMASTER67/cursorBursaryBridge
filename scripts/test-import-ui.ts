@@ -218,6 +218,46 @@ async function main() {
     check('it names the applicant', csvText.includes(`Dlamini${tag}`));
     check('it carries the file name for tracing', csvText.includes('amara-dlamini.pdf'));
 
+    console.log('\nA field can be corrected without losing what the form said');
+    const field = await db.importExtractedField.findFirstOrThrow({
+      where: { file: { batchId, status: 'READY' }, canonicalKey: 'city' },
+      select: { id: true, value: true },
+    });
+    const patch = await page.request.patch(
+      `${BASE}/api/corporate/imports/${batchId}/fields/${field.id}`,
+      { data: { value: 'Richards Bay' } },
+    );
+    check('the correction is accepted', patch.ok(), String(patch.status()));
+    const corrected = await db.importExtractedField.findUniqueOrThrow({
+      where: { id: field.id },
+      select: { value: true, correctedValue: true, correctedById: true, correctedAt: true },
+    });
+    check('the correction is stored', corrected.correctedValue === 'Richards Bay');
+    check('what the form said is kept', corrected.value === field.value, corrected.value);
+    check('who corrected it is recorded', Boolean(corrected.correctedById && corrected.correctedAt));
+
+    const cleared = await page.request.patch(
+      `${BASE}/api/corporate/imports/${batchId}/fields/${field.id}`,
+      { data: { value: '' } },
+    );
+    check('clearing it is accepted', cleared.ok());
+    const restored = await db.importExtractedField.findUniqueOrThrow({
+      where: { id: field.id },
+      select: { correctedValue: true, correctedById: true },
+    });
+    check(
+      'clearing restores the reading rather than storing an empty correction',
+      restored.correctedValue === null && restored.correctedById === null,
+    );
+
+    console.log('\nA finished batch cannot be resumed');
+    const noResume = await page.request.post(`${BASE}/api/corporate/imports/${batchId}/resume`);
+    check(
+      'resuming a fully-read batch is refused',
+      noResume.status() === 409,
+      String(noResume.status()),
+    );
+
     console.log('\nConfirming imports only what was chosen');
     // The duplicate starts unselected; leave it that way and import the rest.
     await page.click('button:has-text("Import")');

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Alert, Card, CardBody } from '@/components/ui';
+import { Alert, Button, Card, CardBody, useToast } from '@/components/ui';
 import { Spinner } from '@/components/icons';
 
 type Status = {
@@ -26,7 +26,10 @@ type Status = {
  */
 export function ImportProgress({ batchId, initial }: { batchId: string; initial: Status }) {
   const router = useRouter();
+  const toast = useToast();
   const [state, setState] = useState(initial);
+  const [resuming, setResuming] = useState(false);
+  const [stalled, setStalled] = useState(false);
 
   useEffect(() => {
     if (state.status !== 'EXTRACTING' && state.status !== 'UPLOADING') return;
@@ -40,6 +43,10 @@ export function ImportProgress({ batchId, initial }: { batchId: string; initial:
         if (!response.ok) return;
         const next: Status = await response.json();
         if (cancelled) return;
+        // Extraction runs in the application process, so a restart part way
+        // through leaves the counter still. Two minutes without a file being
+        // read is long enough to offer the remedy rather than spin forever.
+        setStalled((was) => (next.processedFiles === state.processedFiles ? was : false));
         setState(next);
         if (next.status !== 'EXTRACTING' && next.status !== 'UPLOADING') {
           clearInterval(timer);
@@ -51,11 +58,29 @@ export function ImportProgress({ batchId, initial }: { batchId: string; initial:
       }
     }, 2000);
 
+    const stall = setTimeout(() => {
+      if (!cancelled) setStalled(true);
+    }, 120_000);
+
     return () => {
       cancelled = true;
       clearInterval(timer);
+      clearTimeout(stall);
     };
-  }, [batchId, state.status, router]);
+  }, [batchId, state.status, state.processedFiles, router]);
+
+  async function resume() {
+    setResuming(true);
+    const response = await fetch(`/api/corporate/imports/${batchId}/resume`, { method: 'POST' });
+    const payload = await response.json().catch(() => ({}));
+    setResuming(false);
+    if (!response.ok) {
+      toast.push('error', payload.error ?? 'That import could not be resumed.');
+      return;
+    }
+    setStalled(false);
+    toast.push('success', `Reading resumed on ${payload.pending} file(s).`);
+  }
 
   const percent =
     state.totalFiles === 0 ? 0 : Math.round((state.processedFiles / state.totalFiles) * 100);
@@ -100,6 +125,19 @@ export function ImportProgress({ batchId, initial }: { batchId: string; initial:
         </dl>
 
         {state.failureReason && <Alert tone="danger">{state.failureReason}</Alert>}
+
+        {stalled && (
+          <Alert tone="warning">
+            <p>
+              Nothing has been read for a couple of minutes. If the server restarted while this
+              batch was being read, the files that were not reached are still waiting. Resuming
+              picks up only those; nothing already read is read again.
+            </p>
+            <Button size="sm" className="mt-2" disabled={resuming} onClick={() => void resume()}>
+              {resuming ? 'Resuming…' : 'Resume reading'}
+            </Button>
+          </Alert>
+        )}
 
         <p className="text-xs text-muted">
           You can leave this page. Reading continues on the server, and the batch waits for you in

@@ -17,6 +17,15 @@ const schema = z.object({
   S3_SECRET_ACCESS_KEY: z.string().optional(),
   EMAIL_DRIVER: z.enum(['console', 'smtp']).default('console'),
   EMAIL_FROM: z.string().default('Bursary-Bridge <no-reply@bursarybridge.local>'),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(1025),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASSWORD: z.string().optional(),
+  /// Off for a local Mailpit on 1025; on for a provider on 465.
+  SMTP_SECURE: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
