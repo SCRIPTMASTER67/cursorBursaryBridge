@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { SiteFooter, SiteHeader } from '@/components/landing/site-header';
-import { HeroIllustration } from '@/components/landing/hero-illustration';
+import { HeroMedia } from '@/components/landing/hero-media';
+import { Parallax } from '@/components/landing/parallax';
 import { Reveal } from '@/components/landing/reveal';
 import { directoryTotals } from '@/services/bursary-directory';
 import { ButtonLink } from '@/components/ui/button';
@@ -152,7 +153,7 @@ export default async function LandingPage() {
          */}
         <section className="border-b border-line bg-surface-cream">
           <div className="mx-auto grid max-w-shell items-center gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-8 lg:py-20">
-            <div>
+            <Parallax speed={0.07} max={44}>
               <span className="inline-flex animate-rise-in items-center rounded-full bg-brand-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-brand-700 [animation-delay:60ms]">
                 Connecting Talent. Funding Futures.
               </span>
@@ -215,25 +216,27 @@ export default async function LandingPage() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Parallax>
 
-            <div className="animate-scale-in [animation-delay:260ms]">
-              <HeroIllustration openCount={openCount} />
-            </div>
+            <Parallax speed={-0.05} max={36} className="animate-scale-in [animation-delay:260ms]">
+              <HeroMedia openCount={openCount} />
+            </Parallax>
           </div>
         </section>
 
         {/* ------------------------------------------------ Audience value cards */}
         <section id="for-organisations" className="border-b border-line bg-surface-muted">
           <div className="mx-auto max-w-shell px-5 py-16 sm:px-8">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
-                A better way to connect funding with talent
-              </h2>
-              <p className="mt-3 text-[15px] leading-7 text-ink-500">
-                Bursary-Bridge makes the journey simple, transparent and impactful for everyone.
-              </p>
-            </Reveal>
+            <Parallax speed={0.05} max={28} className="mx-auto max-w-2xl">
+              <Reveal className="text-center">
+                <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
+                  A better way to connect funding with talent
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-ink-500">
+                  Bursary-Bridge makes the journey simple, transparent and impactful for everyone.
+                </p>
+              </Reveal>
+            </Parallax>
 
             {/* Each card a beat behind the one before it: enough to read as
                 deliberate, not enough to make anyone wait. */}
@@ -267,14 +270,16 @@ export default async function LandingPage() {
         {/* ------------------------------------------------------- How it works */}
         <section id="how-it-works" className="border-b border-line bg-white">
           <div className="mx-auto max-w-shell px-5 py-16 sm:px-8">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
-                How it works
-              </h2>
-              <p className="mt-3 text-[15px] leading-7 text-ink-500">
-                Three simple steps for students to find and apply for funding.
-              </p>
-            </Reveal>
+            <Parallax speed={0.05} max={28} className="mx-auto max-w-2xl">
+              <Reveal className="text-center">
+                <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
+                  How it works
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-ink-500">
+                  Three simple steps for students to find and apply for funding.
+                </p>
+              </Reveal>
+            </Parallax>
 
             <ol className="mt-12 grid gap-8 md:grid-cols-3 md:gap-6">
               {steps.map((step, index) => (
@@ -304,14 +309,16 @@ export default async function LandingPage() {
         {/* ----------------------------------------------------- Student benefits */}
         <section id="opportunities" className="border-b border-line bg-surface-muted">
           <div className="mx-auto max-w-shell px-5 py-16 sm:px-8">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
-                Why students love Bursary-Bridge
-              </h2>
-              <p className="mt-3 text-[15px] leading-7 text-ink-500">
-                Everything you need to find opportunities and reach your goals.
-              </p>
-            </Reveal>
+            <Parallax speed={0.05} max={28} className="mx-auto max-w-2xl">
+              <Reveal className="text-center">
+                <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
+                  Why students love Bursary-Bridge
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-ink-500">
+                  Everything you need to find opportunities and reach your goals.
+                </p>
+              </Reveal>
+            </Parallax>
 
             <div className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {benefits.map((benefit, index) => (
@@ -340,14 +347,16 @@ export default async function LandingPage() {
          */}
         <section id="about" className="border-b border-line bg-surface-cream">
           <div className="mx-auto max-w-shell px-5 py-16 sm:px-8">
-            <Reveal className="mx-auto max-w-2xl text-center">
-              <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
-                Where the opportunities come from
-              </h2>
-              <p className="mt-3 text-[15px] leading-7 text-ink-500">
-                Every bursary on Bursary-Bridge was read from a published source, and says so.
-              </p>
-            </Reveal>
+            <Parallax speed={0.05} max={28} className="mx-auto max-w-2xl">
+              <Reveal className="text-center">
+                <h2 className="text-[26px] font-bold tracking-[-0.02em] text-ink sm:text-[30px]">
+                  Where the opportunities come from
+                </h2>
+                <p className="mt-3 text-[15px] leading-7 text-ink-500">
+                  Every bursary on Bursary-Bridge was read from a published source, and says so.
+                </p>
+              </Reveal>
+            </Parallax>
 
             <div className="mt-10 grid gap-5 md:grid-cols-3">
               {provenance.map((item, index) => (
