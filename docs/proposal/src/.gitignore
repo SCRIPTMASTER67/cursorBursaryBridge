@@ -1,0 +1,8 @@
+# The faculty template and its unpacked form are supplied, not ours to publish.
+template.docx
+unpacked/
+
+# Build output. The delivered copy lives at
+# docs/proposal/Bursary-Bridge_Project_Proposal.docx.
+Bursary-Bridge_Project_Proposal.docx
+__pycache__/

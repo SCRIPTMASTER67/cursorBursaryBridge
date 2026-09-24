@@ -55,13 +55,16 @@ SCOPE = [
     "through Prisma. The application exposes two portals over one codebase and "
     "one database: a Student portal and a Corporate portal.",
 
-    "The system recognises exactly two roles, STUDENT and CORPORATE. A Student "
-    "builds a profile, receives ranked funding opportunities with the reasons "
-    "behind each score, and applies using the profile already captured. A "
-    "Corporate User states an organisation's funding criteria as structured "
-    "data, publishes funding programmes, and moves applicants through review, "
-    "shortlisting and selection. No administrative, university or government "
-    "role exists in the system.",
+    "The system recognises three roles, STUDENT, CORPORATE and ADMIN. A "
+    "Student builds a profile, receives ranked funding opportunities with the "
+    "reasons behind each score, and applies using the profile already "
+    "captured. A Corporate User states an organisation's funding criteria as "
+    "structured data, publishes funding programmes, and moves applicants "
+    "through review, shortlisting and selection. An Administrator maintains "
+    "the catalogue of institutions, qualifications and subjects that the "
+    "other two roles select from, and suspends or restores accounts; the "
+    "Administration Portal in Section 3 is the design entity that carries "
+    "that role. No university or government role exists in the system.",
 
     "The prototype does not disburse funds, does not verify submitted documents "
     "against any external authority, and does not integrate with the "
