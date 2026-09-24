@@ -169,6 +169,17 @@ async function main() {
     await page(anon, '/reset-password');
     await page(anon, '/verify', '/login');
 
+    console.log('\nThe health check');
+    const health = await fetch(`${BASE}/api/health`, { headers: { 'cache-control': 'no-cache' } });
+    const healthBody = (await health.json()) as { ok?: boolean; database?: string };
+    check('it answers 200 while the database is up', health.status === 200, `status ${health.status}`);
+    check('it reports the database as reachable', healthBody.ok === true && healthBody.database === 'ok');
+    check(
+      'it is never cached, so a load balancer sees the current state',
+      health.headers.get('cache-control') === 'no-store',
+      String(health.headers.get('cache-control')),
+    );
+
     // --- the funder --------------------------------------------------------
     console.log('\nPages a funder opens');
     const organisation = await db.organisation.create({
