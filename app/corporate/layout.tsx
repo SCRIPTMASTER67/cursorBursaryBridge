@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   Settings,
   Star,
+  Upload,
   Users,
 } from '@/components/icons';
 import { requireCorporate } from '@/lib/auth/guards';
@@ -40,6 +41,11 @@ export default async function CorporateLayout({ children }: { children: React.Re
       href: '/corporate/applications',
       label: 'Applications',
       icon: <ClipboardList className="h-[18px] w-[18px]" />,
+    },
+    {
+      href: '/corporate/imports',
+      label: 'Imports',
+      icon: <Upload className="h-[18px] w-[18px]" />,
     },
     {
       href: '/corporate/shortlists',

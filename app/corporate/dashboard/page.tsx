@@ -6,7 +6,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Card, CardHeader, StatCard } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ProgressBar } from '@/components/ui/progress';
-import { Award, Calendar, Clock, Plus } from '@/components/icons';
+import { Award, Calendar, Clock, Plus, Upload } from '@/components/icons';
 import { requireCorporate } from '@/lib/auth/guards';
 import { prisma } from '@/lib/db';
 import { deadlineLabel, formatDate, formatNumber, greeting } from '@/lib/utils';
@@ -50,9 +50,18 @@ export default async function CorporateDashboardPage() {
             Here’s what’s happening with your programmes at {organisation.name}.
           </p>
         </div>
-        <ButtonLink href="/corporate/programmes/new" leadingIcon={<Plus className="h-4 w-4" />}>
-          Create New Programme
-        </ButtonLink>
+        <div className="flex flex-wrap gap-2">
+          <ButtonLink
+            href="/corporate/imports/new"
+            variant="secondary"
+            leadingIcon={<Upload className="h-4 w-4" />}
+          >
+            Import Applications
+          </ButtonLink>
+          <ButtonLink href="/corporate/programmes/new" leadingIcon={<Plus className="h-4 w-4" />}>
+            Create New Programme
+          </ButtonLink>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

@@ -35,14 +35,15 @@
     "test:import": "tsx --conditions=react-server scripts/test-application-import.ts",
     "test:ingest": "tsx --conditions=react-server scripts/test-ingest.ts",
     "test:directory": "tsx --conditions=react-server scripts/test-directory-e2e.ts",
-    "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:catalogue && npm run test:results && npm run test:requests && npm run test:letters && npm run test:import && npm run test:ingest && npm run test:directory && npm run test:letters:ui && npm run test:e2e",
+    "test": "npm run test:matching && npm run test:pdf:labels && npm run test:pdf && npm run test:autofill && npm run test:catalogue && npm run test:results && npm run test:requests && npm run test:letters && npm run test:import && npm run test:ingest && npm run test:directory && npm run test:letters:ui && npm run test:import:ui && npm run test:e2e",
     "screenshots": "tsx scripts/screenshots.ts",
     "ingest": "tsx --conditions=react-server scripts/ingest.ts",
     "make:test-forms": "tsx scripts/make-test-forms.ts",
     "import:pages": "tsx --conditions=react-server scripts/import-pages.ts",
     "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts",
     "export:opportunities": "tsx scripts/export-opportunities.ts",
-    "import:snapshot": "tsx scripts/import-snapshot.ts"
+    "import:snapshot": "tsx scripts/import-snapshot.ts",
+    "test:import:ui": "tsx --conditions=react-server scripts/test-import-ui.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
