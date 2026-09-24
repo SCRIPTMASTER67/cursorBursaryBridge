@@ -119,6 +119,25 @@ if [ -d cursorBursaryBridge/.git ]; then
     # the right one rather than building on whatever happens to be there.
     cd cursorBursaryBridge
     git fetch origin "$BRANCH" --depth=1 || die "Could not fetch $BRANCH."
+
+    # Clear the way for the checkout below, which refuses to run over a
+    # modified tracked file and takes the whole script down with it.
+    #
+    # package-lock.json is the one that actually shows up. npm rewrites it
+    # whenever its own version differs from the one that wrote it, so a first
+    # run leaves it modified and the second run dies on a file the script
+    # itself changed. It is discarded rather than kept: the committed lockfile
+    # is the one the branch was tested with, which is the entire point of it.
+    git checkout -- package-lock.json 2>/dev/null || true
+
+    # Anything else belongs to whoever is at this machine. It is set aside
+    # where they can get it back, never dropped.
+    if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+        git stash push --quiet --message "setup-linux.sh $(date '+%Y-%m-%d %H:%M')" \
+            || die 'Could not set aside your local changes. Commit or stash them, then re-run.'
+        printf '  Your local changes were set aside. Restore them with: git stash pop\n'
+    fi
+
     git checkout -B "$BRANCH" "origin/$BRANCH" || die "Could not switch to $BRANCH."
 else
     git clone --branch "$BRANCH" "$REPO" || die "Could not clone $BRANCH from $REPO."
@@ -135,8 +154,18 @@ echo "On $on at $(git rev-parse --short HEAD)"
 [ -f prisma/seed-demo.ts ] || die 'This clone does not contain prisma/seed-demo.ts. Wrong branch?'
 [ -f lib/ingest/pipeline.ts ] || die 'This clone does not contain lib/ingest. Wrong branch?'
 
+# `npm ci` rather than `npm install`: it installs exactly the versions in
+# package-lock.json, so this machine gets the tree the branch was tested with,
+# and -- unlike `npm install` -- it never rewrites the lockfile, which is what
+# left the working tree dirty and blocked the checkout above on a second run.
+# It needs the lockfile to agree with package.json; if it does not, or a
+# platform-specific package has no entry for this machine, fall back rather
+# than stopping, and say which one ran.
 step 'Installing packages (this takes a couple of minutes)'
-npm install
+if ! npm ci; then
+    printf '\n  npm ci did not succeed; falling back to npm install.\n\n'
+    npm install || die 'Could not install the packages.'
+fi
 
 # Generate the Prisma client explicitly rather than relying on the install to
 # do it. On a re-run over an existing clone npm has nothing to install, so it
