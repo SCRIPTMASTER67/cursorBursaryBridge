@@ -3,11 +3,26 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { Spinner } from '@/components/icons';
 import { cn } from '@/lib/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'success';
+export type ButtonVariant =
+  | 'primary'
+  | 'accent'
+  | 'secondary'
+  | 'outline'
+  | 'ghost'
+  | 'danger'
+  | 'success';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 shadow-card',
+  /**
+   * The coral call-to-action from the reference screens.
+   *
+   * Filled with accent-600 rather than the sampled accent-500: white text on
+   * the sampled coral reaches only 3.33:1, which fails AA at button sizes. One
+   * step deeper reads as the same colour and clears 4.57:1.
+   */
+  accent: 'bg-accent-600 text-white hover:bg-accent-700 active:bg-accent-700 shadow-card',
   secondary: 'bg-brand-50 text-brand-700 hover:bg-brand-100 active:bg-brand-200',
   outline:
     'bg-white text-ink-700 border border-line hover:bg-surface-subtle hover:border-line-strong active:bg-surface-muted',
@@ -24,8 +39,19 @@ const sizes: Record<ButtonSize, string> = {
 };
 
 const base =
-  'inline-flex items-center justify-center rounded-btn font-semibold transition-colors ' +
+  'inline-flex items-center justify-center rounded-btn font-semibold ' +
+  'transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-entrance ' +
   'disabled:pointer-events-none disabled:opacity-55 whitespace-nowrap select-none';
+
+/**
+ * Filled buttons lift very slightly on hover and settle on press.
+ *
+ * Only the filled variants: a half-pixel of movement reads as responsiveness
+ * on a call-to-action and as jitter on a row of table actions. Transform and
+ * shadow only, so nothing around the button moves.
+ */
+const lift = 'hover:-translate-y-0.5 hover:shadow-elevated active:translate-y-0 active:shadow-card';
+const LIFTED: ButtonVariant[] = ['primary', 'accent', 'success'];
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
@@ -58,7 +84,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       disabled={disabled || loading}
       aria-busy={loading || undefined}
-      className={cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
+      className={cn(
+        base,
+        variants[variant],
+        LIFTED.includes(variant) && lift,
+        sizes[size],
+        fullWidth && 'w-full',
+        className,
+      )}
       {...props}
     >
       {loading ? <Spinner className="h-4 w-4 animate-spin" /> : leadingIcon}
@@ -104,7 +137,14 @@ export function ButtonLink({
       href={href}
       prefetch={prefetch}
       {...(external ? { target: '_blank', rel: 'noopener noreferrer nofollow' } : {})}
-      className={cn(base, variants[variant], sizes[size], fullWidth && 'w-full', className)}
+      className={cn(
+        base,
+        variants[variant],
+        LIFTED.includes(variant) && lift,
+        sizes[size],
+        fullWidth && 'w-full',
+        className,
+      )}
     >
       {leadingIcon}
       {children}

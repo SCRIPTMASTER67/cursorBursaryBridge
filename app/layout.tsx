@@ -25,7 +25,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#5B2EDB',
+  // The browser chrome colour. Metadata cannot read a CSS variable, so this is
+  // the one place the sidebar teal is written twice; keep it in step with
+  // --sidebar in styles/globals.css.
+  themeColor: '#012527',
   width: 'device-width',
   initialScale: 1,
 };

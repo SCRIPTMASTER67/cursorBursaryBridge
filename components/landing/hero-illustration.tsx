@@ -1,13 +1,17 @@
 /**
  * Hero artwork.
  *
- * The reference design pairs the headline with a student photograph and three
- * floating status cards. No licensed photography ships with the prototype, so
- * the portrait is drawn as a flat SVG illustration in the same composition —
- * purple blob behind, figure holding study books in the foreground — and the
- * floating cards are real DOM so they stay crisp and readable at every size.
+ * The reference design pairs the headline with a student photograph. No
+ * licensed photography ships with this repository, so the portrait is drawn as
+ * a flat SVG illustration in the same composition — a soft brand-teal field
+ * behind, a figure holding study books in front. Its colours are Tailwind
+ * classes rather than hex attributes, so the artwork re-themes with the rest
+ * of the product.
+ *
+ * Swap this component for a photograph when one is licensed; nothing else on
+ * the page depends on it being a drawing.
  */
-export function HeroIllustration() {
+export function HeroIllustration({ openCount }: { openCount: number }) {
   return (
     <div className="relative mx-auto w-full max-w-[520px]">
       <svg
@@ -18,8 +22,8 @@ export function HeroIllustration() {
       >
         <defs>
           <linearGradient id="bb-blob" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#EFEAFD" />
-            <stop offset="100%" stopColor="#D9CFFB" />
+            <stop offset="0%" className="[stop-color:theme(colors.brand.50)]" />
+            <stop offset="100%" className="[stop-color:theme(colors.brand.200)]" />
           </linearGradient>
           <clipPath id="bb-body">
             {/* Torso silhouette — everything painted on the body is clipped to it. */}
@@ -37,14 +41,24 @@ export function HeroIllustration() {
         {/* Torso */}
         <path
           d="M260 248c58 0 97 34 109 85l13 76c5 26-14 47-40 47H178c-26 0-45-21-40-47l13-76c12-51 51-85 109-85Z"
-          fill="#F5B841"
+          className="fill-accent-500"
         />
         <g clipPath="url(#bb-body)">
           {/* Soft shading down the left of the top */}
-          <path d="M132 248h74l-18 210h-74Z" fill="#E2A52E" opacity="0.45" />
+          <path d="M132 248h74l-18 210h-74Z" className="fill-accent-600" opacity="0.45" />
           {/* Backpack straps */}
-          <path d="M222 250 210 456" stroke="#4A22BC" strokeWidth="15" strokeLinecap="round" />
-          <path d="M298 250 310 456" stroke="#4A22BC" strokeWidth="15" strokeLinecap="round" />
+          <path
+            d="M222 250 210 456"
+            className="stroke-brand-700"
+            strokeWidth="15"
+            strokeLinecap="round"
+          />
+          <path
+            d="M298 250 310 456"
+            className="stroke-brand-700"
+            strokeWidth="15"
+            strokeLinecap="round"
+          />
         </g>
 
         {/* Head */}
@@ -78,8 +92,16 @@ export function HeroIllustration() {
 
         {/* Stack of books held at the waist */}
         <g transform="rotate(-4 260 386)">
-          <rect x="168" y="352" width="184" height="26" rx="6" fill="#5B2EDB" />
-          <rect x="176" y="358" width="8" height="14" rx="2" fill="#BCA9F7" opacity="0.7" />
+          <rect x="168" y="352" width="184" height="26" rx="6" className="fill-brand-700" />
+          <rect
+            x="176"
+            y="358"
+            width="8"
+            height="14"
+            rx="2"
+            className="fill-brand-300"
+            opacity="0.7"
+          />
           <rect
             x="168"
             y="380"
@@ -87,12 +109,20 @@ export function HeroIllustration() {
             height="26"
             rx="6"
             fill="#FFFFFF"
-            stroke="#D9CFFB"
+            className="stroke-brand-200"
             strokeWidth="2"
           />
-          <rect x="176" y="386" width="8" height="14" rx="2" fill="#D9CFFB" />
-          <rect x="168" y="408" width="184" height="26" rx="6" fill="#8055EA" />
-          <rect x="176" y="414" width="8" height="14" rx="2" fill="#EBE6FD" opacity="0.7" />
+          <rect x="176" y="386" width="8" height="14" rx="2" className="fill-brand-200" />
+          <rect x="168" y="408" width="184" height="26" rx="6" className="fill-brand-500" />
+          <rect
+            x="176"
+            y="414"
+            width="8"
+            height="14"
+            rx="2"
+            className="fill-brand-100"
+            opacity="0.7"
+          />
         </g>
 
         {/* Arms wrapping the books */}
@@ -115,14 +145,21 @@ export function HeroIllustration() {
         <ellipse cx="354" cy="392" rx="19" ry="15" fill="#C68A62" transform="rotate(12 354 392)" />
       </svg>
 
-      {/* Floating status cards, mirroring the reference layout. */}
-      <div className="absolute -right-1 top-4 w-[166px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:-right-4">
-        <p className="text-[11px] font-medium text-ink-400">Matched for you</p>
+      {/* Floating cards, in the reference's composition.
+       *
+       * The reference fills these with numbers — "24 Opportunities", "85%
+       * profile strength", "5 days left". Two of the three cannot be true of a
+       * visitor who has no account yet, and the third would be a number we
+       * made up. So one card carries a real figure counted from the directory
+       * at request time, and the others describe what the product does without
+       * asserting anything we cannot show. */}
+      <div className="absolute -right-1 top-4 w-[176px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:-right-4">
+        <p className="text-[11px] font-medium text-ink-400">Open right now</p>
         <div className="mt-1 flex items-end justify-between">
-          <span className="text-2xl font-bold leading-none text-ink">24</span>
+          <span className="text-2xl font-bold leading-none text-ink">{openCount}</span>
           <svg
             viewBox="0 0 48 22"
-            className="h-5 w-12 text-success-600"
+            className="h-5 w-12 text-brand-500"
             fill="none"
             aria-hidden="true"
           >
@@ -135,22 +172,24 @@ export function HeroIllustration() {
             />
           </svg>
         </div>
-        <p className="mt-0.5 text-[11px] text-ink-400">Opportunities</p>
+        <p className="mt-0.5 text-[11px] text-ink-400">
+          {openCount === 1 ? 'bursary accepting applications' : 'bursaries accepting applications'}
+        </p>
       </div>
 
-      <div className="absolute right-2 top-[168px] w-[140px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:right-0">
-        <p className="text-[11px] font-medium text-ink-400">Next deadline</p>
-        <p className="mt-1 text-xl font-bold leading-none text-brand-600">5 days</p>
-        <p className="mt-1 text-[11px] text-ink-400">Left to apply</p>
+      <div className="absolute right-2 top-[168px] w-[150px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:right-0">
+        <p className="text-[11px] font-medium text-ink-400">Deadline reminders</p>
+        <p className="mt-1 text-[13px] font-bold leading-tight text-brand-600">
+          Before applications close
+        </p>
       </div>
 
-      <div className="absolute -left-3 bottom-8 w-[176px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:-left-10 lg:-left-16">
-        <p className="text-[11px] font-medium text-ink-400">Profile strength</p>
-        <p className="mt-1 text-xl font-bold leading-none text-ink">85%</p>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-line">
-          <div className="h-full w-[85%] rounded-full bg-success-600" />
-        </div>
-        <p className="mt-1.5 text-[11px] text-ink-400">Almost there!</p>
+      <div className="absolute -left-3 bottom-8 w-[186px] rounded-card border border-line bg-white p-3.5 shadow-elevated sm:-left-10 lg:-left-16">
+        <p className="text-[11px] font-medium text-ink-400">One profile</p>
+        <p className="mt-1 text-[13px] font-bold leading-tight text-ink">Many applications</p>
+        <p className="mt-1.5 text-[11px] leading-4 text-ink-400">
+          Fill your details in once, reuse them everywhere.
+        </p>
       </div>
     </div>
   );

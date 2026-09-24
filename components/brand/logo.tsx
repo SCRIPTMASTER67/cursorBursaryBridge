@@ -2,8 +2,13 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 /**
- * The Bursary-Bridge mark: a stylised bridge span, drawn to match the
- * reference designs. `tone` switches it for dark sidebars.
+ * The Bursary-Bridge mark: an arch of three spans rising from a common base,
+ * banded coral through teal, as drawn in the reference screens.
+ *
+ * The bands are Tailwind classes rather than hex attributes so the mark is
+ * themed by the same tokens as everything else — change the palette and the
+ * logo changes with it. On a dark sidebar the `light` tone keeps the same
+ * shape in tints that hold up against the deep teal.
  */
 export function LogoMark({
   className,
@@ -12,20 +17,28 @@ export function LogoMark({
   className?: string;
   tone?: 'brand' | 'light';
 }) {
-  const stroke = tone === 'light' ? '#FFFFFF' : '#12132B';
-  const accent = tone === 'light' ? '#FFFFFF' : '#5B2EDB';
+  const bands =
+    tone === 'light'
+      ? ['stroke-accent-300', 'stroke-brand-300', 'stroke-white']
+      : ['stroke-accent-500', 'stroke-brand-500', 'stroke-brand-700'];
+
   return (
     <svg viewBox="0 0 40 28" className={cn('h-7 w-10', className)} fill="none" aria-hidden="true">
-      <path d="M2 25h36" stroke={stroke} strokeWidth="2" strokeLinecap="round" />
-      <path d="M20 3 4 25M20 3l16 22" stroke={accent} strokeWidth="2" strokeLinecap="round" />
-      <path d="M20 3v22" stroke={stroke} strokeWidth="1.6" strokeLinecap="round" opacity="0.55" />
+      {/* Outer span to inner span, each a little shorter, like a bridge seen
+          end-on — or a rainbow, which is the reading we want first. */}
       <path
-        d="M11.6 13.5h16.8M8 19h24"
-        stroke={accent}
-        strokeWidth="1.6"
+        d="M3 24a17 17 0 0 1 34 0"
+        className={bands[0]}
+        strokeWidth="3.2"
         strokeLinecap="round"
-        opacity="0.6"
       />
+      <path
+        d="M8.5 24a11.5 11.5 0 0 1 23 0"
+        className={bands[1]}
+        strokeWidth="3.2"
+        strokeLinecap="round"
+      />
+      <path d="M14 24a6 6 0 0 1 12 0" className={bands[2]} strokeWidth="3.2" strokeLinecap="round" />
     </svg>
   );
 }

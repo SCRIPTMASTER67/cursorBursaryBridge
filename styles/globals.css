@@ -2,13 +2,122 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * The Bursary-Bridge design tokens.
+ *
+ * Every colour in the application resolves to one of the variables below, and
+ * they are the only place a colour value is written down. Tailwind reads them
+ * through `tailwind.config.ts`, so changing a value here changes it
+ * everywhere — that is the point, and it is why no component carries a hex
+ * code of its own.
+ *
+ * The values are sampled from the approved reference screens rather than
+ * invented: the deep teal of the sidebar, the warm cream of the landing
+ * background, the coral of the call-to-action, the soft teal of the match
+ * badges. Where a sampled value could not carry text accessibly it is kept for
+ * decoration and a deeper step is used for the text-bearing surface; those two
+ * cases are noted below.
+ *
+ * Channel triplets rather than hex, so Tailwind's opacity modifiers
+ * (`bg-brand-600/10`) keep working.
+ */
 @layer base {
   :root {
     color-scheme: light;
+
+    /* ---------------------------------------------- Primary: deep teal green */
+    --brand-50: 239 247 244;
+    --brand-100: 223 240 234; /* sampled: match-badge tint */
+    --brand-200: 188 224 212;
+    --brand-300: 142 203 182;
+    --brand-400: 94 181 151; /* sampled: match-badge green */
+    --brand-500: 44 162 124; /* sampled: statistic green */
+    --brand-600: 6 95 79; /* sampled: hero accent — primary action */
+    --brand-700: 1 71 63; /* sampled: landing primary button — hover */
+    --brand-800: 1 56 48;
+    --brand-900: 1 42 40;
+    --brand-950: 1 37 39; /* sampled: sidebar */
+
+    /* ------------------------------------------------- Accent: coral / orange
+     * 500 is the sampled coral and is used for rules, icons and tints. White
+     * text on it reaches only 3.33:1, so a call-to-action that carries text
+     * uses 600 (4.57:1) instead. Same colour family, legible either way.
+     */
+    --accent-50: 253 243 237;
+    --accent-100: 250 224 210;
+    --accent-200: 244 196 171;
+    --accent-300: 237 159 121;
+    --accent-400: 229 129 79;
+    --accent-500: 222 108 54; /* sampled: call-to-action coral */
+    --accent-600: 192 86 31; /* text-bearing surfaces */
+    --accent-700: 162 67 24; /* coral text on a light background */
+
+    /* ------------------------------------------------------------------ Text */
+    --ink: 14 31 33; /* headings */
+    --ink-700: 39 64 63;
+    --ink-600: 66 89 90; /* body */
+    --ink-500: 99 119 122; /* secondary */
+    --ink-400: 116 133 135; /* muted — 3.86:1, large text and meta only */
+    --ink-300: 160 176 177; /* placeholders and disabled */
+
+    /* ----------------------------------------------------------- Backgrounds */
+    --surface: 255 255 255;
+    --surface-muted: 250 250 248; /* sampled: dashboard background */
+    --surface-subtle: 244 243 238;
+    --surface-cream: 252 246 239; /* sampled: landing background */
+
+    /* --------------------------------------------------- Borders and dividers */
+    --line: 232 229 221; /* warm neutral */
+    --line-strong: 215 210 199;
+
+    /* ----------------------------------------------------------- Navigation */
+    --sidebar: 1 37 39;
+    --sidebar-hover: 9 58 56;
+    --sidebar-active: 11 92 75;
+    --sidebar-text: 157 184 178;
+
+    /* --------------------------------------------------------------- States */
+    --success-50: 233 246 239;
+    --success-100: 207 235 219;
+    --success-600: 26 138 82;
+    --success-700: 19 107 63;
+
+    --warning-50: 255 246 232;
+    --warning-100: 255 233 203;
+    --warning-600: 178 106 0;
+    --warning-700: 138 82 0;
+
+    --danger-50: 253 237 234;
+    --danger-100: 249 216 209;
+    --danger-600: 192 57 43;
+    --danger-700: 154 43 32;
+
+    --info-50: 234 242 249;
+    --info-100: 211 228 241;
+    --info-600: 37 102 162; /* sampled: dashboard statistic tile */
+    --info-700: 28 78 125;
+
+    /* ------------------------------------------------------------- Semantic
+     * Aliases for the roles above, so a component can ask for "the primary
+     * colour" without knowing which step of the scale that happens to be.
+     */
+    --color-primary: var(--brand-600);
+    --color-primary-dark: var(--brand-700);
+    --color-primary-light: var(--brand-400);
+    --color-accent: var(--accent-500);
+    --color-background: var(--surface-muted);
+    --color-surface: var(--surface);
+    --color-border: var(--line);
+    --color-text-primary: var(--ink);
+    --color-text-secondary: var(--ink-500);
+    --color-success: var(--success-600);
+    --color-warning: var(--warning-600);
+    --color-error: var(--danger-600);
   }
 
   html {
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
 
   body {
@@ -64,6 +173,28 @@
     );
     animation: shimmer 1.6s infinite;
   }
+
+  /**
+   * Scroll-revealed sections.
+   *
+   * The element is laid out in its final position from the start and only its
+   * opacity and transform change, so a reveal cannot shift the page or
+   * introduce a horizontal scrollbar. `.is-visible` is added by an
+   * IntersectionObserver; with JavaScript unavailable the content is shown by
+   * the `no-js` rule below rather than left invisible.
+   */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition:
+      opacity 620ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity, transform;
+  }
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @layer utilities {
@@ -76,7 +207,28 @@
   }
 }
 
+/**
+ * Motion is a decoration, never a mechanism.
+ *
+ * Everything animated is readable and operable without the animation, so a
+ * reader who asks for less motion loses nothing but the movement — including
+ * the scroll reveals, which resolve to their visible state immediately.
+ */
+/* A reveal must never be the reason something cannot be read. In print, and
+   for anything that renders the page without scrolling it, the content is
+   simply there. */
+@media print {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -84,5 +236,10 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
