@@ -23,19 +23,33 @@ SECTIONS = [
 
     ("Test Plan Identifier", [
         ("p", "Bursary-Bridge TP_2.0"),
+        ("blank", None),
+        ("p", "This test plan covers the Bursary-Bridge system developed by "
+              "CPP Mchunu (202242486), A Nsibande (240079346), KN Bikile "
+              "(202356797) and SP Tshazi (240103222) for the Department of "
+              "Computer Science, University of Zululand, under the supervision "
+              "of Ms Zulu."),
     ]),
 
     ("References", [
-        ("p", "Documents that support this test plan include the Final Year "
-              "Project Proposal for Bursary-Bridge, the Software Requirements "
-              "Specification for Bursary-Bridge and the Software Design "
-              "Description for Bursary-Bridge. Section 3.2 of the Software "
-              "Requirements Specification defines the thirty-seven use cases "
-              "from which the features listed below are drawn, and Section 5 of "
-              "the Software Design Description traces twelve of those use cases "
-              "to the design objects that carry them out."),
+        ("p", "The documents below support this test plan and are cited by "
+              "bracketed number where they are relied on. Every source listed "
+              "here is cited at least once in the text."),
         ("blank", None),
-        ("p", "The project supervisor is Ms Zulu."),
+        ("ref", "[1] Department of Computer Science, University of Zululand, "
+            "\u201cFinal Year Project Proposal: Bursary-Bridge,\u201d 2026."),
+        ("ref", "[2] Department of Computer Science, University of Zululand, "
+            "\u201cSoftware Requirements Specification: Bursary-Bridge,\u201d "
+            "2026. Section 3.2 defines the thirty-seven use cases from which "
+            "the features in this plan are drawn."),
+        ("ref", "[3] Department of Computer Science, University of Zululand, "
+            "\u201cSoftware Design Description: Bursary-Bridge,\u201d 2026. "
+            "Section 5 traces twelve of those use cases to the design objects "
+            "that carry them out."),
+        ("ref", "[4] Republic of South Africa, Protection of Personal Information "
+            "Act 4 of 2013. Pretoria: Government Printer, 2013. [Online]. "
+            "Available: https://www.justice.gov.za/legislation/acts/"
+            "2013-004.pdf."),
     ]),
 
     ("Introduction", [
@@ -261,7 +275,9 @@ SECTIONS = [
               "the test environment cannot be prepared. Testing is also paused "
               "if a defect is found that exposes one user's data to another, "
               "because every later result would be unsafe to trust until that "
-              "is corrected."),
+              "is corrected and because the system holds information the "
+              "Protection of Personal Information Act [4] requires to be kept "
+              "from anyone not entitled to see it."),
         ("blank", None),
         ("p", "Testing is paused if a suite is found to delete data it did not "
               "create. A suite that removes records belonging to the imported "
@@ -283,8 +299,8 @@ SECTIONS = [
     ("Testing Tasks", [
         ("p", "The following activities must be completed:"),
         (1, "Test plan prepared."),
-        (1, "Software Requirements Specification and Software Design Description "
-            "delivered to the testing team."),
+        (1, "Software Requirements Specification [2] and Software Design "
+            "Description [3] delivered to the testing team."),
         (1, "Environment prepared: Node.js 20 or later installed, PostgreSQL 16 "
             "running, the database created and its migrations applied, and the "
             "bursary directory restored from the recorded snapshot."),
@@ -344,12 +360,12 @@ SECTIONS = [
               "should work through the student journey and the organisation "
               "journey, so that no journey is only ever seen by one person, and "
               "the areas of the system allocated in Section 10.1 of the Final "
-              "Year Project Proposal should not determine who tests them."),
+              "Year Project Proposal [1] should not determine who tests them."),
         ("blank", None),
         ("p", "Testers need no specialist tools beyond the repository itself, "
               "but they must be able to run the project locally and read the "
               "output of the test scripts. Before testing begins they should "
-              "read Section 3.2 of the Software Requirements Specification, so "
+              "read Section 3.2 of the Software Requirements Specification [2], so "
               "that the expected behaviour of each use case is clear; they "
               "should understand how the weighted criteria produce a match "
               "score, so that an incorrect score is recognised rather than "

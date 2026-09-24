@@ -214,9 +214,10 @@ GOAL = ("The goal of this project is to design, develop and evaluate a "
         "receive.")
 
 OBJECTIVES_INTRO = [
-    "The following objectives are the measurable steps through which the goal "
-    "will be achieved. Each states a deliverable that can be inspected, and "
-    "together they span the project lifecycle from investigation to "
+    "Table 1 states the measurable steps through which the goal will be "
+    "achieved. Each objective names a deliverable that can be inspected, and "
+    "the second column states the evidence by which its completion is judged. "
+    "Together they span the project lifecycle from investigation to "
     "documentation.",
 ]
 
@@ -470,9 +471,10 @@ METHODOLOGY = [
 # 5. Equipment, Tools and Technologies
 # ---------------------------------------------------------------------------
 TOOLS_INTRO = [
-    "The technologies below are those the system is built on. No hardware "
-    "beyond ordinary development machines is required, because the system is a "
-    "web application with no sensor, device or embedded component.",
+    "Tables 2 and 3 list the hardware and the software the system is built on. "
+    "No hardware beyond ordinary development machines is required, because "
+    "the system is a web application with no sensor, device or embedded "
+    "component.",
 ]
 
 HARDWARE = [
@@ -589,8 +591,10 @@ OUT_OF_SCOPE = [
 # ---------------------------------------------------------------------------
 BENEFICIARIES_INTRO = [
     "The project delivers value to two groups directly, through their own use "
-    "of the system, and to two further groups indirectly, through the effect "
-    "the system has on the process they take part in.",
+    "of the system, and to three further groups indirectly, through the "
+    "effect the system has on the process they take part in. Table 4 sets out "
+    "the direct beneficiaries and Table 5 the indirect ones, in each case "
+    "naming how the group meets the system and what it gains.",
 ]
 
 # (group, how they interact, what they gain)

@@ -1,3 +1,8 @@
+# The faculty template and its unpacked form are supplied, not ours to publish.
 template.docx
 unpacked/
+
+# Build output. The delivered copy lives at docs/srs/Bursary-Bridge_SRS.docx.
+Bursary-Bridge_SRS.docx
+build/
 __pycache__/

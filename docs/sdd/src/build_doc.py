@@ -111,7 +111,8 @@ def page_break():
     return ('<w:p><w:pPr>' + BODY_SPACING + '</w:pPr>'
             '<w:r><w:br w:type="page"/></w:r></w:p>')
 HEADINGS = []      # (level, text) in document order, collected during build
-FIGURES = []       # caption text in document order
+FIGURES = []       # figure caption text in document order
+TABLES = []        # table caption text in document order
 
 
 def toc_entry(level, text, page, first=False, last=False, instr=None):
@@ -337,6 +338,29 @@ def entity_line(text):
             f'<w:r><w:t xml:space="preserve">{escape(text)}</w:t></w:r></w:p>')
 
 
+def table_caption(text):
+    """
+    A numbered table caption, on a counter of its own.
+
+    Captioned above the table it introduces, which is the convention for
+    tables; figures are captioned beneath.
+    """
+    TABLES.append(f"Table {len(TABLES) + 1} {text}")
+    n = len(TABLES)
+    ppr = ('<w:pPr><w:pStyle w:val="Caption"/><w:keepNext/>' + BODY_SPACING
+           + '<w:jc w:val="both"/>' + BODY_RPR + '</w:pPr>')
+    return (
+        f'<w:p>{ppr}'
+        f'<w:r>{BODY_RPR}<w:t xml:space="preserve">Table </w:t></w:r>'
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> SEQ Table \\* ARABIC </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
+        f'<w:r>{BODY_RPR}<w:t>{n}</w:t></w:r>'
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+        f'<w:r>{BODY_RPR}<w:t xml:space="preserve"> {escape(text)}</w:t></w:r></w:p>'
+    )
+
+
 def caption(text):
     """Numbered with a SEQ field, so Word can rebuild the Table of Figures."""
     FIGURES.append(f"Figure {len(FIGURES) + 1} {text}")
@@ -558,6 +582,11 @@ def introduction():
         x += para(p)
 
     x += heading(2, "1.3. Glossary")
+    x += para(
+        "Table 1 defines the terms used throughout this document. Each term "
+        "carries the same meaning here as in the Software Requirements "
+        "Specification [2].")
+    x += table_caption("Glossary of Terms")
     x += table([("Term", "Definition")] + GLOSSARY, [2122, 6518])
     x += blank()
 
@@ -579,6 +608,11 @@ def introduction():
 # ---------------------------------------------------------------------------
 def deployment_section():
     x = heading(1, "2.0. Deployment diagram")
+    x += para(
+        "Figure 1 shows the physical nodes on which the system runs and the "
+        "artefacts placed on each, so that the location of every part of the "
+        "system is unambiguous. The paragraphs that follow describe each node "
+        "and the protocol by which it is reached.")
     x += figure("figures/fig1_deployment.png", "Deployment Diagram")
     for p in DEPLOYMENT:
         x += para(p)
@@ -591,6 +625,10 @@ def deployment_section():
 def architecture_section():
     x = heading(1, "3.0. Architecture design")
     x += heading(2, "3.1. Web System Architecture")
+    x += para(
+        "Figure 2 presents the design entities that make up the system and the "
+        "collaborations between them. Each entity is then described in turn, "
+        "under the headings that follow.")
     x += figure("figures/fig2_architecture.png", "Architecture Design")
     for p in ARCH_INTRO:
         x += para(p)
@@ -630,6 +668,10 @@ def data_section():
     for p in DATA_INTRO:
         x += para(p)
     x += heading(2, "4.1.  Data field types and sizes.")
+    x += para(
+        "Table 2 gives every stored field, grouped by the entity that holds it, "
+        "with its type and the size or constraint that applies.")
+    x += table_caption("Data Field Types and Sizes")
     x += table(DATA_FIELDS, [4140, 1620, 2880], tblpr=TBLPR_DATA)
     x += blank()
     for p in DATA_NOTES:
@@ -644,6 +686,10 @@ def realizations_section():
     x = heading(1, "5.0. Use case realizations")
     for p in SYSTEM_SEQUENCE_NOTE:
         x += para(p)
+    x += para(
+        "Each realization that follows is introduced by its cross reference to "
+        "the Software Requirements Specification [2], described in prose, and "
+        "illustrated by a sequence diagram of its own.")
     x += figure("figures/fig3_system.png", "System Sequence Diagram")
     for title, srs, note, fname, cap in REALIZATIONS:
         x += heading(2, title)
@@ -661,6 +707,13 @@ def interface_section():
     x = heading(1, "6.0. Interface design")
     for p in INTERFACE_INTRO:
         x += para(p, style="BodyText", ind=False)
+    first = len(FIGURES) + 1
+    x += para(
+        f"Figures {first} to {first + len(INTERFACE_SHOTS) - 1} present the "
+        "implemented screens in the order a user meets them: the public pages "
+        "first, then the Student portal, then the Corporate portal, and finally "
+        "the same screens again at tablet and mobile widths.",
+        style="BodyText", ind=False)
     for fname, cap in INTERFACE_SHOTS:
         x += figure(f"figures/{fname}", cap)
     return x
@@ -719,6 +772,7 @@ def index_section(index_hits=None):
 def assemble(toc_entries=None, fig_entries=None, index_hits=None):
     HEADINGS.clear()
     FIGURES.clear()
+    TABLES.clear()
     images.clear()
     body = (
         title_page()

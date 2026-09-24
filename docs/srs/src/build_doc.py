@@ -93,6 +93,7 @@ def para(parts, style=None, jc="both", ind=None, keep_next=False, spacing=True):
 # ---------------------------------------------------------------------------
 HEADINGS = []      # (level, text) in document order, collected during build
 FIGURES = []       # caption text in document order
+TABLES = []       # table caption text in document order
 
 
 def toc_entry(level, text, page, first=False, last=False, instr=None):
@@ -312,6 +313,34 @@ def figure(path, text, max_width_in=TEXT_WIDTH_IN):
     return picture(path, max_width_in) + caption(text)
 
 
+def reference(number, text):
+    """One entry in the reference list, hanging-indented under its number."""
+    return para(f"[{number}]\t{text}",
+                ind='<w:ind w:left="567" w:hanging="567"/>')
+
+
+def table_caption(text):
+    """
+    A numbered table caption, on its own SEQ counter.
+
+    Tables are captioned above rather than below, which is the convention for
+    tables as captioning beneath is for figures, and the caption is what the
+    List of Tables is built from.
+    """
+    TABLES.append(f"Table {len(TABLES) + 1} - {text}")
+    return (
+        '<w:p><w:pPr><w:pStyle w:val="Caption"/><w:keepNext/>'
+        '<w:jc w:val="center"/></w:pPr>'
+        '<w:r><w:t xml:space="preserve">Table </w:t></w:r>'
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> SEQ Table \\* ARABIC </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="separate"/></w:r>'
+        f'<w:r><w:t>{len(TABLES)}</w:t></w:r>'
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r>'
+        f'<w:r><w:t xml:space="preserve"> - {escape(text)}</w:t></w:r></w:p>'
+    )
+
+
 # ---------------------------------------------------------------------------
 # Tables
 # ---------------------------------------------------------------------------
@@ -446,17 +475,25 @@ def title_page():
 # ---------------------------------------------------------------------------
 # Front matter
 # ---------------------------------------------------------------------------
-def front_matter(toc_entries=None, fig_entries=None):
+def front_matter(toc_entries=None, fig_entries=None, tbl_entries=None):
     toc = (build_toc(toc_entries, 'TOC \\o "1-4" \\h \\z \\u') if toc_entries
            else toc_field('TOC \\o "1-4" \\h \\z \\u', "Table of contents"))
     lof = (build_toc(fig_entries, 'TOC \\h \\z \\c "Figure"') if fig_entries
            else toc_field('TOC \\h \\z \\c "Figure"', "List of figures"))
+    # The document carries eighteen captioned tables as well as its figures, so
+    # the front matter lists both. A reader who can find a figure by number but
+    # not a table has half a document.
+    lot = (build_toc(tbl_entries, 'TOC \\h \\z \\c "Table"') if tbl_entries
+           else toc_field('TOC \\h \\z \\c "Table"', "List of tables"))
     return (
         heading(1, "Table of Contents", in_toc=False)
         + toc
         + page_break()
         + heading(1, "List of Figures", in_toc=False)
         + lof
+        + page_break()
+        + heading(1, "List of Tables", in_toc=False)
+        + lot
         + section_break(SECT_FRONT)
     )
 
@@ -533,22 +570,40 @@ def introduction():
         "and assessed, and moves applicants through review, shortlisting and "
         "selection.")
     x += para(
-        "The system serves two kinds of user: the Student and the Corporate User. "
-        "It does not attempt to disburse funds, to verify documents against any "
-        "external authority, or to integrate with the administration systems of "
-        "universities or of government. Those lie outside the scope of this "
-        "release.")
+        "The system serves three kinds of user: the Student, the Corporate User "
+        "and the Administrator. The Administrator maintains the catalogue of "
+        "institutions, qualifications and subjects that the other two select "
+        "from, and suspends or restores accounts; the Administrator does not "
+        "take part in matching or in selection. The system does not attempt to "
+        "disburse funds, to verify documents against any external authority, or "
+        "to integrate with the administration systems of universities or of "
+        "government. Those lie outside the scope of this release.")
 
     x += heading(2, "1.3.\tGlossary")
+    x += para(
+        "Table 1 defines the terms used throughout this specification. Each term "
+        "carries the same meaning wherever it appears, in this document and in "
+        "the Software Design Description and Test Plan that accompany it.")
+    x += table_caption("Glossary of Terms")
     x += table([("Term", "Definition")] + GLOSSARY, [2520, 6120])
 
     x += heading(2, "1.4.\tReferences")
-    x += para("IEEE. IEEE Std 830-1998 IEEE Recommended Practice for Software "
-              "Requirements Specifications. IEEE Computer Society, 1998.")
-    x += para("Object Management Group. OMG Unified Modeling Language (OMG UML), "
-              "Version 2.5.1. Object Management Group, 2017.")
-    x += para("Republic of South Africa. Protection of Personal Information Act 4 "
-              "of 2013. Government Gazette, 2013.")
+    x += para(
+        "The sources below are cited by bracketed number throughout this "
+        "document. Each is cited at least once in the text, and every bracketed "
+        "number in the text appears here.")
+    x += reference(
+        1, "IEEE, IEEE Std 830-1998, IEEE Recommended Practice for Software "
+           "Requirements Specifications. Los Alamitos, CA: IEEE Computer "
+           "Society, 1998.")
+    x += reference(
+        2, "Object Management Group, OMG Unified Modeling Language (OMG UML), "
+           "Version 2.5.1. Needham, MA: Object Management Group, 2017. "
+           "[Online]. Available: https://www.omg.org/spec/UML/2.5.1/.")
+    x += reference(
+        3, "Republic of South Africa, Protection of Personal Information Act 4 "
+           "of 2013. Pretoria: Government Printer, 2013. [Online]. Available: "
+           "https://www.justice.gov.za/legislation/acts/2013-004.pdf.")
 
     x += heading(2, "1.5.\tOverview of Document")
     x += para(
@@ -564,7 +619,20 @@ def introduction():
         "the logical structure of the data and the security requirements.")
     x += para(
         "Both chapters describe the same software product in its entirety, but "
-        "are intended for different audiences and so use different language.")
+        "are intended for different audiences and so use different language. "
+        "The division of the document between them, and the content of each "
+        "section, follow the recommended practice for a software requirements "
+        "specification set out in [1].")
+    x += para(
+        "Four conventions are used throughout. Figures are numbered "
+        "consecutively and listed in the List of Figures; every use case is "
+        "accompanied by its own numbered diagram. Tables that present data in "
+        "their own right are numbered and listed in the List of Tables; the "
+        "formal requirement tables of Section 3.2 are not separately numbered, "
+        "because each sits directly beneath the numbered heading of the use "
+        "case it describes. Sources are cited by bracketed number against the "
+        "list in Section 1.4. Cross references name the section, figure or "
+        "table by its number rather than by its position on the page.")
     return x
 
 
@@ -576,7 +644,12 @@ def overall_description():
     x += heading(2, "2.1\tSystem Environment")
     x += figure("figures/fig1_environment.png", "System Environment")
     x += para(
-        "Bursary-Bridge has two active actors and one cooperating system.")
+        "Figure 1 shows the environment in which Bursary-Bridge operates. The "
+        "system has three active actors, the Student, the Corporate User and "
+        "the Administrator, each reaching it through a portal of their own, and "
+        "five cooperating components: the Matching Engine, the database, "
+        "document storage, an email service and the published bursary sources "
+        "from which the directory is collected.")
     x += para(
         "The Student and the Corporate User both reach the system through a web "
         "browser over the Internet. Each is presented with a different portal, "
@@ -611,8 +684,7 @@ def overall_description():
 
     x += figure("figures/fig2_lifecycle.png", "Application Status Lifecycle")
     x += para(
-        "The Application Status Lifecycle above summarises the use cases that "
-        "follow. A Student prepares an application as a draft and submits it. The "
+        "Figure 2 summarises the use cases that follow. A Student prepares an application as a draft and submits it. The "
         "Corporate User reviews it, may ask for further information, and either "
         "shortlists the applicant or records the application as unsuccessful. A "
         "shortlisted applicant is either selected as a beneficiary or, ultimately, "
@@ -642,8 +714,8 @@ def overall_description():
     # an overview.
     x += heading(3, "2.2.5\tComplete Use Case Diagram")
     x += para(
-        "The diagram below brings together every actor and every use case "
-        "described in this section. The Student, the Corporate User and the "
+        f"Figure {len(FIGURES) + 1} brings together every actor and every use "
+        "case described in this section. The Student, the Corporate User and the "
         "Administrator are all specialisations of a User, which is why the four "
         "use cases they share are attached once to the User actor rather than "
         "drawn three times. The diagram is set sideways on the page overleaf "
@@ -698,7 +770,8 @@ def use_case_section(uc):
         first = uc["pre"].split(". ")[0] + "."
         x += para([(first, False, True)])
     x += para([("Diagram:", True, False)])
-    x += picture(f"figures/{uc['id']}.png", max_width_in=4.9)
+    x += figure(f"figures/{uc['id']}.png", f"{uc['name']} Use Case",
+                max_width_in=4.9)
     x += para([("Brief Description", True, False)])
     x += para(uc["brief"])
     x += para([("Initial Step-By-Step Description", True, False)])
@@ -762,12 +835,19 @@ def requirements_specification():
 
     x += heading(2, "3.3\tDetailed Non-Functional Requirements")
     x += heading(3, "3.3.1\tLogical Structure of the Data")
-    x += para("The logical structure of the data stored by Bursary-Bridge is "
-              "given below.")
+    data_fig = len(FIGURES) + 1
+    x += para(
+        f"Figure {data_fig} presents the logical structure of the data stored "
+        "by Bursary-Bridge, drawn as a Unified Modeling Language class diagram "
+        "in accordance with [2].")
     x += figure("figures/fig8_data.png", "Logical Structure of the Bursary-Bridge Data")
-    x += para("The data descriptions of each of these data entities is as follows:")
+    x += para(
+        f"Tables {len(TABLES) + 1} to {len(TABLES) + len(DATA_ENTITIES)} "
+        f"describe each of the entities in Figure {data_fig} in turn, giving "
+        "the data items it holds, the type of each and the constraints that "
+        "apply.")
     for name, rows in DATA_ENTITIES:
-        x += para([(f"{name} Data Entity", True, False)])
+        x += table_caption(f"{name} Data Entity")
         x += table([("Data Item", "Type", "Description", "Comment")] + rows,
                    [1780, 1440, 3160, 2260])
     x += para(
@@ -794,7 +874,7 @@ def requirements_specification():
         "and the matching profile; an application collects what a specific "
         "programme requires. Collecting less reduces both the value of the "
         "database to an attacker and the obligations of the operator under the "
-        "Protection of Personal Information Act.")
+        "Protection of Personal Information Act [3].")
     return x
 
 
@@ -823,10 +903,11 @@ def requirement_table(uc):
 # ---------------------------------------------------------------------------
 # Assemble and package
 # ---------------------------------------------------------------------------
-def assemble(toc_entries=None, fig_entries=None):
+def assemble(toc_entries=None, fig_entries=None, tbl_entries=None):
     """Produce the whole document.xml for one pass."""
     HEADINGS.clear()
     FIGURES.clear()
+    TABLES.clear()
     images.clear()
     _next_rid[0] = 100
 
@@ -834,7 +915,7 @@ def assemble(toc_entries=None, fig_entries=None):
     intro = introduction()
     overall = overall_description()
     reqs = requirements_specification()
-    front = front_matter(toc_entries, fig_entries)
+    front = front_matter(toc_entries, fig_entries, tbl_entries)
 
     body = tp + front + intro + overall + reqs
     src = open(f"{SRC}/word/document.xml", encoding="utf-8").read()
@@ -842,7 +923,46 @@ def assemble(toc_entries=None, fig_entries=None):
     return f"{prefix}{body}{SECT_BODY}</w:body></w:document>"
 
 
-def package(document, out):
+def set_footer_total(build_dir, body_pages):
+    """
+    Put the real body page total into the footer.
+
+    The template's footer reads "Page PAGE of NUMPAGES". NUMPAGES counts every
+    page in the file, but the body restarts its numbering at 1 after the roman
+    front matter, so the two never agree: the last page of the body printed
+    "Page 71 of 77" in a seventy-five page document. PAGE is left alone as a
+    field; only NUMPAGES is replaced, by the body total this build measured,
+    which is the number the footer was always trying to say.
+
+    The replacement is anchored on the NUMPAGES instruction itself and walks
+    outwards to that field's own begin and end. Matching from the first
+    fldChar in the paragraph instead swallows the PAGE field and the word
+    "of" with it, leaving a footer that reads "Page 73" on every page.
+    """
+    path = f"{build_dir}/word/footer2.xml"
+    xml = open(path, encoding="utf-8").read()
+
+    m = re.search(r"<w:instrText[^>]*>\s*NUMPAGES\s*</w:instrText>", xml)
+    if not m:
+        raise SystemExit("footer: NUMPAGES field not found, refusing to guess")
+
+    before, after = xml[:m.start()], xml[m.end():]
+    open_at = before.rfind('<w:r>')
+    while open_at != -1 and 'fldCharType="begin"' not in before[open_at:]:
+        open_at = before.rfind('<w:r>', 0, open_at)
+    close_token = '<w:fldChar w:fldCharType="end"/></w:r>'
+    close_at = after.find(close_token)
+    if open_at == -1 or close_at == -1:
+        raise SystemExit("footer: NUMPAGES field is not well formed")
+
+    literal = ('<w:r><w:rPr><w:b/><w:bCs/><w:sz w:val="24"/>'
+               f'<w:szCs w:val="24"/></w:rPr><w:t>{body_pages}</w:t></w:r>')
+    xml = before[:open_at] + literal + after[close_at + len(close_token):]
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(xml)
+
+
+def package(document, out, body_pages=None):
     if os.path.exists(BUILD):
         shutil.rmtree(BUILD)
     shutil.copytree(SRC, BUILD)
@@ -879,6 +999,9 @@ def package(document, out):
     with open(st_path, "w", encoding="utf-8") as fh:
         fh.write(st)
 
+    if body_pages is not None:
+        set_footer_total(BUILD, body_pages)
+
     if os.path.exists(out):
         os.remove(out)
     # Word writes [Content_Types].xml as the first entry and stores no
@@ -909,6 +1032,7 @@ def build():
     package(assemble(), "pass1.docx")
     headings = list(HEADINGS)
     figures = list(FIGURES)
+    tables = list(TABLES)
     render("pass1.docx", "pass1.pdf")
 
     # The body restarts its numbering at 1, so work out how many pages precede
@@ -916,19 +1040,28 @@ def build():
     offset = body_offset("pass1.pdf")
     h_pages = page_map("pass1.pdf", [t for _, t in headings], offset)
     f_pages = page_map("pass1.pdf", figures, offset)
+    t_pages = page_map("pass1.pdf", tables, offset)
 
     toc_entries = [(lvl, txt, pg if pg else 1)
                    for (lvl, txt), pg in zip(headings, h_pages)]
     fig_entries = [(1, txt, pg if pg else 1)
                    for txt, pg in zip(figures, f_pages)]
+    tbl_entries = [(1, txt, pg if pg else 1)
+                   for txt, pg in zip(tables, t_pages)]
 
-    missing = sum(1 for p in h_pages + f_pages if p is None)
+    missing = sum(1 for p in h_pages + f_pages + t_pages if p is None)
 
-    # Pass 2 — rebuild with the cached table of contents and list of figures.
-    package(assemble(toc_entries, fig_entries), OUT)
+    total_pages = int(subprocess.run(["pdfinfo", "pass1.pdf"], capture_output=True,
+                                     text=True).stdout.split("Pages:")[1].split()[0])
+    body_pages = total_pages - offset
+
+    # Pass 2 — rebuild with the cached contents, lists and footer total.
+    package(assemble(toc_entries, fig_entries, tbl_entries), OUT,
+            body_pages=body_pages)
     size = os.path.getsize(OUT)
     print(f"wrote {OUT}  ({size/1024:.0f} KB, {len(images)} figures, "
-          f"{len(toc_entries)} TOC entries, {len(fig_entries)} figure entries"
+          f"{len(toc_entries)} TOC entries, {len(fig_entries)} figure entries, "
+          f"{len(tbl_entries)} table entries, {body_pages} body pages"
           + (f", {missing} page numbers not resolved" if missing else "") + ")")
     for f in ("pass1.docx", "pass1.pdf"):
         if os.path.exists(f):

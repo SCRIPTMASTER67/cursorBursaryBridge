@@ -36,7 +36,8 @@ PURPOSE = [
     "University of Zululand, including the project supervisor and the studio "
     "committee, together with any developer who is asked to extend or maintain "
     "the system. The reader is assumed to be familiar with the Software "
-    "Requirements Specification for Bursary-Bridge, to which this document is a "
+    "Requirements Specification for Bursary-Bridge [2], to which this document "
+    "is a "
     "companion; requirements are not restated here except where a design "
     "decision cannot be understood without them.",
 ]
@@ -49,11 +50,12 @@ SCOPE = [
     "Bursary-Bridge as implemented in the prototype.",
 
     "The architecture is a single web application served from one process. It "
-    "is built on Next.js 15 using the App Router, with React 19 components "
+    "is built on Next.js 15 using the App Router [3], with React 19 components "
     "rendered on the server by default, TypeScript throughout and Tailwind CSS "
     "for presentation. Persistent state is held in PostgreSQL and reached "
-    "through Prisma. The application exposes two portals over one codebase and "
-    "one database: a Student portal and a Corporate portal.",
+    "through Prisma [4]. The application exposes three portals over one "
+    "codebase and one database: a Student portal, a Corporate portal and an "
+    "Administration portal.",
 
     "The system recognises three roles, STUDENT, CORPORATE and ADMIN. A "
     "Student builds a profile, receives ranked funding opportunities with the "
@@ -129,21 +131,30 @@ GLOSSARY = [
 # 1.4 References
 # ---------------------------------------------------------------------------
 REFERENCES = [
-    "[IEEE] The applicable IEEE standards are published in “IEEE Standards",
-    "Collection,” 2001 edition. IEEE 1016 Recommended Practice for Software",
-    "Design Descriptions provides the structure adopted by this document.",
+    "The sources below are cited by bracketed number throughout this document.",
+    "Each is cited at least once in the text, and every bracketed number in the",
+    "text appears here.",
     "",
-    "[SRS] “Software Requirements Specification: Bursary-Bridge, A Bursary and",
-    "Scholarship Matching Platform.” Department of Computer Science,",
-    "University of Zululand, 2026. All Section 3.2 cross references in Section 5",
-    "of this document refer to that specification.",
+    "[1] IEEE, IEEE Std 1016-2009, IEEE Standard for Information Technology -",
+    "Systems Design - Software Design Descriptions. New York: Institute of",
+    "Electrical and Electronics Engineers, 2009. The structure of this document,",
+    "and the description of each design entity by its name, type, attributes,",
+    "resources and operations, follow this standard.",
     "",
-    "[Next] Next.js 15 documentation, App Router. Vercel, 2025.",
+    "[2] Department of Computer Science, University of Zululand, \u201cSoftware",
+    "Requirements Specification: Bursary-Bridge, A Bursary and Scholarship",
+    "Matching Platform,\u201d 2026. Every Section 3.2 cross reference in Section 5",
+    "of this document refers to that specification.",
     "",
-    "[Prisma] Prisma ORM documentation, version 6. Prisma Data, Inc., 2025.",
+    "[3] Vercel, Next.js Documentation, Version 15: App Router. [Online].",
+    "Available: https://nextjs.org/docs.",
     "",
-    "[POPIA] Protection of Personal Information Act 4 of 2013, Republic of South",
-    "Africa.",
+    "[4] Prisma Data, Inc., Prisma ORM Documentation, Version 6. [Online].",
+    "Available: https://www.prisma.io/docs.",
+    "",
+    "[5] Republic of South Africa, Protection of Personal Information Act 4 of",
+    "2013. Pretoria: Government Printer, 2013. [Online]. Available:",
+    "https://www.justice.gov.za/legislation/acts/2013-004.pdf.",
 ]
 
 # ---------------------------------------------------------------------------
@@ -157,7 +168,7 @@ OVERVIEW = [
     "Section 3 is the Architecture Design. It identifies the design entities that "
     "collaborate to perform the functions of the system and describes each by its "
     "name, type, description, attributes, resources and operations, in the manner "
-    "recommended by IEEE 1016.",
+    "recommended by IEEE 1016 [1].",
     "Section 4 concerns the Data Structure Design, giving the logical structure of "
     "the stored data and the type and size of each field.",
     "Section 5 contains the Use Case Realizations. Each use case is traced from "
@@ -1182,7 +1193,7 @@ DATA_INTRO = [
     "validation schemas on the server, which are the limits a user actually "
     "encounters. Fields whose type is an enumerated type are constrained by the "
     "database itself to the values listed in the schema.",
-    "The table below gives the fields of the principal entities. Relationship "
+    "Table 2 gives the fields of the principal entities. Relationship "
     "fields are shown by the entity they refer to rather than by their "
     "identifier column.",
 ]
@@ -1265,6 +1276,16 @@ DATA_FIELDS = [
 ]
 
 DATA_NOTES = [
+    "The structure records personal information of the kinds the Protection of "
+    "Personal Information Act [5] treats as requiring protection: identity "
+    "numbers, dates of birth, contact details, academic results and an "
+    "indication of household income. Two design decisions follow from that. "
+    "Each of these fields is held once, on the profile that owns it, rather "
+    "than being copied onto every application, so there is a single place to "
+    "correct or remove it. And every query that reads them is scoped by the "
+    "identifiers a guard returns, as Section 3 describes, so the structure "
+    "itself cannot be read across the boundary between one user and another.",
+
     "Fields marked with an asterisk are required. Fields shown as Reference are "
     "foreign keys to the named entity. Fields shown as Enumerated are constrained "
     "by the database to the values declared in the schema; where the set is long "
@@ -1290,7 +1311,7 @@ DATA_NOTES = [
 # 5.0 Use case realizations
 # ---------------------------------------------------------------------------
 SYSTEM_SEQUENCE_NOTE = [
-    "The diagram below shows the interaction common to every request the system "
+    "Figure 3 shows the interaction common to every request the system "
     "serves. A request from the browser reaches the application node, where the "
     "guard resolves the session before anything else occurs, the service layer "
     "composes a query already scoped to the caller, and the result is rendered "

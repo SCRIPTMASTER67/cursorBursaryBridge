@@ -92,6 +92,13 @@ def blank():
     return f'<w:p><w:pPr>{PBDR}<w:rPr>{TNR}</w:rPr></w:pPr></w:p>'
 
 
+def reference(s):
+    """One entry in the reference list, hanging-indented under its number."""
+    return (f'<w:p><w:pPr>{PBDR}{SPACING}'
+            '<w:ind w:left="567" w:hanging="567"/>'
+            f'{JC}<w:rPr>{TNR}</w:rPr></w:pPr>{_text(s)}</w:p>')
+
+
 def item(s, num):
     # CT_PPr orders numPr before pBdr.
     return (f'<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/>'
@@ -107,6 +114,8 @@ def section(title, blocks):
             out += para(value)
         elif kind == "blank":
             out += blank()
+        elif kind == "ref":
+            out += reference(value)
         else:
             out += item(value, kind)
     return out + blank()

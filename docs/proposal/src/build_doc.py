@@ -259,6 +259,26 @@ def picture(path, doc_id=[1]):
     )
 
 
+TABLES = []          # table caption text in document order
+
+
+def table_caption(text):
+    """
+    A numbered table caption, on a counter of its own.
+
+    Captioned above the table, which is the convention for tables; figures are
+    captioned beneath. The cover page's student table is deliberately not
+    captioned: it is a form the template supplies, not data this document
+    presents.
+    """
+    TABLES.append(f"Table {len(TABLES) + 1} {text}")
+    ppr = ('<w:pPr><w:keepNext/>' + BODY_SPACING
+           + '<w:jc w:val="left"/><w:rPr>' + TNR
+           + '<w:b/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr></w:pPr>')
+    return (f'<w:p>{ppr}'
+            f'{runs([(f"Table {len(TABLES)} {text}", True, False)], sz=20)}</w:p>')
+
+
 def caption(text):
     ppr = ('<w:pPr>' + BODY_SPACING + '<w:jc w:val="center"/><w:rPr>' + TNR
            + '<w:b/><w:sz w:val="20"/><w:szCs w:val="20"/></w:rPr></w:pPr>')
@@ -351,6 +371,7 @@ def goal_section():
     rows = [["No.", "Objective", "How completion is measured"]]
     for i, (objective, measure) in enumerate(OBJECTIVES, start=1):
         rows.append([str(i), objective, measure])
+    x += table_caption("Objectives and the evidence that each has been met")
     x += table(rows, [560, 4233, 4233], sz=20)
     return x
 
@@ -375,10 +396,12 @@ def tools_section():
         x += para(p)
     x += blank()
     x += para([("Hardware", True, False)], jc="left")
+    x += table_caption("Hardware required for the project")
     x += table([["Item", "Purpose in this project"]] + [list(r) for r in HARDWARE],
                [2800, 6226], sz=20)
     x += blank()
     x += para([("Software and technologies", True, False)], jc="left")
+    x += table_caption("Software and technologies required for the project")
     x += table([["Category", "Technology and the reason for it"]]
                + [list(r) for r in SOFTWARE], [2800, 6226], sz=20)
     return x
@@ -403,11 +426,13 @@ def beneficiaries_section():
     x += para([("Direct beneficiaries", True, False)], jc="left")
     rows = [["Beneficiary", "How they interact with the system", "Benefit"]]
     rows += [list(r) for r in BENEFICIARIES_DIRECT]
+    x += table_caption("Direct beneficiaries of the project")
     x += table(rows, [1900, 3563, 3563], sz=20)
     x += blank()
     x += para([("Indirect beneficiaries", True, False)], jc="left")
     rows = [["Beneficiary", "Relationship to the system", "Benefit"]]
     rows += [list(r) for r in BENEFICIARIES_INDIRECT]
+    x += table_caption("Indirect beneficiaries of the project")
     x += table(rows, [1900, 3563, 3563], sz=20)
     return x
 
@@ -423,14 +448,15 @@ def assumptions_section():
 
 def risks_section():
     x = heading(1, "Project Risks")
-    x += para("The risks below are those that could prevent the project from "
-              "reaching its objectives. Likelihood and impact are the team's "
-              "own assessment; each risk carries the mitigation that is "
-              "already planned for it rather than a general intention to be "
-              "careful.")
+    x += para("Table 6 sets out the risks that could prevent the project from "
+              "reaching the objectives stated in Section 3.2. Likelihood and "
+              "impact are the team's own assessment; each risk carries the "
+              "mitigation already planned for it rather than a general "
+              "intention to be careful.")
     x += blank()
     rows = [["Risk", "Likelihood", "Impact", "Mitigation"]]
     rows += [[r[0], r[1], r[2], r[3]] for r in RISKS]
+    x += table_caption("Project risks, their assessment and their mitigation")
     x += table(rows, [2800, 1300, 850, 4076], sz=20)
     return x
 
@@ -442,8 +468,13 @@ def workplan_section():
     for p in EXPERTISE_INTRO:
         x += para(p)
     x += blank()
+    x += para("Table 7 allocates each area of the system to the member "
+              "accountable for it.")
+    x += blank()
     rows = [["Member", "Responsibilities", "Level of knowledge"]]
     rows += [list(r) for r in TEAM]
+    x += table_caption("Team members, their responsibilities and their level of "
+                       "knowledge")
     x += table(rows, [1500, 4726, 2800], sz=20)
     x += blank()
     for p in TEAM_NOTE:
@@ -453,10 +484,15 @@ def workplan_section():
     for p in WORKPLAN_INTRO:
         x += para(p)
     x += blank()
+    x += para("Table 8 lists the tasks and the weeks each occupies, and "
+              "Figure 1 presents the same plan as a Gantt chart so that the "
+              "overlap between tasks can be seen at a glance.")
+    x += blank()
     rows = [["Task", "Weeks", "Description"]]
     for name, start, end, note in WORKPLAN:
         span = str(start) if start == end else f"{start}–{end}"
         rows.append([name, span, note])
+    x += table_caption("Project work plan by task and week")
     x += table(rows, [2600, 900, 5526], sz=20)
     x += blank()
     x += picture("figures/gantt.png")
@@ -496,8 +532,12 @@ def appendices_section():
     for p in APPENDIX_B_INTRO:
         x += para(p)
     x += blank()
+    x += para("Table 9 lists the documents the project produces and the "
+              "structure each follows.")
+    x += blank()
     rows = [["Document", "Structure it follows", "Status"]]
     rows += [list(r) for r in APPENDIX_B]
+    x += table_caption("Project documents and the structure each follows")
     x += table(rows, [3000, 4026, 2000], sz=20)
     return x
 
@@ -518,6 +558,7 @@ def assemble(toc_entries=None):
     _counter[0] = _counter[1] = 0
     _list_id[0] = 20
     images.clear()
+    TABLES.clear()
 
     body = (
         title_page()
