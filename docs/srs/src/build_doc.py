@@ -467,7 +467,7 @@ def title_page():
         + para("Submitted by", jc="left", spacing=False)
         + table(students, [4320, 4320], header_bold=False)
         + blank()
-        + centred("Date", size=20)
+        + centred("September 2026", size=20)
         + section_break(SECT_TITLE)
     )
 
