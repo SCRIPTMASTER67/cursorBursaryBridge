@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-09-24T03:15:03.444Z",
+  "exportedAt": "2026-09-24T08:26:34.668Z",
   "note": "Collected by the Bursary-Bridge ingestion pipeline from the sources named on each row. Every opportunity carries the URL it was read from and the date it was last confirmed. Nothing here was written by hand.",
   "count": 189,
   "opportunities": [
@@ -28,7 +28,8 @@
         "name": "ABSA BMI",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/absa-bank-bursary/"
       },
       "sources": [
         {
@@ -68,7 +69,8 @@
         "name": "ADSA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/medical-bursaries-south-africa/adsa-bursary/"
       },
       "sources": [
         {
@@ -108,7 +110,8 @@
         "name": "ADvTECH Student Teacher",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/education-bursaries-south-africa/advtech-student-teacher-bursary/"
       },
       "sources": [
         {
@@ -148,7 +151,8 @@
         "name": "AECI",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/aeci-limited-bursary/"
       },
       "sources": [
         {
@@ -188,7 +192,8 @@
         "name": "AFROX",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/afrox-accounting-engineering-bursary-south-africa/"
       },
       "sources": [
         {
@@ -228,7 +233,8 @@
         "name": "ATNS",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/atns-aimo-bursary/"
       },
       "sources": [
         {
@@ -268,7 +274,8 @@
         "name": "AWS Skills Development",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/aws-skills-development-bursary/"
       },
       "sources": [
         {
@@ -308,7 +315,8 @@
         "name": "Absa",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/absa-bursary/"
       },
       "sources": [
         {
@@ -348,7 +356,8 @@
         "name": "Absa Fellowship",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/absa-fellowship-scholarship-programme/"
       },
       "sources": [
         {
@@ -388,7 +397,8 @@
         "name": "Accenture",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/accenture-scholarship-south-africa/"
       },
       "sources": [
         {
@@ -428,7 +438,8 @@
         "name": "Access Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/access-trust-bursary/"
       },
       "sources": [
         {
@@ -468,7 +479,8 @@
         "name": "Adapt IT",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/adapt-it-bursary/"
       },
       "sources": [
         {
@@ -508,7 +520,8 @@
         "name": "Advance Africa",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/advance-africa-scholarship/"
       },
       "sources": [
         {
@@ -548,7 +561,8 @@
         "name": "Alexander Forbes",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/alexander-forbes-bursary/"
       },
       "sources": [
         {
@@ -588,7 +602,8 @@
         "name": "Alfeco",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/alfeco-bursary/"
       },
       "sources": [
         {
@@ -628,7 +643,8 @@
         "name": "Alfred Nzo District Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/alfred-nzo-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -668,7 +684,8 @@
         "name": "Allan Gray Orbis Fellowship",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/allan-gray-orbis-fellowship-bursary/"
       },
       "sources": [
         {
@@ -708,7 +725,8 @@
         "name": "Altron Bill Venter Academy",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/altron-bill-venter-academy-bursary/"
       },
       "sources": [
         {
@@ -748,7 +766,8 @@
         "name": "Amazon",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/amazon-bursary/"
       },
       "sources": [
         {
@@ -788,7 +807,8 @@
         "name": "ArcelorMittal",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/arcelormittal-sa-bursary/"
       },
       "sources": [
         {
@@ -828,7 +848,8 @@
         "name": "Armscor",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/armscor-bursary/"
       },
       "sources": [
         {
@@ -868,7 +889,8 @@
         "name": "Arts & Culture Trust (ACT) Nyoloha",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/music-and-performing-arts-bursaries-south-africa/arts-culture-trust-act-scholarship/"
       },
       "sources": [
         {
@@ -908,7 +930,8 @@
         "name": "Arup Education Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/construction-and-built-environment-bursaries-south-africa/arup-education-trust-bursary/"
       },
       "sources": [
         {
@@ -948,7 +971,8 @@
         "name": "Ashinaga Africa Initiative (AAI) Leadership",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/ashinaga-africa-initiative-aai-leadership-programme/"
       },
       "sources": [
         {
@@ -988,7 +1012,8 @@
         "name": "BBD",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/bbd-bursary/"
       },
       "sources": [
         {
@@ -1028,7 +1053,8 @@
         "name": "BCE Foodservice Equipment",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/bce-foodservice-equipment-bursary/"
       },
       "sources": [
         {
@@ -1068,7 +1094,8 @@
         "name": "BET Software",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/bet-bursary/"
       },
       "sources": [
         {
@@ -1108,7 +1135,8 @@
         "name": "BHP Billiton",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/bhp-billiton-bursary/"
       },
       "sources": [
         {
@@ -1148,7 +1176,8 @@
         "name": "Baker Hughes",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/baker-hughes-bursary/"
       },
       "sources": [
         {
@@ -1188,7 +1217,8 @@
         "name": "Bank of Namibia",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/bank-of-namibia-bursary/"
       },
       "sources": [
         {
@@ -1228,7 +1258,8 @@
         "name": "Beit Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/beit-trust-scholarship-south-africa-and-uk/"
       },
       "sources": [
         {
@@ -1268,7 +1299,8 @@
         "name": "Bergrivier Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/bergrivier-municipality-bursary/"
       },
       "sources": [
         {
@@ -1308,7 +1340,8 @@
         "name": "Bester",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/bester-bursary-graduate-development-programme/"
       },
       "sources": [
         {
@@ -1348,7 +1381,8 @@
         "name": "Bheki Mlangeni Memorial",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/law-bursaries-south-africa/bheki-mlangeni-memorial-scholarship/"
       },
       "sources": [
         {
@@ -1388,7 +1422,8 @@
         "name": "Bitou Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/bitou-municipality-mayoral-bursary/"
       },
       "sources": [
         {
@@ -1428,7 +1463,8 @@
         "name": "Black Management Forum (BMF)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/black-management-forum-bmf-bursary/"
       },
       "sources": [
         {
@@ -1468,7 +1504,8 @@
         "name": "Bombela",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/bombela-civils-joint-venture-bursary/"
       },
       "sources": [
         {
@@ -1508,7 +1545,8 @@
         "name": "Boogertman + Partners",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/construction-and-built-environment-bursaries-south-africa/boogertman-partners-bursary/"
       },
       "sources": [
         {
@@ -1548,7 +1586,8 @@
         "name": "Brain-Jar Skills Development",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/education-bursaries-south-africa/brain-jar-skills-development-bursary/"
       },
       "sources": [
         {
@@ -1588,7 +1627,8 @@
         "name": "Brand South Africa",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/brand-south-africa-bursary/"
       },
       "sources": [
         {
@@ -1628,7 +1668,8 @@
         "name": "Breede Valley Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/breede-valley-municipality-bursary/"
       },
       "sources": [
         {
@@ -1668,7 +1709,8 @@
         "name": "Bridgestone",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/bridgestone-bursary/"
       },
       "sources": [
         {
@@ -1708,7 +1750,8 @@
         "name": "Buffalo City Metropolitan Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/buffalo-city-metropolitan-municipality-bursary/"
       },
       "sources": [
         {
@@ -1748,7 +1791,8 @@
         "name": "Bushbuckridge Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/bushbuckridge-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -1788,7 +1832,8 @@
         "name": "CETA Thapelo Madibeng",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/construction-and-built-environment-bursaries-south-africa/construction-education-and-training-authority-ceta-bursary/"
       },
       "sources": [
         {
@@ -1828,7 +1873,8 @@
         "name": "CHIETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/chieta-bursary/"
       },
       "sources": [
         {
@@ -1868,7 +1914,8 @@
         "name": "CSIR",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/csir-bursary/"
       },
       "sources": [
         {
@@ -1908,7 +1955,8 @@
         "name": "CSIR-SASOL Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/csir-sasol-foundation-bursary/"
       },
       "sources": [
         {
@@ -1948,7 +1996,8 @@
         "name": "Calvin and Family Group (CFG)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/calvin-and-family-group-cfg-bursary/"
       },
       "sources": [
         {
@@ -1988,7 +2037,8 @@
         "name": "Canon Collins Thekgo",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/canon-collins-thekgo-bursary/"
       },
       "sources": [
         {
@@ -2028,7 +2078,8 @@
         "name": "Canon Collins Trust and University of London",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/canon-collins-trust-and-university-of-london-scholarships-for-distance-learning/"
       },
       "sources": [
         {
@@ -2068,7 +2119,8 @@
         "name": "Cape Agulhas Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/cape-agulhas-municipality-bursary/"
       },
       "sources": [
         {
@@ -2108,7 +2160,8 @@
         "name": "Cape Winelands District Municipality Mayoral",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/cape-winelands-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -2148,7 +2201,8 @@
         "name": "Capitec",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/capitec-bank-bursary/"
       },
       "sources": [
         {
@@ -2188,7 +2242,8 @@
         "name": "Cecil Renaud International",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/cecil-renaud-overseas-scholarship-for-postgraduate-studies-in-the-uk/"
       },
       "sources": [
         {
@@ -2228,7 +2283,8 @@
         "name": "Chris Hani District Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/chris-hani-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -2268,7 +2324,8 @@
         "name": "Cipla",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/cipla-bursary/"
       },
       "sources": [
         {
@@ -2308,7 +2365,8 @@
         "name": "Cisco Charitable Foundation Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/cisco-charitable-foundation-trust-bursary/"
       },
       "sources": [
         {
@@ -2348,7 +2406,8 @@
         "name": "City of Cape Town",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/city-of-cape-town-bursary/"
       },
       "sources": [
         {
@@ -2388,7 +2447,8 @@
         "name": "City of Ekurhuleni",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/ekurhuleni-metropolitan-municipality-bursaries/"
       },
       "sources": [
         {
@@ -2428,7 +2488,8 @@
         "name": "City of Johannesburg (COJ)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/city-of-johannesburg-bursary/"
       },
       "sources": [
         {
@@ -2468,7 +2529,8 @@
         "name": "City of Johannesburg Emergency Management Services",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/city-of-johannesburg-ems-bursary/"
       },
       "sources": [
         {
@@ -2508,7 +2570,8 @@
         "name": "Clover Pinnacle",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/clover-bursary/"
       },
       "sources": [
         {
@@ -2548,7 +2611,8 @@
         "name": "Columbus Stainless",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/columbus-stainless-bursary/"
       },
       "sources": [
         {
@@ -2588,7 +2652,8 @@
         "name": "Compensation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/compensation-fund-bursary/"
       },
       "sources": [
         {
@@ -2628,7 +2693,8 @@
         "name": "Cyril Ramaphosa Education Trust (CRET)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/cyril-ramaphosa-education-trust-cret-bursary/"
       },
       "sources": [
         {
@@ -2668,7 +2734,8 @@
         "name": "Daimler Truck Southern Africa (DTSA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/daimler-truck-southern-africa-dtsa-bursary/"
       },
       "sources": [
         {
@@ -2708,7 +2775,8 @@
         "name": "Department of Agriculture (DoA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/dalrrd-bursary/"
       },
       "sources": [
         {
@@ -2748,7 +2816,8 @@
         "name": "Department of Economic Development, Environmental Affairs and Tourism (DEDEAT)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/dedea-bursary/"
       },
       "sources": [
         {
@@ -2788,7 +2857,8 @@
         "name": "Department of Forestry, Fisheries and the Environment (DFFE)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/department-of-environment-forestry-and-fisheries-bursary/"
       },
       "sources": [
         {
@@ -2828,7 +2898,8 @@
         "name": "Department of Public Works",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/department-of-public-works-bursary/"
       },
       "sources": [
         {
@@ -2868,7 +2939,8 @@
         "name": "Department of Rural Development and Agrarian Reform (DRDAR)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/department-of-rural-development-and-agrarian-reform-drdar-bursary/"
       },
       "sources": [
         {
@@ -2908,7 +2980,8 @@
         "name": "Department of Tourism",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/department-of-tourism-bursary/"
       },
       "sources": [
         {
@@ -2948,7 +3021,8 @@
         "name": "Donald White/ Mandla A. Ndwanya Memorial",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/donald-white-mandla-a-ndwanya-memorial-fund-bursary/"
       },
       "sources": [
         {
@@ -2988,7 +3062,8 @@
         "name": "Dr AB Xuma Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/dr-ab-xuma-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -3028,7 +3103,8 @@
         "name": "Drakenstein Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/drakenstein-municipality-bursary/"
       },
       "sources": [
         {
@@ -3068,7 +3144,8 @@
         "name": "ETDP SETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/etdp-seta-bursary/"
       },
       "sources": [
         {
@@ -3108,7 +3185,8 @@
         "name": "East London Industrial Development Zone (ELIDZ)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/east-london-idz-bursary/"
       },
       "sources": [
         {
@@ -3148,7 +3226,8 @@
         "name": "Eastern Cape Department of",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-department-of-agriculture-bursary/"
       },
       "sources": [
         {
@@ -3188,7 +3267,8 @@
         "name": "Eastern Cape Department of Education (ECDOE)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-department-of-education-ecdoe/"
       },
       "sources": [
         {
@@ -3228,7 +3308,8 @@
         "name": "Eastern Cape Department of Health",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-department-of-health-bursary/"
       },
       "sources": [
         {
@@ -3268,7 +3349,8 @@
         "name": "Eastern Cape Department of Public Works and Infrastructure",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-dept-of-roads-and-public-works-bursary/"
       },
       "sources": [
         {
@@ -3308,7 +3390,8 @@
         "name": "Eastern Cape Department of Transport",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-department-of-transport-bursary/"
       },
       "sources": [
         {
@@ -3348,7 +3431,8 @@
         "name": "Eastern Cape Department of Transport Traffic",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-department-of-transport-traffic-bursary/"
       },
       "sources": [
         {
@@ -3388,7 +3472,8 @@
         "name": "Eastern Cape Dept of Economic Development, Environmental Affairs and Tourism",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-dept-of-economic-development-environmental-affairs-and-tourism-bursary/"
       },
       "sources": [
         {
@@ -3428,7 +3513,8 @@
         "name": "Eastern Cape Office of the Premier (ECOTP)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-office-of-the-premier-ecotp-bursary/"
       },
       "sources": [
         {
@@ -3468,7 +3554,8 @@
         "name": "Eastern Cape Provincial Treasury",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/eastern-cape-provincial-treasury-bursary/"
       },
       "sources": [
         {
@@ -3508,7 +3595,8 @@
         "name": "Education Empowerment and Development",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/education-empowerment-and-development-fund-eedf-bursary/"
       },
       "sources": [
         {
@@ -3548,7 +3636,8 @@
         "name": "Emfuleni Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/emfuleni-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -3588,7 +3677,8 @@
         "name": "Energy Mobility Education Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/energy-mobility-education-trust-scholarship/"
       },
       "sources": [
         {
@@ -3628,7 +3718,8 @@
         "name": "Exxaro",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/exxaro-bursary/"
       },
       "sources": [
         {
@@ -3668,7 +3759,8 @@
         "name": "FASSET",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/accounting-bursaries-south-africa/fasset-bursary/"
       },
       "sources": [
         {
@@ -3708,7 +3800,8 @@
         "name": "FEDHASA Cape",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/fedhasa-cape-bursary/"
       },
       "sources": [
         {
@@ -3748,7 +3841,8 @@
         "name": "FEDISA Fashion School",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/music-and-performing-arts-bursaries-south-africa/fedisa-fashion-school-bursary/"
       },
       "sources": [
         {
@@ -3788,7 +3882,8 @@
         "name": "Fairtree",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/fairtree-bursary/"
       },
       "sources": [
         {
@@ -3828,7 +3923,8 @@
         "name": "Financial Sector Conduct Authority (FSCA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/financial-sector-conduct-authority-fsca-bursary/"
       },
       "sources": [
         {
@@ -3868,7 +3964,8 @@
         "name": "FirstRand Empowerment Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/firstrand-foundation-trust-bursary/"
       },
       "sources": [
         {
@@ -3908,7 +4005,8 @@
         "name": "Fluor",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/fluor-bursary/"
       },
       "sources": [
         {
@@ -3948,7 +4046,8 @@
         "name": "Foskor",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/foskor-bursary/"
       },
       "sources": [
         {
@@ -3988,7 +4087,8 @@
         "name": "Fulbright Foreign Student",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/fulbright-foreign-student-program-south-africa/"
       },
       "sources": [
         {
@@ -4028,7 +4128,8 @@
         "name": "Gallagher Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/gallagher-foundation-scholarship/"
       },
       "sources": [
         {
@@ -4068,7 +4169,8 @@
         "name": "Games Global",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/games-global-bursary/"
       },
       "sources": [
         {
@@ -4108,7 +4210,8 @@
         "name": "Gates Cambridge International",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/gates-cambridge-international-scholarship/"
       },
       "sources": [
         {
@@ -4148,7 +4251,8 @@
         "name": "Gauteng Department of Health",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gauteng-department-of-health-bursary-to-study-medicine-in-cuba/"
       },
       "sources": [
         {
@@ -4188,7 +4292,8 @@
         "name": "Gauteng Department of e-Government",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gauteng-department-of-e-government-bursary/"
       },
       "sources": [
         {
@@ -4228,7 +4333,8 @@
         "name": "Gauteng Dept of Infrastructure Development",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gauteng-dept-of-infrastructure-development-bursary/"
       },
       "sources": [
         {
@@ -4268,7 +4374,8 @@
         "name": "Gauteng Film Commission (GFC)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gauteng-film-commission-gfc-bursary/"
       },
       "sources": [
         {
@@ -4308,7 +4415,8 @@
         "name": "Gauteng Provincial Treasury",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gauteng-provincial-treasury-bursary/"
       },
       "sources": [
         {
@@ -4348,7 +4456,8 @@
         "name": "General Electric (GE)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/general-electric-bursary/"
       },
       "sources": [
         {
@@ -4388,7 +4497,8 @@
         "name": "Generation Google",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/generation-google-scholarship/"
       },
       "sources": [
         {
@@ -4428,7 +4538,8 @@
         "name": "Gert Sibande District Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/gert-sibande-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -4468,7 +4579,8 @@
         "name": "Goethe Talents",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/goethe-talents-scholarship/"
       },
       "sources": [
         {
@@ -4508,7 +4620,8 @@
         "name": "GrandWest",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/grandwest-bursary/"
       },
       "sources": [
         {
@@ -4548,7 +4661,8 @@
         "name": "Grandslots",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/grandslots-bursary/"
       },
       "sources": [
         {
@@ -4588,7 +4702,8 @@
         "name": "HENSOLDT South Africa",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/hensoldt-optronics-bursary/"
       },
       "sources": [
         {
@@ -4628,7 +4743,8 @@
         "name": "HP Inc",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/hp-inc-bursary/"
       },
       "sources": [
         {
@@ -4668,7 +4784,8 @@
         "name": "Hessequa Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/hessequa-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -4708,7 +4825,8 @@
         "name": "Hollywood Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/hollywoodbets-bursary/"
       },
       "sources": [
         {
@@ -4748,7 +4866,8 @@
         "name": "Huawei Technologies",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/huawei-technologies-bursary/"
       },
       "sources": [
         {
@@ -4788,7 +4907,8 @@
         "name": "INSETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/inseta-bursary/"
       },
       "sources": [
         {
@@ -4828,7 +4948,8 @@
         "name": "ISFAP",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/isfap-bursary/"
       },
       "sources": [
         {
@@ -4868,7 +4989,8 @@
         "name": "ITHUBA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/ithuba-bursary/"
       },
       "sources": [
         {
@@ -4908,7 +5030,8 @@
         "name": "Industrial Development Corporation (IDC)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/industrial-development-corporation-idc-bursary/"
       },
       "sources": [
         {
@@ -4948,7 +5071,8 @@
         "name": "Ingquza Hill Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/ingquza-hill-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -4988,7 +5112,8 @@
         "name": "Instinctif Partners",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/instinctif-partners-bursary/"
       },
       "sources": [
         {
@@ -5028,7 +5153,8 @@
         "name": "Institute for Landscape Architecture in South Africa (ILASA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/construction-and-built-environment-bursaries-south-africa/ilasa-bursary/"
       },
       "sources": [
         {
@@ -5068,7 +5194,8 @@
         "name": "Investec",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/commerce-bursaries-south-africa/investec-bursary/"
       },
       "sources": [
         {
@@ -5118,7 +5245,8 @@
         "name": "Islamic Relief South Africa",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/islamic-relief-bursary/"
       },
       "sources": [
         {
@@ -5158,7 +5286,8 @@
         "name": "J.P. Morgan",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/j-p-morgan-bursary/"
       },
       "sources": [
         {
@@ -5198,7 +5327,8 @@
         "name": "JSE Empowerment",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/johannesburg-stock-exchange-bursary/"
       },
       "sources": [
         {
@@ -5238,7 +5368,8 @@
         "name": "Joe Morolong Assmang",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/joe-morolong-assmang-bursary/"
       },
       "sources": [
         {
@@ -5278,7 +5409,8 @@
         "name": "Julius Berger Nigeria",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/julius-berger-nigeria-scholarship/"
       },
       "sources": [
         {
@@ -5318,7 +5450,8 @@
         "name": "Jurumani Solutions and Tangent Solutions",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/jurumani-solutions-and-tangent-solutions-bursary/"
       },
       "sources": [
         {
@@ -5358,7 +5491,8 @@
         "name": "KZN Department of Economic Development, Tourism and Environmental Affairs (EDTEA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/kwazulu-natal-dept-of-edtea-bursary/"
       },
       "sources": [
         {
@@ -5398,7 +5532,8 @@
         "name": "Korbicom Education Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/computer-science-it-bursaries-south-africa/korbicom-education-trust-bursary/"
       },
       "sources": [
         {
@@ -5438,7 +5573,8 @@
         "name": "Kouga Wind Farm",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/kouga-wind-farm-bursary/"
       },
       "sources": [
         {
@@ -5478,7 +5614,8 @@
         "name": "KwaDukuza Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/kwadukuza-municipality-bursary/"
       },
       "sources": [
         {
@@ -5518,7 +5655,8 @@
         "name": "KwaZulu-Natal Department of Sport, Arts and Culture",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/kzn-department-of-sport-arts-and-culture-bursary/"
       },
       "sources": [
         {
@@ -5558,7 +5696,8 @@
         "name": "KwaZulu-Natal Government",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/kzn-provincial-government-bursaries/"
       },
       "sources": [
         {
@@ -5598,7 +5737,8 @@
         "name": "LGSETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/lgseta-bursary/"
       },
       "sources": [
         {
@@ -5638,7 +5778,8 @@
         "name": "Land Bank",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/land-bank-bursary/"
       },
       "sources": [
         {
@@ -5678,7 +5819,8 @@
         "name": "Langeberg Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/langeberg-municipality-bursary/"
       },
       "sources": [
         {
@@ -5718,7 +5860,8 @@
         "name": "Liberty",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/liberty-life-bursary/"
       },
       "sources": [
         {
@@ -5758,7 +5901,8 @@
         "name": "Limpopo Department of Agriculture and Rural Development (LDARD)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/limpopo-department-of-agriculture-and-rural-development-ldard-bursary/"
       },
       "sources": [
         {
@@ -5798,7 +5942,8 @@
         "name": "Limpopo Department of Public Works",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/limpopo-provincial-government-bursary/"
       },
       "sources": [
         {
@@ -5838,7 +5983,8 @@
         "name": "Limpopo Provincial Treasury",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/limpopo-provincial-treasury-bursary/"
       },
       "sources": [
         {
@@ -5878,7 +6024,8 @@
         "name": "Masakh’iSizwe (MiS)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/masakhisizwe-bursary/"
       },
       "sources": [
         {
@@ -5918,7 +6065,8 @@
         "name": "Mediclinic / ER24",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/medical-bursaries-south-africa/mediclinic-er24-bursary/"
       },
       "sources": [
         {
@@ -5958,7 +6106,8 @@
         "name": "Mercedes-Benz",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/mercedes-benz-bursary/"
       },
       "sources": [
         {
@@ -5998,7 +6147,8 @@
         "name": "Mpumalanga Department of Health",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/mpumalanga-department-of-health-bursary-to-study-medicine-in-cuba/"
       },
       "sources": [
         {
@@ -6038,7 +6188,8 @@
         "name": "Mpumalanga Provincial Government",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/mpumalanga-provincial-government-bursary/"
       },
       "sources": [
         {
@@ -6078,7 +6229,8 @@
         "name": "Musina Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/musina-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -6118,7 +6270,8 @@
         "name": "N3TC",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/n3tc-bursary/"
       },
       "sources": [
         {
@@ -6158,7 +6311,8 @@
         "name": "NAC South Africa International",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/music-and-performing-arts-bursaries-south-africa/national-arts-council-of-sa-bursary/"
       },
       "sources": [
         {
@@ -6198,7 +6352,8 @@
         "name": "NFVF International",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/nfvf-international-bursary/"
       },
       "sources": [
         {
@@ -6238,7 +6393,8 @@
         "name": "NUMSA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/numsa-bursary/"
       },
       "sources": [
         {
@@ -6278,7 +6434,8 @@
         "name": "NamPower",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/nampower-bursary-for-namibian-students/"
       },
       "sources": [
         {
@@ -6318,7 +6475,8 @@
         "name": "Ndwedwe Local Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/ndwedwe-local-municipality-bursary/"
       },
       "sources": [
         {
@@ -6358,7 +6516,8 @@
         "name": "Nelson Mandela Bay Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/nelson-mandela-bay-municipality-bursary/"
       },
       "sources": [
         {
@@ -6398,7 +6557,8 @@
         "name": "Nkangala District Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/nkangala-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -6438,7 +6598,8 @@
         "name": "North West Provincial Government (NWPG)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/north-west-provincial-government-office-of-the-premier-bursary/"
       },
       "sources": [
         {
@@ -6478,7 +6639,8 @@
         "name": "Northern Cape Provincial Government",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/northern-cape-provincial-government-bursary/"
       },
       "sources": [
         {
@@ -6518,7 +6680,8 @@
         "name": "PPS Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/pps-chairmans-fund-bursary/"
       },
       "sources": [
         {
@@ -6558,7 +6721,8 @@
         "name": "Queen Elizabeth Commonwealth",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/queen-elizabeth-commonwealth-scholarships-qecs/"
       },
       "sources": [
         {
@@ -6598,7 +6762,8 @@
         "name": "Rand Water",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/rand-water-bursary/"
       },
       "sources": [
         {
@@ -6638,7 +6803,8 @@
         "name": "Rhodes Trust",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/the-rhodes-trust-scholarship-postgraduate/"
       },
       "sources": [
         {
@@ -6678,7 +6844,8 @@
         "name": "Rio Tinto/ Richards Bay Minerals (RBM)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/rio-tinto-bursary/"
       },
       "sources": [
         {
@@ -6718,7 +6885,8 @@
         "name": "Rustenburg Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/rustenburg-municipality-bursary/"
       },
       "sources": [
         {
@@ -6758,7 +6926,8 @@
         "name": "Ruth Titilayo Secondary School",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/ruth-titilayo-secondary-school-scholarship-for-nigerian-students/"
       },
       "sources": [
         {
@@ -6798,7 +6967,8 @@
         "name": "Ruth Titilayo Technical & Vocational",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/ruth-titilayo-technical-vocational-scholarship-for-nigerian-students/"
       },
       "sources": [
         {
@@ -6838,7 +7008,8 @@
         "name": "Ruth Titilayo",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/ruth-titilayo-undergraduate-scholarship-2024-for-nigerian-students/"
       },
       "sources": [
         {
@@ -6888,7 +7059,8 @@
         "name": "SA Chefs Bill Gallagher Study Assistance",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/sa-chefs-bill-gallagher-study-assistance-bursary-fund/"
       },
       "sources": [
         {
@@ -6928,7 +7100,8 @@
         "name": "SA Chefs Bryan Montgomery",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/sa-chefs-bryan-montgomery-bursary-fund/"
       },
       "sources": [
         {
@@ -6968,7 +7141,8 @@
         "name": "SAMAC",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/samac-bursary/"
       },
       "sources": [
         {
@@ -7008,7 +7182,8 @@
         "name": "SAMNET",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/samnet-bursary/"
       },
       "sources": [
         {
@@ -7048,7 +7223,8 @@
         "name": "SASLHA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/medical-bursaries-south-africa/saslha-bursary/"
       },
       "sources": [
         {
@@ -7088,7 +7264,8 @@
         "name": "SIOC-CDT",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/sioc-cdt-bursary/"
       },
       "sources": [
         {
@@ -7128,7 +7305,8 @@
         "name": "South African Civil Aviation Authority (SACAA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/south-african-civil-aviation-authority-bursary/"
       },
       "sources": [
         {
@@ -7168,7 +7346,8 @@
         "name": "South African National Space Agency (SANSA)",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/engineering-bursaries-south-africa/sansa-bursary/"
       },
       "sources": [
         {
@@ -7208,7 +7387,8 @@
         "name": "Sun City Resort",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/sun-city-resort-bursary/"
       },
       "sources": [
         {
@@ -7248,7 +7428,8 @@
         "name": "TETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/teta-bursary/"
       },
       "sources": [
         {
@@ -7288,7 +7469,8 @@
         "name": "Thabo Mofutsanyana District Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/thabo-mofutsanyana-district-municipality-bursary/"
       },
       "sources": [
         {
@@ -7328,7 +7510,8 @@
         "name": "UC Berkeley Mastercard Foundation",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/international-scholarships-bursaries-south-africa/uc-berkeley-mastercard-foundation-scholarship/"
       },
       "sources": [
         {
@@ -7368,7 +7551,8 @@
         "name": "W&RSETA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/wrseta-bursary/"
       },
       "sources": [
         {
@@ -7408,7 +7592,8 @@
         "name": "Western Cape Department of Health and Wellness",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/western-cape-department-of-health/"
       },
       "sources": [
         {
@@ -7448,7 +7633,8 @@
         "name": "dentsu SA",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/dentsu-sa-bursary/"
       },
       "sources": [
         {
@@ -7488,7 +7674,8 @@
         "name": "eMedia",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/general-bursaries-south-africa/emedia-bursary/"
       },
       "sources": [
         {
@@ -7528,7 +7715,8 @@
         "name": "eThekwini Municipality",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/government-bursaries-south-africa/durban-ethekwini-municipality-bursary/"
       },
       "sources": [
         {
@@ -7568,7 +7756,8 @@
         "name": "iSimangaliso Wetland Park",
         "type": "OTHER",
         "industry": "OTHER",
-        "website": null
+        "website": null,
+        "sourceUrl": "https://www.zabursaries.co.za/science-bursaries-south-africa/isimangaliso-wetland-park-bursary/"
       },
       "sources": [
         {

@@ -1,0 +1,8 @@
+# The supplied sample and its unpacked form are not ours to publish.
+template.docx
+unpacked/
+
+# Build output. The delivered copy lives at
+# docs/testplan/Bursary-Bridge_Test_Plan.docx.
+Bursary-Bridge_Test_Plan.docx
+__pycache__/

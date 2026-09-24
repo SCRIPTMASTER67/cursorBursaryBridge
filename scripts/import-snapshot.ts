@@ -44,7 +44,13 @@ type SnapshotRow = {
   lastVerifiedAt: string | null;
   lastCheckedAt: string | null;
   dedupeKey: string | null;
-  organisation: { name: string; type: string; industry: string; website: string | null };
+  organisation: {
+    name: string;
+    type: string;
+    industry: string;
+    website: string | null;
+    sourceUrl?: string | null;
+  };
   sources: {
     url: string;
     name: string;
@@ -80,6 +86,14 @@ async function main() {
       continue;
     }
 
+    // EXTERNAL, for the same reason the ingestion pipeline records it that
+    // way: this funder was named by a published source and has no account
+    // here, and nothing downstream may mistake it for one that registered.
+    // The column defaults to REGISTERED, so leaving it off here quietly turned
+    // every restored funder into a registered one.
+    //
+    // `update` stays empty on purpose. A funder that really did register, and
+    // that a source later names as well, keeps the origin it earned.
     const organisation = await db.organisation.upsert({
       where: { name: row.organisation.name },
       update: {},
@@ -88,6 +102,11 @@ async function main() {
         type: row.organisation.type as never,
         industry: row.organisation.industry as never,
         website: row.organisation.website,
+        origin: 'EXTERNAL',
+        // Snapshots taken before the exporter carried this field have no
+        // organisation sourceUrl, so fall back to the page the opportunity
+        // itself was read from. Both name the same source.
+        sourceUrl: row.organisation.sourceUrl ?? row.sourceUrl,
       },
       select: { id: true },
     });

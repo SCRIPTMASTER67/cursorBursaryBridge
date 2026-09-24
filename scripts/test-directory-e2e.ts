@@ -147,6 +147,14 @@ async function login(page: Page, email: string, password: string) {
 
 async function main() {
   const runId = randomBytes(4).toString('hex');
+
+  // Everything the directory already holds, recorded before this test writes
+  // anything. Cleanup removes what is not in this set. The previous version
+  // deleted every EXTERNAL organisation and its programmes, which is the whole
+  // imported directory once those organisations carry the origin they should.
+  const preexistingOrgs = new Set(
+    (await db.organisation.findMany({ select: { id: true } })).map((o) => o.id),
+  );
   const created = await seedDirectoryFromPipeline();
   console.log(`Directory populated by the pipeline: ${created} opportunities.\n`);
 
@@ -163,6 +171,13 @@ async function main() {
     const cards = page.locator('article');
     const cardCount = await cards.count();
     check('the directory lists opportunities', cardCount > 0, `${cardCount} card(s)`);
+    // Search for this run's own fixture rather than expecting it on the first
+    // page. The directory legitimately holds every bursary the ingestion
+    // pipeline has imported, so which rows land on page one is not this test's
+    // to assume.
+    await page.goto(`${BASE}/student/bursaries?search=Ndlovu+Test+Holdings`, {
+      waitUntil: 'networkidle',
+    });
     check(
       'each one names its organisation',
       (await page.getByText('Ndlovu Test Holdings', { exact: false }).count()) > 0,
@@ -293,6 +308,9 @@ async function main() {
       directoryCount > matchCount,
       `directory ${directoryCount} vs matches ${matchCount}`,
     );
+    await page.goto(`${BASE}/student/bursaries?search=Ndlovu+Test+Holdings`, {
+      waitUntil: 'networkidle',
+    });
     check(
       'the directory shows opportunities outside the student’s field',
       (await page.getByText(/Ndlovu Test Holdings/i).count()) > 0,
@@ -317,18 +335,19 @@ async function main() {
   } finally {
     await browser.close();
 
-    const orgs = await db.organisation.findMany({
-      where: { origin: 'EXTERNAL' },
+    const mine = await db.organisation.findMany({
+      where: { id: { notIn: [...preexistingOrgs] } },
       select: { id: true },
     });
-    await db.fundingProgramme.deleteMany({
-      where: { organisationId: { in: orgs.map((o) => o.id) } },
-    });
-    await db.organisation.deleteMany({ where: { id: { in: orgs.map((o) => o.id) } } });
+    const mineIds = mine.map((o) => o.id);
+    await db.fundingProgramme.deleteMany({ where: { organisationId: { in: mineIds } } });
+    await db.organisation.deleteMany({ where: { id: { in: mineIds } } });
     await db.user.deleteMany({ where: { email: { contains: runId } } });
     await db.ingestionRun.deleteMany({ where: { trigger: 'test' } });
-    const left = await db.fundingProgramme.count();
-    console.log(`\nCleanup: ${left} opportunities remain in the database.`);
+    const left = await db.fundingProgramme.count({
+      where: { organisationId: { in: mineIds } },
+    });
+    console.log(`\nCleanup: ${left} of this run's own opportunities remain.`);
   }
 
   console.log(`\n${passed} passed, ${failed} failed`);

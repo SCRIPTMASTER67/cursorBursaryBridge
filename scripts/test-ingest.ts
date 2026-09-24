@@ -46,6 +46,15 @@ function check(name: string, ok: boolean, detail = '') {
 }
 
 async function main() {
+  // Everything already in the directory, recorded before this test writes a
+  // single row. The cleanup at the end deletes what is not in this set, so a
+  // run of this suite can never touch a bursary the ingestion pipeline
+  // imported for real. An earlier version deleted every EXTERNAL organisation
+  // it could find, which would have taken the whole directory with it.
+  const preexistingOrgs = new Set(
+    (await db.organisation.findMany({ select: { id: true } })).map((o) => o.id),
+  );
+
   console.log('\nrobots.txt is parsed and obeyed');
   const partial = parseRobots(ROBOTS_PARTIAL);
   check('a group naming our agent takes precedence', partial.disallow.includes('/members/'));
@@ -491,18 +500,25 @@ async function main() {
     rejected: listingRun.rejections.length,
   });
 
-  // Nothing this test wrote may survive it.
-  const orgs = await db.organisation.findMany({
-    where: { origin: 'EXTERNAL' },
+  // Nothing this test wrote may survive it -- and nothing it did not write may
+  // be removed by it. Both halves matter: the check below counts what is left
+  // of this run's own writes, not every external opportunity in the database,
+  // because the directory legitimately holds imported bursaries that this
+  // suite neither created nor may delete.
+  const mine = await db.organisation.findMany({
     select: { id: true },
+    where: { id: { notIn: [...preexistingOrgs] } },
   });
-  await db.fundingProgramme.deleteMany({
-    where: { organisationId: { in: orgs.map((o) => o.id) } },
-  });
-  await db.organisation.deleteMany({ where: { id: { in: orgs.map((o) => o.id) } } });
+  const mineIds = mine.map((o) => o.id);
+  await db.fundingProgramme.deleteMany({ where: { organisationId: { in: mineIds } } });
+  await db.organisation.deleteMany({ where: { id: { in: mineIds } } });
   await db.ingestionRun.deleteMany({ where: { trigger: 'test' } });
-  const left = await db.fundingProgramme.count({ where: { origin: 'EXTERNAL' } });
-  check('the test leaves nothing behind', left === 0, String(left));
+
+  const left = await db.fundingProgramme.count({
+    where: { organisationId: { in: mineIds } },
+  });
+  const strays = await db.organisation.count({ where: { id: { in: mineIds } } });
+  check('the test leaves nothing behind', left === 0 && strays === 0, `${left}/${strays}`);
 
   console.log(`\n${passed} passed, ${failed} failed`);
   if (failures.length) {

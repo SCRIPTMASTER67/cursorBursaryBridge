@@ -3,19 +3,33 @@ Build the Test Plan inside the supplied template.
 
 Only word/document.xml is rewritten; styles.xml, numbering.xml, the theme, the
 header and the section definition are carried through from the template
-untouched, so the font (Arial 11pt from docDefaults), the heading sizes, the
-margins and the page setup are the template's own.
+untouched, so the heading sizes, the margins, the page size and the page setup
+are the template's own.
 
 The paragraph shapes were read off the template and are reproduced exactly:
 
-    Heading1   pStyle + pBdr, no run properties
-    Heading2   pStyle + pBdr + <w:b/> on the paragraph mark only
+    Heading1   pStyle + pBdr, sz 40 (20pt) from the template's own style
+    Heading2   pStyle + pBdr + <w:b/> on the paragraph mark, sz 32 (16pt)
     body       pBdr alone
     list item  numPr + pBdr
 
 Every paragraph in the template carries a pBdr of nil borders, which is an
 export artefact of the tool that produced it. It is reproduced rather than
 tidied away, because the instruction is to preserve the template.
+
+Two things the template does NOT carry are added, because the brief asks for
+them explicitly and names the template's own default as a font not to use:
+
+    Times New Roman   stated on every paragraph mark and every run. The
+                      template's docDefaults set Arial, which the brief rules
+                      out by name, so the override is stated everywhere rather
+                      than by editing the template's styles.
+    1.5 line spacing  on body text and list items. The template's default is
+                      276 (1.15). Headings keep the template's own spacing,
+                      since the requirement is for the body.
+
+Body text stays at 11pt, which is what the template's docDefaults already give
+it, so no size is stated on body runs at all.
 
 List numbering is kept as the template defines it:
     numId 2 -> decimal, used for the Introduction objectives
@@ -36,33 +50,53 @@ OUT = "Bursary-Bridge_Test_Plan.docx"
 PBDR = ('<w:pBdr><w:top w:val="nil"/><w:left w:val="nil"/><w:bottom w:val="nil"/>'
         '<w:right w:val="nil"/><w:between w:val="nil"/></w:pBdr>')
 
+TNR = ('<w:rFonts w:ascii="Times New Roman" w:eastAsia="Times New Roman" '
+       'w:hAnsi="Times New Roman" w:cs="Times New Roman"/>')
+SPACING = '<w:spacing w:line="360" w:lineRule="auto"/>'
+JC = '<w:jc w:val="both"/>'
 
-def _text(s):
-    return f'<w:r><w:t xml:space="preserve">{escape(s)}</w:t></w:r>'
+
+def _text(s, bold=False):
+    # A typewriter apostrophe in a justified serif column is the one
+    # typographic detail a reader notices without looking for it.
+    body = escape(s.replace("'", "\u2019"))
+    rpr = "<w:rPr>" + TNR + ("<w:b/>" if bold else "") + "</w:rPr>"
+    return f'<w:r>{rpr}<w:t xml:space="preserve">{body}</w:t></w:r>'
 
 
 def h1(s):
-    return (f'<w:p><w:pPr><w:pStyle w:val="Heading1"/>{PBDR}</w:pPr>'
-            f'{_text(s)}</w:p>')
+    # No jc: the template leaves its headings ranged left, and the brief asks
+    # for justification of the body.
+    return (f'<w:p><w:pPr><w:pStyle w:val="Heading1"/>{PBDR}'
+            f'<w:rPr>{TNR}</w:rPr></w:pPr>{_text(s)}</w:p>')
 
 
 def h2(s):
+    # The <w:b/> sits on the paragraph mark and not on the run, which is how
+    # the template has it: the heading text itself is not bold, and making it
+    # bold would change the template's appearance.
     return (f'<w:p><w:pPr><w:pStyle w:val="Heading2"/>{PBDR}'
-            f'<w:rPr><w:b/></w:rPr></w:pPr>{_text(s)}</w:p>')
+            f'<w:rPr>{TNR}<w:b/></w:rPr></w:pPr>{_text(s)}</w:p>')
 
 
 def para(s):
-    return f'<w:p><w:pPr>{PBDR}</w:pPr>{_text(s)}</w:p>'
+    # CT_PPr orders pBdr before spacing, spacing before jc, jc before rPr.
+    return (f'<w:p><w:pPr>{PBDR}{SPACING}{JC}<w:rPr>{TNR}</w:rPr></w:pPr>'
+            f'{_text(s)}</w:p>')
 
 
 def blank():
-    return f'<w:p><w:pPr>{PBDR}</w:pPr></w:p>'
+    # No spacing override. The template's own empty paragraphs carry nothing
+    # but the border, and an empty paragraph set to one and a half lines is
+    # half a line of whitespace that only ever pushes content onto a new page.
+    return f'<w:p><w:pPr>{PBDR}<w:rPr>{TNR}</w:rPr></w:pPr></w:p>'
 
 
 def item(s, num):
     # CT_PPr orders numPr before pBdr.
     return (f'<w:p><w:pPr><w:numPr><w:ilvl w:val="0"/>'
-            f'<w:numId w:val="{num}"/></w:numPr>{PBDR}</w:pPr>{_text(s)}</w:p>')
+            f'<w:numId w:val="{num}"/></w:numPr>{PBDR}{SPACING}{JC}'
+            f'<w:rPr>{TNR}</w:rPr></w:pPr>{_text(s)}</w:p>')
 
 
 def section(title, blocks):

@@ -26,7 +26,13 @@ async function main() {
     where: { origin: 'EXTERNAL' },
     orderBy: { name: 'asc' },
     include: {
-      organisation: { select: { name: true, type: true, industry: true, website: true } },
+      // sourceUrl travels with the funder, not just with the opportunity:
+      // it is what marks the funder as one a source named rather than one
+      // that registered, and a snapshot that drops it restores a directory
+      // the production audit then reports as unattributed.
+      organisation: {
+        select: { name: true, type: true, industry: true, website: true, sourceUrl: true },
+      },
       sources: {
         select: {
           url: true,
