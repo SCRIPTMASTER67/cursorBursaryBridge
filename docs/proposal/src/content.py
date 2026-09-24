@@ -524,8 +524,8 @@ SOFTWARE = [
 # ---------------------------------------------------------------------------
 SCOPE_INTRO = [
     "The boundaries below were set so that the project is completable within "
-    "one academic year by a team of four while still addressing both sides of "
-    "the problem stated in Section 2.",
+    "the four months of a single semester by a team of four while still "
+    "addressing both sides of the problem stated in Section 2.",
 ]
 
 IN_SCOPE = [
@@ -666,9 +666,12 @@ ASSUMPTIONS = [
 ]
 
 CONSTRAINTS = [
-    "Time. The project must be completed within one academic year, alongside "
-    "the team's other coursework, which fixes the total effort available and "
-    "makes scope control the principal planning discipline.",
+    "Time. The project must be completed within a single semester of four "
+    "months, alongside the team's other coursework. This is the binding "
+    "constraint on the project: it fixes the total effort available, it is "
+    "why the work plan overlaps its phases rather than running them in "
+    "sequence, and it makes scope control the principal planning "
+    "discipline.",
     "Team size. The team consists of four members, which limits the amount of "
     "work that can proceed in parallel in any sprint.",
     "Budget. The project has no funding, so every tool and service used must be "
@@ -827,41 +830,50 @@ TEAM_NOTE = [
 ]
 
 WORKPLAN_INTRO = [
-    "The plan below organises the project into ten tasks across ten months. "
-    "Month 1 corresponds to the first month of the project year, "
-    "[INSERT PROJECT START MONTH]. Tasks overlap deliberately: development "
-    "begins before the whole specification is settled, and testing begins "
-    "before development ends, which is what the chosen methodology requires.",
+    "The project runs over a single semester of four months. The plan below "
+    "organises it into ten tasks across the sixteen weeks of that semester; "
+    "weeks rather than months are used because at four columns a chart cannot "
+    "show which tasks overlap, and the overlap is the point. Week 1 is the "
+    "first week of the semester, beginning in [INSERT PROJECT START MONTH].",
+
+    "Tasks overlap deliberately. Development begins before the whole "
+    "specification is settled and testing begins before development ends, "
+    "which is what the chosen methodology requires and what four months make "
+    "unavoidable. The three tasks that carry the most risk, the background "
+    "investigation, the requirements and the data ingestion, are scheduled "
+    "early, so that a problem found in any of them is found while there is "
+    "still time to act on it.",
 ]
 
-# (task, start month, end month, note)
+# (task, start week, end week, note)
 WORKPLAN = [
-    ("Project initiation and proposal", 1, 2,
+    ("Project initiation and proposal", 1, 3,
      "Topic definition, supervisor consultation, and this proposal."),
-    ("Background research and investigation", 1, 3,
+    ("Background research and investigation", 1, 5,
      "Review of the publishing channels and of adjacent systems; the "
      "exploratory crawl of an agreed source."),
-    ("Requirements gathering and specification", 2, 4,
+    ("Requirements gathering and specification", 3, 7,
      "Use cases and requirements; delivery of the Software Requirements "
      "Specification."),
-    ("System analysis and design", 3, 5,
+    ("System analysis and design", 5, 8,
      "Data model, architecture, matching algorithm and interface design; "
      "delivery of the Software Design Description."),
-    ("Implementation: student portal", 4, 8,
+    ("Implementation: student portal", 6, 13,
      "Profile, matching, directory, applications and documents."),
-    ("Implementation: organisation portal", 5, 9,
+    ("Data ingestion and provenance", 8, 11,
+     "The ingestion pipeline; sample review, then the full run."),
+    ("Implementation: organisation portal", 8, 14,
      "Programme publication, applicant review, shortlisting, selection and "
      "bulk intake."),
-    ("Data ingestion and provenance", 5, 7,
-     "The ingestion pipeline; sample review, then the full run."),
-    ("Testing and validation", 6, 10,
+    ("Testing and validation", 10, 16,
      "Unit, integration, end-to-end and accuracy testing; delivery of the Test "
      "Plan."),
-    ("Evaluation", 9, 10,
+    ("Evaluation", 14, 16,
      "Traceability of requirements to implementation; audit of the data "
      "visible to users."),
-    ("Documentation and final presentation", 1, 10,
-     "Maintained throughout; final report and demonstration in month 10."),
+    ("Documentation and final presentation", 1, 16,
+     "Maintained throughout; final report and demonstration in the closing "
+     "week."),
 ]
 
 # ---------------------------------------------------------------------------
@@ -964,5 +976,5 @@ APPENDIX_B = [
      "Delivered."),
     ("Test Plan", "Departmental template", "Delivered."),
     ("Final project report and demonstration", "Departmental requirements",
-     "Scheduled for month 10 of the work plan."),
+     "Scheduled for the closing week of the work plan."),
 ]

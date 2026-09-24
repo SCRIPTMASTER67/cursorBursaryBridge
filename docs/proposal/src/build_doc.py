@@ -453,14 +453,14 @@ def workplan_section():
     for p in WORKPLAN_INTRO:
         x += para(p)
     x += blank()
-    rows = [["Task", "Months", "Description"]]
+    rows = [["Task", "Weeks", "Description"]]
     for name, start, end, note in WORKPLAN:
         span = str(start) if start == end else f"{start}–{end}"
         rows.append([name, span, note])
     x += table(rows, [2600, 900, 5526], sz=20)
     x += blank()
     x += picture("figures/gantt.png")
-    x += caption("Figure 1 Gantt chart of the project work plan, months 1 to 10")
+    x += caption("Figure 1 Gantt chart of the project work plan, weeks 1 to 16 of the semester")
     return x
 
 

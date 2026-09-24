@@ -41,15 +41,24 @@ unpack it to `unpacked/`, then run:
 `build_doc.py` needs Pillow and a `soffice` on the path for the page-number
 passes.
 
+## Schedule
+
+The project runs over one semester of four months. Section 10.2 plans it as ten
+tasks across the sixteen weeks of that semester, and the Gantt chart is drawn
+from the same table, so the bars and the table cannot disagree about when a task
+runs. Weeks rather than months are the unit because at four columns a chart
+cannot show which tasks overlap, and the overlap is what the plan exists to
+show.
+
 ## What is asserted and what is not
 
 Every factual claim is either read off the implemented system in this
 repository or attributed to one of the nine references, each of which was
 retrieved and checked rather than recalled. Where the proposal needs a fact
 about the team that nothing in the project records — who leads it, what prior
-experience each member brings, which calendar month the project year starts in
-— the text carries a bracketed placeholder instead of an invention. There are
-six such placeholders and they are the only ones in the document.
+experience each member brings, which calendar month the semester starts in —
+the text carries a bracketed placeholder instead of an invention. There are six
+such placeholders and they are the only ones in the document.
 
 No survey or interview result is reported, because none was conducted: Section
 4 states that requirements are derived from documentary analysis of published
