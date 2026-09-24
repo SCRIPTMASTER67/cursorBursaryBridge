@@ -4,6 +4,7 @@ import {
   POTENTIAL_MATCH_THRESHOLD,
   STRONG_MATCH_THRESHOLD,
   TOTAL_WEIGHT,
+  resolveWeights,
 } from './config';
 import {
   evaluateAcademic,
@@ -15,7 +16,35 @@ import {
   evaluateSubjects,
   selectBestPreference,
 } from './criteria';
-import type { MatchResult, MatchableProgramme, MatchableStudent } from './types';
+import type {
+  CriterionKey,
+  CriterionResult,
+  MatchResult,
+  MatchableProgramme,
+  MatchableStudent,
+} from './types';
+
+export type ScoreOptions = {
+  /**
+   * A programme's own weighting for the criteria. Anything not named keeps the
+   * platform default, so a funder configures only what they care about.
+   */
+  weights?: Partial<Record<CriterionKey, number>>;
+};
+
+/**
+ * Re-weight a criterion without re-evaluating it.
+ *
+ * Each criterion decides independently whether it is met, and how completely —
+ * that judgement does not change because a funder cares about it more. So the
+ * result is scaled by the share it earned of its default weight, which keeps
+ * one evaluation path for both the platform's weighting and a funder's.
+ */
+function reweight(criterion: CriterionResult, weight: number): CriterionResult {
+  if (weight === criterion.weight) return criterion;
+  const share = criterion.weight === 0 ? 0 : criterion.awarded / criterion.weight;
+  return { ...criterion, weight, awarded: Math.round(share * weight * 100) / 100 };
+}
 
 /**
  * MatchingService — the prototype scoring engine.
@@ -28,8 +57,14 @@ import type { MatchResult, MatchableProgramme, MatchableStudent } from './types'
  * replace `score()` while keeping the same contract.
  */
 export const MatchingService = {
-  score(student: MatchableStudent, programme: MatchableProgramme): MatchResult {
+  score(
+    student: MatchableStudent,
+    programme: MatchableProgramme,
+    options: ScoreOptions = {},
+  ): MatchResult {
     const eligibility = programme.eligibility;
+    const weights = resolveWeights(options.weights);
+    const totalWeight = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
 
     // 1. Decide which of the student's preferences this programme is judged on.
     const preferenceMatch = selectBestPreference(student, programme);
@@ -43,11 +78,11 @@ export const MatchingService = {
       evaluateQualification(student, eligibility),
       evaluateLocation(student, eligibility),
       evaluateFinancial(student, eligibility),
-    ];
+    ].map((criterion) => reweight(criterion, weights[criterion.key]));
 
     // 3. Sum the awarded points into a 0–100 score.
     const awarded = criteria.reduce((sum, c) => sum + c.awarded, 0);
-    const matchScore = Math.round((awarded / TOTAL_WEIGHT) * 100);
+    const matchScore = Math.round((awarded / totalWeight) * 100);
 
     // 4. Work out how much of the profile we could not evaluate.
     const unknownWeight = criteria
