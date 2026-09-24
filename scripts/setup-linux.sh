@@ -89,13 +89,20 @@ done
     die 'PostgreSQL is installed but not accepting connections.'
 
 step 'Creating the role and database'
+# Overridable, so a second instance — a test run, a scratch copy — can be set
+# up beside an existing one without the two sharing a database. Anything that
+# drops or reseeds one then cannot reach into the other.
+DB_NAME=${DB_NAME:-bursarybridge}
+DB_USER=${DB_USER:-bursary}
+DB_PASSWORD=${DB_PASSWORD:-bursary}
+
 # CREATEDB is not needed to run the app, but `npm run db:migrate` later needs
 # it to build its shadow database.
-if [ "$("${PG[@]}" psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='bursary'")" != '1' ]; then
-    "${PG[@]}" psql -c "CREATE USER bursary WITH PASSWORD 'bursary' CREATEDB;"
+if [ "$("${PG[@]}" psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'")" != '1' ]; then
+    "${PG[@]}" psql -c "CREATE USER \"$DB_USER\" WITH PASSWORD '$DB_PASSWORD' CREATEDB;"
 fi
-if [ "$("${PG[@]}" psql -tAc "SELECT 1 FROM pg_database WHERE datname='bursarybridge'")" != '1' ]; then
-    "${PG[@]}" psql -c 'CREATE DATABASE bursarybridge OWNER bursary;'
+if [ "$("${PG[@]}" psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'")" != '1' ]; then
+    "${PG[@]}" psql -c "CREATE DATABASE \"$DB_NAME\" OWNER \"$DB_USER\";"
 fi
 
 # --- 3. Source --------------------------------------------------------------
@@ -147,6 +154,11 @@ npx --yes prisma generate
 # created above, so only the secret has to be filled in.
 step 'Writing .env'
 [ -f .env ] || cp .env.example .env
+
+# The database this instance talks to, which is only the default when nothing
+# was overridden above.
+tmp=$(mktemp)
+sed "s|^DATABASE_URL=.*|DATABASE_URL=\"postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME?schema=public\"|" .env > "$tmp" && mv "$tmp" .env
 
 secret=$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')
 [ -n "$secret" ] || die 'Could not generate AUTH_SECRET.'
