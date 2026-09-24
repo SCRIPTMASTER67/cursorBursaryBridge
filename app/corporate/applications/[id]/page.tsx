@@ -5,6 +5,7 @@ import { ApplicantProfile } from '@/components/corporate/applicant-profile';
 import { requireCorporate } from '@/lib/auth/guards';
 import { getApplicantDetail, getApplicantNeighbours } from '@/services/applicants';
 import { requestsForApplication } from '@/services/information-requests';
+import { applicantView } from '@/lib/applicant-view';
 
 export const metadata: Metadata = { title: 'Applicant' };
 
@@ -17,6 +18,8 @@ export default async function ApplicantPage({ params }: { params: Promise<{ id: 
   if (!result) notFound();
 
   const { application, eligibility } = result;
+  // One shape whether this applicant has an account here or was imported.
+  const person = applicantView(application);
   const [neighbours, informationRequests] = await Promise.all([
     getApplicantNeighbours(organisationId, application.id, application.fundingProgrammeId),
     requestsForApplication(application.id),
@@ -55,28 +58,25 @@ export default async function ApplicantPage({ params }: { params: Promise<{ id: 
           requiredDocuments: application.fundingProgramme.eligibility?.requiredDocuments ?? [],
         }}
         student={{
-          firstName: application.studentProfile.user.firstName,
-          lastName: application.studentProfile.user.lastName,
-          email: application.studentProfile.user.email,
-          mobile: application.studentProfile.user.mobile,
-          province: application.studentProfile.province,
-          city: application.studentProfile.city,
-          institution: application.studentProfile.currentInstitution?.name ?? null,
-          programme: application.studentProfile.currentProgramme?.name ?? null,
-          qualificationLevel: application.studentProfile.qualificationLevel,
-          yearOfStudy: application.studentProfile.yearOfStudy,
-          academicAverage: application.studentProfile.academicAverage,
-          achievements: application.studentProfile.achievements,
-          householdIncome: application.studentProfile.householdIncome,
-          citizenship: application.studentProfile.citizenship,
-          firstGeneration: application.studentProfile.firstGeneration,
-          fundingNeeds: application.studentProfile.fundingNeeds,
-          fundingSituation: application.studentProfile.fundingSituation,
-          studyPreferences: application.studentProfile.studyPreferences.map((preference) => ({
-            preferenceNumber: preference.preferenceNumber,
-            programme: preference.programme.name,
-            institution: preference.institution.name,
-          })),
+          firstName: person.firstName,
+          lastName: person.lastName,
+          email: person.email ?? '',
+          mobile: person.mobile,
+          province: person.province,
+          city: person.city,
+          institution: person.institution,
+          programme: person.programme,
+          qualificationLevel: person.qualificationLevel,
+          yearOfStudy: person.yearOfStudy,
+          academicAverage: person.academicAverage,
+          achievements: person.achievements,
+          householdIncome: person.householdIncome,
+          citizenship: person.citizenship,
+          firstGeneration: person.firstGeneration,
+          fundingNeeds: person.fundingNeeds,
+          fundingSituation: person.fundingSituation,
+          studyPreferences: person.studyPreferences,
+          external: person.external,
         }}
         documents={application.documents.map((link) => ({
           id: link.documentId,

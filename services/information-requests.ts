@@ -49,6 +49,16 @@ export async function createRequest(input: CreateRequestInput) {
   if (application.status === 'DRAFT') {
     return { ok: false as const, reason: 'This application has not been submitted yet.' };
   }
+  // An imported applicant has no account here, so a request made through the
+  // platform would have nowhere to arrive. Saying so is better than creating a
+  // request that silently never reaches anyone.
+  if (!application.studentProfile) {
+    return {
+      ok: false as const,
+      reason:
+        'This application was imported, so the applicant has no Bursary-Bridge account to receive a request. Contact them using the details on their application.',
+    };
+  }
 
   const items = input.items
     .map((item) => ({ ...item, label: item.label.trim() }))
@@ -297,7 +307,12 @@ export async function submitResponse(studentProfileId: string, requestId: string
     where: { organisationId: request.organisationId },
     select: { userId: true },
   });
-  const student = request.application.studentProfile.user;
+  // An imported applicant has no account here, so there is no name to take
+  // from a user row; the request could not have been created for one anyway.
+  const student = request.application.studentProfile?.user ?? {
+    firstName: 'the',
+    lastName: 'applicant',
+  };
   for (const reviewer of reviewers) {
     await notify({
       userId: reviewer.userId,

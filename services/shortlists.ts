@@ -1,6 +1,7 @@
 import 'server-only';
 import type { ShortlistStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
+import { applicantSummary } from '@/lib/applicant-view';
 
 /** Shortlist or beneficiary rows for one organisation. */
 export async function getShortlistRows(organisationId: string, statuses: ShortlistStatus[]) {
@@ -15,9 +16,20 @@ export async function getShortlistRows(organisationId: string, statuses: Shortli
           studentProfile: {
             select: {
               academicAverage: true,
-              user: { select: { firstName: true, lastName: true } },
+              qualificationLevel: true,
+              user: { select: { firstName: true, lastName: true, email: true } },
               currentInstitution: { select: { name: true, shortName: true } },
               currentProgramme: { select: { name: true } },
+            },
+          },
+          externalApplicant: {
+            select: {
+              fullName: true,
+              email: true,
+              institutionName: true,
+              programmeName: true,
+              qualificationLevel: true,
+              academicAverage: true,
             },
           },
         },
@@ -26,18 +38,19 @@ export async function getShortlistRows(organisationId: string, statuses: Shortli
     orderBy: [{ addedAt: 'desc' }],
   });
 
-  return entries.map((entry) => ({
-    applicationId: entry.applicationId,
-    studentName: `${entry.application.studentProfile.user.firstName} ${entry.application.studentProfile.user.lastName}`,
-    institution:
-      entry.application.studentProfile.currentInstitution?.shortName ??
-      entry.application.studentProfile.currentInstitution?.name ??
-      null,
-    programme: entry.application.studentProfile.currentProgramme?.name ?? null,
-    academicAverage: entry.application.studentProfile.academicAverage,
-    matchScore: entry.application.matchScore,
-    status: entry.status,
-    addedAt: (entry.selectedAt ?? entry.addedAt).toISOString(),
-    programmeName: entry.fundingProgramme.name,
-  }));
+  return entries.map((entry) => {
+    const person = applicantSummary(entry.application);
+    return {
+      applicationId: entry.applicationId,
+      studentName: person.fullName,
+      institution: person.institution,
+      programme: person.programme,
+      academicAverage: person.academicAverage,
+      matchScore: entry.application.matchScore,
+      status: entry.status,
+      addedAt: (entry.selectedAt ?? entry.addedAt).toISOString(),
+      programmeName: entry.fundingProgramme.name,
+      external: person.external,
+    };
+  });
 }

@@ -86,7 +86,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     DOCUMENTS_REQUIRED: `${application.fundingProgramme.organisation.name} needs more information for your ${application.fundingProgramme.name} application.`,
   };
 
-  if (studentFacing[status]) {
+  // An imported applicant has no account here, so there is nobody to notify.
+  // The status change still happens and is still audited; it simply is not
+  // announced to somebody who cannot read it.
+  if (studentFacing[status] && application.studentProfile) {
     await notify({
       userId: application.studentProfile.userId,
       type:

@@ -1,8 +1,13 @@
 import 'server-only';
 import type { ApplicationStatus, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db';
+import { applicantSummary } from '@/lib/applicant-view';
 import { EligibilityService, type EligibilityOutcome } from '@/lib/matching';
-import { toMatchableProgramme, toMatchableStudent } from '@/lib/matching/adapters';
+import {
+  toMatchableExternalApplicant,
+  toMatchableProgramme,
+  toMatchableStudent,
+} from '@/lib/matching/adapters';
 
 export type ApplicantFilters = {
   search?: string;
@@ -30,6 +35,8 @@ export type ApplicantRow = {
   submittedAt: Date | null;
   programmeName: string;
   shortlisted: boolean;
+  /** True when the applicant has no Bursary-Bridge account (§20). */
+  external: boolean;
 };
 
 export const DEFAULT_PAGE_SIZE = 25;
@@ -88,6 +95,7 @@ export async function getApplicants(
             currentProgramme: { select: { name: true } },
           },
         },
+        externalApplicant: true,
       },
       orderBy: [{ matchScore: 'desc' }, { submittedAt: 'desc' }],
       skip: (page - 1) * pageSize,
@@ -95,24 +103,26 @@ export async function getApplicants(
     }),
   ]);
 
-  const rows: ApplicantRow[] = applications.map((application) => ({
-    id: application.id,
-    studentName: `${application.studentProfile.user.firstName} ${application.studentProfile.user.lastName}`,
-    studentEmail: application.studentProfile.user.email,
-    institution:
-      application.studentProfile.currentInstitution?.name ??
-      application.studentProfile.currentInstitution?.shortName ??
-      null,
-    programme: application.studentProfile.currentProgramme?.name ?? null,
-    qualification: application.studentProfile.qualificationLevel,
-    academicAverage: application.studentProfile.academicAverage,
-    matchScore: application.matchScore,
-    eligibilityOutcome: application.eligibilityOutcome,
-    status: application.status,
-    submittedAt: application.submittedAt,
-    programmeName: application.fundingProgramme.name,
-    shortlisted: application.shortlist !== null,
-  }));
+  const rows: ApplicantRow[] = applications.map((application) => {
+    // The same row whether the applicant has an account here or was imported.
+    const person = applicantSummary(application);
+    return {
+      id: application.id,
+      studentName: person.fullName,
+      studentEmail: person.email ?? '',
+      institution: person.institution,
+      programme: person.programme,
+      qualification: person.qualificationLevel,
+      academicAverage: person.academicAverage,
+      external: person.external,
+      matchScore: application.matchScore,
+      eligibilityOutcome: application.eligibilityOutcome,
+      status: application.status,
+      submittedAt: application.submittedAt,
+      programmeName: application.fundingProgramme.name,
+      shortlisted: application.shortlist !== null,
+    };
+  });
 
   return { rows, total, page, pageSize };
 }
@@ -181,20 +191,39 @@ export async function getApplicantDetail(organisationId: string, applicationId: 
           },
         },
       },
+      externalApplicant: true,
     },
   });
 
   if (!application) return null;
 
+  // Both kinds of applicant go through the same engine. An imported one is
+  // projected into the same shape rather than scored by a parallel code path,
+  // so a funder comparing two candidates is comparing like with like.
+  const student = application.studentProfile
+    ? toMatchableStudent({
+        ...application.studentProfile,
+        studyPreferences: application.studentProfile.studyPreferences.map((p) => ({
+          preferenceNumber: p.preferenceNumber,
+          programmeId: p.programmeId,
+          institutionId: p.institutionId,
+        })),
+      })
+    : toMatchableExternalApplicant(
+        application.externalApplicant ?? {
+          programmeId: null,
+          institutionId: null,
+          qualificationLevel: null,
+          academicAverage: null,
+          province: null,
+          householdIncome: null,
+          citizenship: null,
+          yearOfStudy: null,
+        },
+      );
+
   const eligibility = EligibilityService.evaluate(
-    toMatchableStudent({
-      ...application.studentProfile,
-      studyPreferences: application.studentProfile.studyPreferences.map((p) => ({
-        preferenceNumber: p.preferenceNumber,
-        programmeId: p.programmeId,
-        institutionId: p.institutionId,
-      })),
-    }),
+    student,
     toMatchableProgramme({
       id: application.fundingProgramme.id,
       supportedProgrammes: application.fundingProgramme.supportedProgrammes,

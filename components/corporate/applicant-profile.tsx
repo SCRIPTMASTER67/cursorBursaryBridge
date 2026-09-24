@@ -72,6 +72,13 @@ type StudentView = {
   fundingNeeds: FundingNeed[];
   fundingSituation: FundingSituation | null;
   studyPreferences: { preferenceNumber: number; programme: string; institution: string }[];
+  /**
+   * True when the organisation imported this application rather than the
+   * applicant submitting it here (§20). Shown, never hidden: a reviewer must
+   * know that the details in front of them were read off a PDF rather than
+   * entered and maintained by the applicant themselves.
+   */
+  external: boolean;
 };
 
 /**
@@ -211,9 +218,15 @@ export function ApplicantProfile({
               <div className="flex items-center gap-4">
                 <Avatar firstName={student.firstName} lastName={student.lastName} size="xl" />
                 <div className="min-w-0">
-                  <h1 className="text-[20px] font-bold leading-tight tracking-[-0.02em] text-ink">
-                    {student.firstName} {student.lastName}
-                  </h1>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-[20px] font-bold leading-tight tracking-[-0.02em] text-ink">
+                      {student.firstName} {student.lastName}
+                    </h1>
+                    {/* Where this application came from, stated plainly. An
+                        imported application must never look like one the
+                        applicant submitted and maintains here. */}
+                    {student.external && <Badge tone="warning">Externally imported</Badge>}
+                  </div>
                   <p className="mt-1 text-[13px] text-ink-500">
                     {student.programme ?? 'Programme not set'}
                     {student.qualificationLevel && (

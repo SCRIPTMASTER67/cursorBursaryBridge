@@ -399,6 +399,9 @@ model User {
   createdProgrammes   FundingProgramme[]   @relation("ProgrammeCreator")
   shortlistEntries    Shortlist[]          @relation("ShortlistAddedBy")
 
+  importBatches   ApplicationImportBatch[] @relation("ImportCreator")
+  correctedFields ImportExtractedField[]   @relation("FieldCorrector")
+
   @@index([role])
   @@index([status])
 }
@@ -480,6 +483,8 @@ model Institution {
   supportedInProgram FundingProgrammeInstitution[]
   offeredProgrammes  ProgrammeInstitution[]
 
+  externalApplicants ExternalApplicant[]
+
   @@index([province])
   @@index([type])
   @@index([status])
@@ -507,6 +512,8 @@ model Programme {
   currentStudents    StudentProfile[]            @relation("CurrentProgramme")
   supportedInProgram FundingProgrammeProgramme[]
   offeredAt          ProgrammeInstitution[]
+
+  externalApplicants ExternalApplicant[]
 
   @@index([field])
   @@index([status])
@@ -641,6 +648,8 @@ model Organisation {
   applications        Application[]
   shortlists          Shortlist[]
   informationRequests InformationRequest[]
+  externalApplicants  ExternalApplicant[]
+  importBatches       ApplicationImportBatch[]
 }
 
 model CorporateProfile {
@@ -737,6 +746,8 @@ model FundingProgramme {
   applicationForms      ApplicationForm[]
   conflicts             SourceConflict[]
   motivationalLetters   MotivationalLetter[]
+  importBatches         ApplicationImportBatch[]
+  criterionWeights      ProgrammeCriterionWeight[]
 
   @@index([organisationId])
   @@index([status])
@@ -812,11 +823,18 @@ model ApplicationQuestion {
 // ===========================================================================
 
 model Application {
-  id                 String            @id @default(cuid())
-  studentProfileId   String
-  fundingProgrammeId String
-  organisationId     String
-  status             ApplicationStatus @default(DRAFT)
+  id                  String            @id @default(cuid())
+  /// Null for an application the organisation received elsewhere and imported:
+  /// there is no Bursary-Bridge student behind it unless one was identified.
+  studentProfileId    String?
+  /// Set instead when the applicant has no account here.
+  externalApplicantId String?
+  fundingProgrammeId  String
+  organisationId      String
+  status              ApplicationStatus @default(DRAFT)
+  /// Whether this arrived through Bursary-Bridge or was imported. Shown to
+  /// reviewers, so an imported application is never mistaken for a submission.
+  source              ApplicationSource @default(PLATFORM)
 
   // Snapshot of the match at submission time, so the score shown to the funder
   // is stable even if the student later edits their profile.
@@ -834,14 +852,18 @@ model Application {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  studentProfile      StudentProfile        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  fundingProgramme    FundingProgramme      @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
-  organisation        Organisation          @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  studentProfile      StudentProfile?        @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  externalApplicant   ExternalApplicant?     @relation(fields: [externalApplicantId], references: [id], onDelete: Cascade)
+  fundingProgramme    FundingProgramme       @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  organisation        Organisation           @relation(fields: [organisationId], references: [id], onDelete: Cascade)
   documents           ApplicationDocument[]
   informationRequests InformationRequest[]
   shortlist           Shortlist?
+  importFile          ApplicationImportFile?
 
   @@unique([studentProfileId, fundingProgrammeId])
+  @@index([externalApplicantId])
+  @@index([organisationId, source])
   @@index([fundingProgrammeId, status])
   @@index([organisationId, status])
   @@index([studentProfileId])
@@ -1558,4 +1580,254 @@ model InformationRequestItem {
 
   @@index([requestId])
   @@index([documentId])
+}
+
+// ===========================================================================
+// Bulk application intake
+//
+// An organisation that already receives applications by email must be able to
+// use everything this platform does — screening, scoring, shortlisting,
+// review — without first making every applicant re-apply here. A batch of
+// PDFs goes in; structured, scored, reviewable application records come out.
+//
+// Two rules shape the model. The original file is never replaced, only
+// accompanied: the extracted data, any reviewer correction, and the document
+// it came from all coexist, because a funding decision has to be auditable
+// back to what the applicant actually submitted. And nothing is guessed: a
+// field the reader was not confident about is stored with that confidence and
+// surfaced for review rather than quietly filled in.
+// ===========================================================================
+
+enum ApplicationSource {
+  /// Submitted by a student through Bursary-Bridge.
+  PLATFORM
+  /// Received by the organisation elsewhere and imported here.
+  EXTERNAL
+}
+
+enum ImportBatchStatus {
+  /// Files are still arriving from the browser.
+  UPLOADING
+  /// Reading and scoring the files that arrived.
+  EXTRACTING
+  /// Extraction finished; the reviewer decides what to import.
+  READY_FOR_REVIEW
+  IMPORTING
+  COMPLETED
+  FAILED
+}
+
+enum ImportFileStatus {
+  PENDING
+  PROCESSING
+  /// Read cleanly and ready to become an application.
+  READY
+  /// Read, but something needs a person: low confidence, or a missing field.
+  NEEDS_REVIEW
+  /// Could not be read at all. Kept, never discarded silently.
+  FAILED
+  /// Looks like an application already held. The reviewer decides.
+  DUPLICATE
+  IMPORTED
+  /// The reviewer chose to leave this one out of the import.
+  DISCARDED
+}
+
+enum IdentityResolution {
+  /// No Bursary-Bridge account matched, so an external applicant was created.
+  NONE
+  /// Matched an existing student on a verified identifier.
+  ID_NUMBER
+  EMAIL
+  /// Several accounts matched, or only the name did. Never merged on this.
+  AMBIGUOUS
+}
+
+/// One upload of many application forms, against one programme.
+model ApplicationImportBatch {
+  id                 String  @id @default(cuid())
+  organisationId     String
+  fundingProgrammeId String
+  createdById        String?
+
+  /// Human reference shown in the import history, e.g. "Batch #4".
+  reference String
+  status    ImportBatchStatus @default(UPLOADING)
+
+  /// Counters maintained as files are processed, so the progress a reviewer
+  /// sees is the real state of the batch rather than a client-side guess.
+  totalFiles     Int @default(0)
+  processedFiles Int @default(0)
+  readyCount     Int @default(0)
+  reviewCount    Int @default(0)
+  failedCount    Int @default(0)
+  duplicateCount Int @default(0)
+  importedCount  Int @default(0)
+
+  /// Set when the batch itself failed, as opposed to individual files.
+  failureReason String?
+
+  createdAt   DateTime  @default(now())
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  organisation     Organisation            @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  fundingProgramme FundingProgramme        @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+  createdBy        User?                   @relation("ImportCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  files            ApplicationImportFile[]
+
+  @@index([organisationId, createdAt])
+  @@index([fundingProgrammeId])
+  @@index([status])
+}
+
+/// One uploaded application form, and everything learned from it.
+model ApplicationImportFile {
+  id      String @id @default(cuid())
+  batchId String
+
+  fileName    String
+  storageKey  String @unique
+  sizeBytes   Int
+  contentType String
+
+  status        ImportFileStatus @default(PENDING)
+  /// Why it could not be read, in words a reviewer can act on.
+  failureReason String?
+
+  pageCount Int?
+  /// "acroform" when read from real form fields, "text-layout" when inferred
+  /// from the page's text. The two are not equally trustworthy and the
+  /// reviewer is told which was used.
+  method    String?
+
+  /// Identity resolution against existing Bursary-Bridge students (§25).
+  identity                IdentityResolution @default(NONE)
+  matchedStudentProfileId String?
+
+  /// Duplicate detection. Never acted on automatically.
+  duplicateOfFileId        String?
+  duplicateOfApplicationId String?
+  duplicateReason          String?
+
+  /// The scores, computed against this batch's programme and stored so the
+  /// review table can sort and filter without rescoring every row.
+  matchScore         Int?
+  eligibilityOutcome EligibilityOutcome?
+  matchReasons       Json?
+  /// How many of the programme's required documents were found.
+  documentsFound     Int                 @default(0)
+  documentsRequired  Int                 @default(0)
+
+  /// Set once the reviewer confirms the import.
+  applicationId String? @unique
+
+  createdAt   DateTime  @default(now())
+  processedAt DateTime?
+
+  batch           ApplicationImportBatch  @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  duplicateOfFile ApplicationImportFile?  @relation("DuplicateOf", fields: [duplicateOfFileId], references: [id], onDelete: SetNull)
+  duplicates      ApplicationImportFile[] @relation("DuplicateOf")
+  application     Application?            @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  fields          ImportExtractedField[]
+
+  @@index([batchId, status])
+  @@index([status])
+  @@index([matchedStudentProfileId])
+}
+
+/// One field read out of one uploaded form.
+model ImportExtractedField {
+  id     String @id @default(cuid())
+  fileId String
+
+  canonicalKey String
+  /// Normalised for use, e.g. an ISO date or a plain integer.
+  value        String
+  /// What the form literally said, kept so a correction can be judged against
+  /// the original wording rather than against our reading of it.
+  raw          String
+  confidence   AutoFillConfidence
+  kind         String
+
+  sourceFieldLabel String
+  sourcePage       Int?
+  method           String
+
+  /// A reviewer's correction. The extracted value is never overwritten — both
+  /// are kept, so the record shows what the form said and what a person
+  /// decided it meant.
+  correctedValue String?
+  correctedById  String?
+  correctedAt    DateTime?
+
+  file        ApplicationImportFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  correctedBy User?                 @relation("FieldCorrector", fields: [correctedById], references: [id], onDelete: SetNull)
+
+  @@unique([fileId, canonicalKey])
+  @@index([fileId])
+  @@index([confidence])
+}
+
+/// An applicant who applied to an organisation without a Bursary-Bridge
+/// account. Holds the structured data the application table filters and sorts
+/// on, so a programme with thousands of applicants stays queryable.
+model ExternalApplicant {
+  id             String @id @default(cuid())
+  organisationId String
+
+  fullName    String
+  firstName   String?
+  lastName    String?
+  email       String?
+  mobile      String?
+  /// Stored because funders deduplicate on it. Access is organisation-scoped
+  /// and every read of it is audited.
+  idNumber    String?
+  dateOfBirth DateTime?
+  citizenship Citizenship?
+
+  province Province?
+  city     String?
+
+  institutionName    String?
+  institutionId      String?
+  programmeName      String?
+  programmeId        String?
+  qualificationLevel QualificationLevel?
+  yearOfStudy        Int?
+  academicAverage    Int?
+
+  householdIncome IncomeBand?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organisation Organisation  @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+  institution  Institution?  @relation(fields: [institutionId], references: [id], onDelete: SetNull)
+  programme    Programme?    @relation(fields: [programmeId], references: [id], onDelete: SetNull)
+  applications Application[]
+
+  @@index([organisationId])
+  @@index([organisationId, idNumber])
+  @@index([organisationId, email])
+  @@index([institutionId])
+  @@index([programmeId])
+}
+
+/// Per-programme weighting for the matching criteria (§8).
+///
+/// Absent rows mean the platform defaults apply, so a funder who has not
+/// configured anything still gets a scored, explainable result.
+model ProgrammeCriterionWeight {
+  id                 String @id @default(cuid())
+  fundingProgrammeId String
+  /// A CriterionKey from lib/matching: course, institution, academic, …
+  criterion          String
+  weight             Int
+
+  fundingProgramme FundingProgramme @relation(fields: [fundingProgrammeId], references: [id], onDelete: Cascade)
+
+  @@unique([fundingProgrammeId, criterion])
+  @@index([fundingProgrammeId])
 }

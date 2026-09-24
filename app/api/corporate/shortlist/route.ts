@@ -97,6 +97,9 @@ export async function POST(request: NextRequest) {
   });
 
   for (const application of applications) {
+    // Imported applicants have no account here to be notified in. The
+    // shortlist itself is recorded either way.
+    if (!application.studentProfile) continue;
     await notify({
       userId: application.studentProfile.userId,
       type: 'APPLICATION_STATUS_CHANGED',

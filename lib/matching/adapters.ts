@@ -89,3 +89,44 @@ export function toMatchableStudent(profile: {
       })),
   };
 }
+
+/**
+ * An imported applicant, in the shape the engine scores.
+ *
+ * The same engine, the same criteria, the same explanations — an application
+ * that arrived as a PDF is judged exactly as one submitted here, which is the
+ * whole point of importing it rather than keeping it in a spreadsheet.
+ *
+ * Where the form did not state something, the field is null and the criterion
+ * comes back as unknown rather than failed. A funder is told "we could not
+ * check this" instead of the applicant being penalised for a question their
+ * form never asked.
+ */
+export function toMatchableExternalApplicant(applicant: {
+  programmeId: string | null;
+  institutionId: string | null;
+  qualificationLevel: MatchableStudent['qualificationLevel'];
+  academicAverage: number | null;
+  province: MatchableStudent['province'];
+  householdIncome: MatchableStudent['householdIncome'];
+  citizenship: MatchableStudent['citizenship'];
+  yearOfStudy: number | null;
+}): MatchableStudent {
+  return {
+    // An imported applicant applied to one programme; they have no ranked list
+    // of study preferences, so the course criterion reads their current course.
+    studyPreferences: [],
+    currentProgrammeId: applicant.programmeId,
+    currentInstitutionId: applicant.institutionId,
+    qualificationLevel: applicant.qualificationLevel,
+    academicAverage: applicant.academicAverage,
+    province: applicant.province,
+    householdIncome: applicant.householdIncome,
+    citizenship: applicant.citizenship,
+    yearOfStudy: applicant.yearOfStudy,
+    // Subject results are not read from an application form: a mark in a table
+    // on a PDF cannot be tied to a catalogue subject with enough confidence to
+    // score against a stated minimum.
+    subjectResults: [],
+  };
+}
