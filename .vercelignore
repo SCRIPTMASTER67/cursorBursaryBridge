@@ -1,0 +1,15 @@
+# Local environment files must never travel with the source. Next.js loads a
+# .env it finds in the build, so an uploaded one silently overrides the
+# project's own variables with a developer's machine settings.
+.env
+.env.*
+!.env.example
+
+# Uploaded documents from a local run.
+.uploads/
+
+# Note on what is NOT excluded: the test scripts and their fixtures stay.
+# `next build` typechecks every TypeScript file in the project, so dropping
+# scripts/fixtures/ breaks the build on the scripts that import from it --
+# "Cannot find module './fixtures/bursary-forms'" -- rather than saving
+# anything worth having.
