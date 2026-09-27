@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { resolveDatabaseUrl } from './database-url';
 
 /**
  * Server-side environment contract. Validated once at module load so a
@@ -31,7 +32,12 @@ const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
 });
 
-const parsed = schema.safeParse(process.env);
+// The connection may be injected under a platform-specific name, so it is
+// resolved before validation rather than being reported as missing.
+const parsed = schema.safeParse({
+  ...process.env,
+  DATABASE_URL: resolveDatabaseUrl() ?? process.env.DATABASE_URL,
+});
 
 if (!parsed.success) {
   const issues = parsed.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n');
