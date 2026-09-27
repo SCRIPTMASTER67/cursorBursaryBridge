@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Card, CardBody, useToast } from '@/components/ui';
 import { Spinner } from '@/components/icons';
 
@@ -24,12 +24,21 @@ type Status = {
  * nothing. When extraction finishes the page is refreshed so the server can
  * render the review table.
  */
+/**
+ * How many times the screen will pick a stalled batch back up on its own
+ * before asking. Each attempt covers one invocation's worth of reading, so
+ * this is generous enough for a large batch and still bounded, so a batch that
+ * cannot progress stops retrying instead of looping forever.
+ */
+const MAX_AUTO_RESUMES = 30;
+
 export function ImportProgress({ batchId, initial }: { batchId: string; initial: Status }) {
   const router = useRouter();
   const toast = useToast();
   const [state, setState] = useState(initial);
   const [resuming, setResuming] = useState(false);
   const [stalled, setStalled] = useState(false);
+  const autoResumes = useRef(0);
 
   useEffect(() => {
     if (state.status !== 'EXTRACTING' && state.status !== 'UPLOADING') return;
@@ -58,8 +67,21 @@ export function ImportProgress({ batchId, initial }: { batchId: string; initial:
       }
     }, 2000);
 
+    // Two minutes without a single file being read means the reader stopped.
+    // On a serverless platform that is ordinary rather than exceptional: the
+    // invocation is capped, so a large batch is cut off part way through and
+    // has to be picked up again. Making somebody click a button once a minute
+    // to finish one import is not a workflow, so the screen resumes itself and
+    // only asks for help if it is still stuck after many attempts -- at which
+    // point something is wrong that retrying will not fix.
     const stall = setTimeout(() => {
-      if (!cancelled) setStalled(true);
+      if (cancelled) return;
+      if (autoResumes.current >= MAX_AUTO_RESUMES) {
+        setStalled(true);
+        return;
+      }
+      autoResumes.current += 1;
+      void resume({ silent: true });
     }, 120_000);
 
     return () => {
@@ -69,17 +91,19 @@ export function ImportProgress({ batchId, initial }: { batchId: string; initial:
     };
   }, [batchId, state.status, state.processedFiles, router]);
 
-  async function resume() {
+  async function resume({ silent = false }: { silent?: boolean } = {}) {
     setResuming(true);
     const response = await fetch(`/api/corporate/imports/${batchId}/resume`, { method: 'POST' });
     const payload = await response.json().catch(() => ({}));
     setResuming(false);
     if (!response.ok) {
-      toast.push('error', payload.error ?? 'That import could not be resumed.');
+      // A batch that finished between the stall firing and this request is not
+      // a failure worth interrupting anybody over.
+      if (!silent) toast.push('error', payload.error ?? 'That import could not be resumed.');
       return;
     }
     setStalled(false);
-    toast.push('success', `Reading resumed on ${payload.pending} file(s).`);
+    if (!silent) toast.push('success', `Reading resumed on ${payload.pending} file(s).`);
   }
 
   const percent =

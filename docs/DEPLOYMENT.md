@@ -99,20 +99,25 @@ Port 587 negotiates TLS after connecting, so `SMTP_SECURE` stays `false` there;
 and the request continues — the in-application notification is already in the
 database, and losing the emailed copy must not roll back the record.
 
-**File storage.** `local` writes uploads to `LOCAL_STORAGE_DIR`, outside
-`public/`, served only through a route handler that checks who is asking. That
-is the only driver that works today.
+**File storage.** Three drivers, chosen by `STORAGE_DRIVER`.
 
-`STORAGE_DRIVER="s3"` is a seam, not an implementation: `lib/storage/s3.ts`
-throws on every call, and the four methods are waiting for
-`@aws-sdk/client-s3`. Do not set it — the upload will fail at runtime, not at
-startup.
+`local` writes uploads to `LOCAL_STORAGE_DIR`, outside `public/`, served only
+through a route handler that checks who is asking. Right for a single
+long-lived server; point it at a mounted volume, not a directory inside the
+checkout, or every document is lost on the next deploy.
 
-So uploads live on the machine's own disk, which has two consequences. Point
-`LOCAL_STORAGE_DIR` at a path that survives a redeploy — a mounted volume, not
-a directory inside the checkout — or every document uploaded is lost the next
-time you deploy. And two instances behind a load balancer will not see each
-other's files, so run one instance until the S3 driver is written.
+`blob` is Vercel Blob, and is what a serverless deployment needs — there the
+filesystem is read-only apart from a `/tmp` that belongs to one invocation, so
+a document written by one request is simply not there for the request that
+reads it back. Linking a Blob store to the project injects
+`BLOB_READ_WRITE_TOKEN` and no other configuration is needed. Objects are
+stored with Vercel Blob's only access mode, `public`, so the blob URL is
+unguessable but not access-controlled — it is therefore never given to a
+browser. `urlFor` still points at the application's own route, which checks
+the caller and streams the bytes.
+
+`s3` remains a seam whose four methods throw. Do not set it: the upload fails
+at runtime, not at startup.
 
 ---
 
@@ -285,6 +290,59 @@ npm run audit:production
 This refuses to pass if any user-visible record looks like sample data, and
 prints what the directory actually holds. It is the last check before you tell
 anybody the site is open.
+
+---
+
+## Deploying to Vercel instead
+
+The steps above stand up one long-lived server. Vercel is the other supported
+target, and needs three things the single-server path does not.
+
+**Storage must be `blob`.** See above — on serverless the local disk does not
+survive the invocation that wrote to it.
+
+**The database must be reachable from a serverless function**, which means a
+pooled connection string. Each invocation opens its own client, so an
+unpooled Postgres runs out of connections under very little load. Vercel
+Postgres and Neon both hand you a pooled URL; use that one for `DATABASE_URL`.
+
+**Reading happens inside the invocation.** Extraction is started by the upload
+request and kept alive past the response by `waitUntil`, bounded by the
+route's `maxDuration` — 60 seconds on Hobby, and asking for more there fails
+the deployment outright. A batch larger than that is cut short, which is
+ordinary rather than exceptional on this platform. Nothing is lost: each
+file's state is written as it is read, the progress screen notices two minutes
+without progress, and it resumes the unread remainder on its own, up to thirty
+times. A large batch therefore finishes in several passes instead of one.
+
+Setting it up:
+
+1. Import the repository at vercel.com and pick this branch.
+2. **Storage → Create → Blob**, linked to the project.
+3. **Storage → Create → Postgres** (or paste a Neon pooled URL).
+4. Set the environment variables:
+
+```ini
+DATABASE_URL="<the pooled connection string>"
+AUTH_SECRET="<64 hex characters>"
+NEXT_PUBLIC_APP_URL="https://your-domain"
+STORAGE_DRIVER="blob"
+EMAIL_DRIVER="console"
+ADMIN_EMAIL="you@example.ac.za"
+ADMIN_PASSWORD="<at least 12 characters>"
+```
+
+`vercel.json` points the build at `npm run vercel-build`, which applies the
+migrations, seeds the catalogue and the administrator, loads the bursary
+snapshot and then builds. All of it upserts, so every deploy repeats it
+harmlessly and there is no one-off command to run by hand.
+
+Two limits worth knowing before you choose this path. The rate limiter keeps
+its counters in memory, so on serverless each instance gets its own budget and
+the limit is weaker than it looks. And the ingestion pipeline (`npm run
+ingest`) honours a thirty-second crawl delay and runs for hours — it cannot
+run inside a function, so refresh the directory from a machine you control and
+let the snapshot carry it.
 
 ---
 

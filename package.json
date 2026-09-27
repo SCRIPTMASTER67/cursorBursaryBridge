@@ -46,13 +46,16 @@
     "test:import:ui": "tsx --conditions=react-server scripts/test-import-ui.ts",
     "smoke": "tsx --conditions=react-server scripts/smoke-routes.ts",
     "deploy:seed": "tsx prisma/seed.ts && tsx scripts/import-snapshot.ts",
-    "deploy:start": "prisma migrate deploy && (npm run deploy:seed || echo \"[deploy] reference data step skipped; the app still starts\") && next start"
+    "deploy:start": "prisma migrate deploy && (npm run deploy:seed || echo \"[deploy] reference data step skipped; the app still starts\") && next start",
+    "vercel-build": "prisma migrate deploy && npm run deploy:seed && npm run build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
+    "@vercel/blob": "^2.8.0",
+    "@vercel/functions": "^3.9.9",
     "bcryptjs": "^2.4.3",
     "cheerio": "^1.2.0",
     "clsx": "^2.1.1",

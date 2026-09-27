@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { apiCorporate, apiError, apiOk } from '@/lib/auth/api';
+import { runDetached } from '@/lib/background';
 import { audit } from '@/services/audit';
 import { createBatch, processBatch } from '@/services/application-import';
 import { MAX_ENTRIES, MAX_TOTAL_BYTES } from '@/lib/import/bundle';
@@ -14,6 +15,14 @@ import { MAX_ENTRIES, MAX_TOTAL_BYTES } from '@/lib/import/bundle';
  * browser or proxy will hold a request open, so the handler returns as soon as
  * the batch exists and the review screen follows its progress.
  */
+/**
+ * The reader runs inside this invocation, so it gets the longest slot the
+ * platform allows. 60 seconds is the ceiling on Vercel's Hobby plan and
+ * requesting more there fails the deployment; Pro allows 300. A batch that
+ * outlasts it is resumed rather than lost — see lib/background.ts.
+ */
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   const auth = await apiCorporate();
   if (!auth.ok) return auth.response;
@@ -71,9 +80,9 @@ export async function POST(request: NextRequest) {
 
   // Detached on purpose. A failure inside is recorded on the batch, which is
   // what the review screen reads, so it is never lost by being unobserved.
-  void processBatch(created.batchId).catch((error) => {
-    console.error('[import] processing failed', created.batchId, error);
-  });
+  // runDetached keeps the work alive past the response on a serverless
+  // platform, where a floating promise would be frozen mid-file instead.
+  runDetached(processBatch(created.batchId), `import ${created.batchId}`);
 
   return apiOk({ ok: true, batchId: created.batchId, reference: created.reference });
 }
