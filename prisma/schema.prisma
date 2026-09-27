@@ -12,7 +12,15 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // The connection the application uses. On a serverless platform this must be
+  // the POOLED one: every invocation opens its own client, so an unpooled
+  // database runs out of connections under very little load.
+  url       = env("DATABASE_URL")
+  // The connection migrations use. A pooler multiplexes statements across
+  // backends, which breaks the advisory locks and prepared statements
+  // `migrate deploy` relies on, so migrations go straight to the database.
+  // On a single server with no pooler this is simply the same value.
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 // ===========================================================================

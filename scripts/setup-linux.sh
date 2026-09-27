@@ -189,6 +189,11 @@ step 'Writing .env'
 tmp=$(mktemp)
 sed "s|^DATABASE_URL=.*|DATABASE_URL=\"postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME?schema=public\"|" .env > "$tmp" && mv "$tmp" .env
 
+# Migrations use DIRECT_DATABASE_URL. There is no pooler on a local machine,
+# so it is the same connection; it exists because a serverless host needs the
+# two to differ, and Prisma fails outright if the variable is missing.
+sed "s|^DIRECT_DATABASE_URL=.*|DIRECT_DATABASE_URL=\"postgresql://$DB_USER:$DB_PASSWORD@localhost:5432/$DB_NAME?schema=public\"|" .env > "$tmp" && mv "$tmp" .env
+
 secret=$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')
 [ -n "$secret" ] || die 'Could not generate AUTH_SECRET.'
 tmp=$(mktemp)
