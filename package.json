@@ -44,7 +44,9 @@
     "export:opportunities": "tsx scripts/export-opportunities.ts",
     "import:snapshot": "tsx scripts/import-snapshot.ts",
     "test:import:ui": "tsx --conditions=react-server scripts/test-import-ui.ts",
-    "smoke": "tsx --conditions=react-server scripts/smoke-routes.ts"
+    "smoke": "tsx --conditions=react-server scripts/smoke-routes.ts",
+    "deploy:seed": "tsx prisma/seed.ts && tsx scripts/import-snapshot.ts",
+    "deploy:start": "prisma migrate deploy && (npm run deploy:seed || echo \"[deploy] reference data step skipped; the app still starts\") && next start"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -99,22 +99,20 @@ Port 587 negotiates TLS after connecting, so `SMTP_SECURE` stays `false` there;
 and the request continues — the in-application notification is already in the
 database, and losing the emailed copy must not roll back the record.
 
-**File storage.** `local` writes uploads to `LOCAL_STORAGE_DIR` on the machine's
-own disk. That works for a single server; it does not survive a container being
-replaced, and two instances behind a load balancer will not see each other's
-files. For anything beyond one long-lived server:
+**File storage.** `local` writes uploads to `LOCAL_STORAGE_DIR`, outside
+`public/`, served only through a route handler that checks who is asking. That
+is the only driver that works today.
 
-```ini
-STORAGE_DRIVER="s3"
-S3_ENDPOINT="https://s3.af-south-1.amazonaws.com"
-S3_REGION="af-south-1"
-S3_BUCKET="bursarybridge-uploads"
-S3_ACCESS_KEY_ID="..."
-S3_SECRET_ACCESS_KEY="..."
-```
+`STORAGE_DRIVER="s3"` is a seam, not an implementation: `lib/storage/s3.ts`
+throws on every call, and the four methods are waiting for
+`@aws-sdk/client-s3`. Do not set it — the upload will fail at runtime, not at
+startup.
 
-The bucket must be private. Documents are served through the application, which
-checks who is asking; a public bucket bypasses that entirely.
+So uploads live on the machine's own disk, which has two consequences. Point
+`LOCAL_STORAGE_DIR` at a path that survives a redeploy — a mounted volume, not
+a directory inside the checkout — or every document uploaded is lost the next
+time you deploy. And two instances behind a load balancer will not see each
+other's files, so run one instance until the S3 driver is written.
 
 ---
 
