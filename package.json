@@ -47,7 +47,7 @@
     "smoke": "tsx --conditions=react-server scripts/smoke-routes.ts",
     "deploy:seed": "tsx prisma/seed.ts && tsx scripts/import-snapshot.ts",
     "deploy:start": "prisma migrate deploy && (npm run deploy:seed || echo \"[deploy] reference data step skipped; the app still starts\") && next start",
-    "vercel-build": "prisma migrate deploy && npm run deploy:seed && npm run build"
+    "vercel-build": "node scripts/vercel-build.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
