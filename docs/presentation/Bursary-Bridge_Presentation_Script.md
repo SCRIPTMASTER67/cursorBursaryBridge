@@ -3,9 +3,9 @@
 **Group 25** · Supervisor: Ms Zulu
 CPP Mchunu · A Nsibande · KN Bikile · SP Tshazi
 
-Measured length: **761 words**. 4:54 at a brisk 155 wpm, 5:14 at a normal 145 wpm.
+Measured length: **761 words**. 4:55 at a brisk 155 wpm, 5:15 at a normal 145 wpm.
 Sentences in `[square brackets]` are safe to drop live if you are running long —
-dropping all four brings it to 688 words, about 4:45.
+dropping all six brings it to 691 words, about 4:46.
 
 ---
 
@@ -166,9 +166,9 @@ who says it.
 | A Nsibande | Goal, Objectives, Methodology, Matching | 203 | 1:19 | 1:24 |
 | KN Bikile | System Functionality (student + funder) | 187 | 1:12 | 1:17 |
 | SP Tshazi | Document Processing, Testing, Value, Close | 199 | 1:17 | 1:22 |
-| **Total** | | **761** | **4:54** | **5:14** |
+| **Total** | | **761** | **4:55** | **5:15** |
 
-Dropping all four bracketed passages: **688 words → 4:26 / 4:45**.
+Dropping all six bracketed passages: **691 words → 4:27 / 4:46**.
 
 ---
 
