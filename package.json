@@ -39,6 +39,7 @@
     "screenshots": "tsx scripts/screenshots.ts",
     "ingest": "tsx --conditions=react-server scripts/ingest.ts",
     "make:test-forms": "tsx scripts/make-test-forms.ts",
+    "verify:demo-forms": "tsx --conditions=react-server scripts/verify-demo-forms.ts",
     "import:pages": "tsx --conditions=react-server scripts/import-pages.ts",
     "verify:opportunities": "tsx --conditions=react-server scripts/verify-opportunities.ts",
     "export:opportunities": "tsx scripts/export-opportunities.ts",
